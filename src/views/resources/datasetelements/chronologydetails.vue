@@ -8,7 +8,7 @@
   const error = ref(null)
 
   function loadChronology() {
-    return fetch("https://api.neotomadb.org/v2.0/data/datasets/" + props.datasetid +'/chronologies', 
+    return fetch(import.meta.env.VUE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + props.datasetid +'/chronologies', 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {

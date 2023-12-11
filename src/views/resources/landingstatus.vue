@@ -3,9 +3,11 @@
 import ProgressSpinner from 'primevue/progressspinner';
 import { ref, onMounted } from 'vue'
 import Panel from 'primevue/panel';
+import Card from 'primevue/card';
+import Badge from 'primevue/badge';
+import Button from 'primevue/button';
 
 const refs = ref({})
-const loading = ref(true)
 
 const loadStatus = new Promise (() => {
         fetch(import.meta.env.VUE_APP_APIDEV_ENDPOINT + '/v2.0/data/datasets/12', {
@@ -46,22 +48,30 @@ const loadStatus = new Promise (() => {
 </script>
 
 <template>
+  <div class="flex flex-wrap justify-content-center align-items-center">
   <Panel header="Neotoma Web Link Status & Reference">
     <div v-if="Object.keys(refs).sort().join() === ['api', 'apidev', 'explorer', 'tilia'].sort().join()">
-        <a href="https://api.neotomadb.org">Neotoma API</a> [<span v-if="refs.api === true" class="online">Online</span>
-                    <span v-else class="offline">Offline</span>];
-        <a href="https://apps.neotomadb.org/explorer">Explorer</a> [<span v-if="refs.explorer === true" class="online">Online</span>
-                <span v-else class="offline">Offline</span>];
-        <a href="https://apps.neotomadb.org/explorer">Tilia API</a> [<span v-if="refs.tilia === true" class="online">Online</span>
-                    <span v-else class="offline">Offline</span>]<br>
-        <a href="https://api-dev.neotomadb.org">Development API</a> [<span v-if="refs.apidev === true" class="online">Online</span>
-                <span v-else class="offline">Offline</span>]<hr style="margin-top:2px;margin-bottom:2px;">
-        <a href="https://open.neotomadb.org/dbschema">Database Schema</a> — <a href="https://open.neotomadb.org/dbschema">Database Manual</a>
+      <span class="p-buttonset">
+        <Button href="https://api.neotomadb.org">Neotoma API <Badge v-if="refs.api === true" severity="success">Online</Badge>
+                    <Badge v-else class="offline">Offline</Badge></Button>
+        <Button href="https://apps.neotomadb.org/explorer">Explorer <Badge v-if="refs.explorer === true" severity="success">Online</Badge>
+                <Badge v-else class="offline">Offline</Badge></Button>
+        <Button href="https://apps.neotomadb.org/explorer">Tilia API <Badge v-if="refs.tilia === true" severity="success">Online</Badge>
+                    <Badge v-else class="offline">Offline</Badge></Button>
+        <Button href="https://api-dev.neotomadb.org">Development API <Badge v-if="refs.apidev === true" severity="success">Online</Badge>
+                <Badge v-else class="offline">Offline</Badge></Button>
+      </span>
+      <Card>
+        <template #content>
+          <a href="https://open.neotomadb.org/dbschema" class="p-button">Database Schema</a> <a href="https://open.neotomadb.org/dbschema" class="p-button">Database Manual</a>
+        </template>
+      </Card>
     </div>
-    <div v-else>
-        <ProgressSpinner />
+    <div v-else class="flex flex-wrap justify-content-center align-items-center">
+        <ProgressSpinner  class="flex-grow-1 w-max" />
     </div>
 </Panel>
+</div>
 </template>
 
 <script>

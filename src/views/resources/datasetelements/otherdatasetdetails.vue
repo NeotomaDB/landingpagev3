@@ -9,7 +9,7 @@
   const error = ref(null)
 
   function loadOtherDatasets() {
-    return fetch("https://api.neotomadb.org/v2.0/data/sites/" + props.siteid + '/datasets', 
+    return fetch(import.meta.env.VUE_APP_API_ENDPOINT + "/v2.0/data/sites/" + props.siteid + '/datasets', 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {

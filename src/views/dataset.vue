@@ -12,7 +12,7 @@
   const error = ref(null)
   
   function loadDataset() {
-    return fetch("https://api.neotomadb.org/v2.0/data/datasets/" + route.params.datasetid, 
+    return fetch(import.meta.env.VUE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + route.params.datasetid, 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {
