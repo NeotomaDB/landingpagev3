@@ -1,3 +1,8 @@
+#app {
+    max-width:1000px;
+    margin: 0 auto;
+  }
+
 :root {
     --surface-a: #ffffff;
     --surface-b: #f8f9fa;
