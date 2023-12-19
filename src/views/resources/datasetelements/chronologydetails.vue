@@ -8,7 +8,7 @@
   const error = ref(null)
 
   function loadChronology() {
-    return fetch(import.meta.env.VUE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + props.datasetid +'/chronologies', 
+    return fetch(import.meta.env.VITE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + props.datasetid +'/chronologies', 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {
@@ -52,11 +52,11 @@ onMounted(() => {
                   <h3>{{ chron.chronology.chronologyName }}</h3>
                 </template>
                 <template #content>
-                  chronid: {{ chron.chronology.chronologyid }}<br>
-                  prepared: {{ chron.chronology.datePrepared }}<br>
-                  control dates: {{ chron.chronology.controls.length }} <br>
-                  reliable age range: {{ chron.chronology.reliableagespan.younger }} - {{ chron.chronology.reliableagespan.older }} {{ chron.chronology.agetype }}<br>
-                  model basis: {{ chron.chronology.modelType }}
+                  <strong>Chronology ID:</strong> {{ chron.chronology.chronologyid }}<br>
+                  <strong>Date Prepared:</strong> {{ chron.chronology.datePrepared }}<br>
+                  <strong>Chronological Controls Used:</strong> {{ chron.chronology.controls.length }} <br>
+                  <strong>Reliable Age Range:</strong> {{ chron.chronology.reliableagespan.younger }} - {{ chron.chronology.reliableagespan.older }} {{ chron.chronology.agetype }}<br>
+                  <strong>Model Basis:</strong> {{ chron.chronology.modelType }}
                 
                 </template>
               </Card>

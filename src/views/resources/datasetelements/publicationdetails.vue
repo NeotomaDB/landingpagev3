@@ -9,7 +9,7 @@
   const error = ref(null)
 
   function loadPublication() {
-    return fetch(import.meta.env.VUE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + props.datasetid +'/publications', 
+    return fetch(import.meta.env.VITE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + props.datasetid +'/publications', 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {

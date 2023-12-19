@@ -1,7 +1,6 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import LandingPageHeader from "@/views/resources/header.vue"
-  import LandingPageFooter from '@/views/resources/footer.vue'
+  import Panel from 'primevue/panel'
   import DatasetStatistics from '@/views/neotomastats.vue'
 
 
@@ -17,15 +16,17 @@
 </script>
 
 <template>
-  <div>
+      <panel>
+        <template #header>
+          <h1>Neotoma Paleoecology Landing Pages</h1>
+        </template>
       <img :src=imageref style="width:100%">
-      <h1>Neotoma Paleoecology Landing Pages</h1>
       <p>This site is a resource for obtaining extended metadata about Neotoma resources. These landing pages also serve as a platform for DOI resolution.</p>
       <p>To access information about an individual Neotoma Dataset include the dataset ID in the URL: <strong>https://data.neotomadb.org/{DatasetID}</strong>, for example, the dataset for the <em>Lake Tulane Loss on Ignition dataset</em> can be found at <router-link to="/datasets/2662">https://data.neotomadb.org/2662</router-link>.</p>
       <p><strong>NOTE:</strong> This page is informational and will not directly lead to datasets. To explore Neotoma datasets interactively please use the <a href="https://apps.neotomadb.org/Explorer">Neotoma Explorer</a>.</p>
       <p>This application is managed and maintained as an open-source project on the <a href="https://github.com/NeotomaDB/landingpagev3">Neotoma GitHub Repository</a>.</p>
-  </div>
-  <DatasetStatistics />
+      <DatasetStatistics />
+      </panel>
 </template>
 
 <script>

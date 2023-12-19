@@ -12,12 +12,12 @@
   const error = ref(null)
   
   function loadDataset() {
-    return fetch(import.meta.env.VUE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + route.params.datasetid, 
+    return fetch(import.meta.env.VITE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + route.params.datasetid, 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {
             const error = new Error(res.statusText)
-            error.json = res.json()
+            error.json = {'error': res.json(), 'datasetid':route.params.datasetid}
             throw error;
           }
           return res.json()
