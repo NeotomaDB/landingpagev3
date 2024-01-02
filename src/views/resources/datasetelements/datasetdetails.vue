@@ -1,13 +1,14 @@
 <script setup>
-  // import SiteMap from "@/views/resources/mapsite.vue"
   import Panel from 'primevue/panel';
   import Card from 'primevue/card';
   import ChronDetails from "@/views/resources/datasetelements/chronologydetails.vue"
+  import TaxaDetails from "@/views/resources/datasetelements/taxaLoad.vue"
   import PublicationsDetails from "@/views/resources/datasetelements/publicationdetails.vue"
   import OtherDetails from "@/views/resources/datasetelements/otherdatasetdetails.vue"
   const props = defineProps(['title'])
   let dstype = props.title.site.datasets[0].datasettype[0].toUpperCase() +
     props.title.site.datasets[0].datasettype.slice(1)
+
 </script>
 
 <template>
@@ -40,8 +41,8 @@
         </div>
         <div v-else>None Reported</div>
       </div>
+      <TaxaDetails />
     </Panel>  
-    
     
     <ChronDetails :datasetid="props.title.site.datasets[0].datasetid"/>
     <PublicationsDetails :datasetid="props.title.site.datasets[0].datasetid"/>

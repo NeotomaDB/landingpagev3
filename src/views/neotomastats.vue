@@ -7,8 +7,14 @@
     const rawstats = ref(null)
     const loaderror = ref(null)
     const visible = ref(false)
-    const today = new Date().toLocaleString()
-    fetch(import.meta.env.VUE_APP_API_ENDPOINT + '/v2.0/data/summary/rawbymonth?end=999999')
+    const today = new Date().toLocaleString() 
+    fetch(import.meta.env.VITE_APP_API_ENDPOINT + '/v2.0/data/summary/rawbymonth?end=999999',
+    { method: "GET",
+      headers: {
+      "Content-Type": "application/json",
+      "User-Agent": "ndb landing pages",
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    }})
         .then(response => response.json())
         .then(data => rawstats.value = data['data']['data'][0])
         .catch(err => {

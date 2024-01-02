@@ -1,38 +1,74 @@
 <script setup>
-  import {ref} from "vue"
-  import { geoJson } from "leaflet"
-  import { LMap, LGeoJson, LTileLayer } from "@vue-leaflet/vue-leaflet";
-  const props = defineProps(['location'])
-  let object = JSON.parse(props.location)
-  let zoom = 10
-  let center = geoJson({ "type": "Polygon", "coordinates": [ [ -112.14744, 36.3709 ], [ -112.14691, 36.3709 ], [ -112.14691, 36.37135 ], [ -112.14744, 36.37135 ], [ -112.14744, 36.3709 ] ] } )
+import { ref } from 'vue'
 
+let props = defineProps(['location'])
+var location = JSON.parse(props.location)
+delete location.crs
+const projection = ref('EPSG:4326')
+const zoom = ref(9)
+const rotation = ref(0)
+
+function centerMap(location) {
+  if (Array.isArray(location.coordinates.flat()[0])) {
+    return location.coordinates.flat()[0]
+  } else {
+    return location.coordinates
+  }
+}
 </script>
 
 <template>
-    <div v-if="props.location">
-        {{ center }}
-      <div id="sitemap" style="height:30vh; width:30vh">
-        <l-map ref="map" 
-                v-model:zoom="zoom"
-                :useGlobalLeaflet="false"
-                v-model:center="center">
-          <l-tile-layer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        layer-type="base"
-                        name="Stadia Maps Basemap"></l-tile-layer>
-          <l-geo-json :geojson="center"></l-geo-json>
-        </l-map>
-      </div>
+  <div v-if="location">
+    <div id="sitemap" style="outline-width: 1px">
+      <ol-map
+        :loadTilesWhileAnimating="true"
+        :loadTilesWhileInteracting="true"
+        style="height: 200px"
+      >
+        <ol-view
+          ref="view"
+          :center="centerMap(location)"
+          :rotation="rotation"
+          :zoom="zoom"
+          :projection="projection"
+        />
+        <ol-tile-layer>
+          <ol-source-stadia-maps layer="stamen_terrain" />
+        </ol-tile-layer>
+        <ol-vector-layer>
+          <ol-source-vector v-if="Array.isArray(location.coordinates.flat()[0])">
+            <ol-feature >
+              <ol-geom-polygon :coordinates="location.coordinates"></ol-geom-polygon>
+              <ol-style>
+                <ol-style-stroke color="rgba(0,0,0,0.8)" width="2"></ol-style-stroke>
+                <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
+              </ol-style>
+            </ol-feature>
+            </ol-source-vector>
+            <ol-source-vector v-else>
+            <ol-feature>
+              <ol-geom-point :coordinates="location.coordinates"></ol-geom-point>
+              <ol-style>
+                <ol-style-circle radius="12">
+                  <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
+                  <ol-style-stroke color="rgba(0,0,0,0.8)" width="6"></ol-style-stroke>
+                </ol-style-circle>
+              </ol-style>
+            </ol-feature>
+          </ol-source-vector>
+        </ol-vector-layer>
+      </ol-map>
     </div>
+  </div>
 </template>
 
 <script>
-  export default {
-    name: 'SiteMap',
-    data () {
-      return {
-        msg: 'Sitemap element has rendered.'
-      }
+export default {
+  name: 'SiteMap',
+  data() {
+    return {
+      msg: 'Sitemap element has rendered.'
     }
   }
+}
 </script>
