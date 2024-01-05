@@ -10,9 +10,10 @@
   const datasetinfo = ref(null)
   const loading = ref(true)
   const error = ref(null)
-  
+  const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+
   function loadDataset() {
-    return fetch(import.meta.env.VITE_APP_API_ENDPOINT + "/v2.0/data/datasets/" + route.params.datasetid, 
+    return fetch(neotomaapi + "/v2.0/data/datasets/" + route.params.datasetid, 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {

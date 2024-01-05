@@ -7,9 +7,10 @@
   let otherDatasets = ref(null)
   let loading = ref(true)
   const error = ref(null)
+  const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
   function loadOtherDatasets() {
-    return fetch(import.meta.env.VITE_APP_API_ENDPOINT + "/v2.0/data/sites/" + props.siteid + '/datasets', 
+    return fetch(neotomaapi + "/v2.0/data/sites/" + props.siteid + '/datasets', 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {

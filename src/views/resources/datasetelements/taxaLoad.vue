@@ -13,9 +13,12 @@ const loading = ref(true)
 const error = ref(null)
 const visible = ref(false)
 
+const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+
+
 function callTaxa() {
   return fetch(
-    import.meta.env.VITE_APP_API_ENDPOINT +
+    neotomaapi +
       '/v2.0/data/datasets/' +
       route.params.datasetid +
       '/taxa',
