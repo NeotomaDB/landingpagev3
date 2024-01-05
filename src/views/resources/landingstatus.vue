@@ -1,56 +1,97 @@
 <script setup>
 import ProgressSpinner from 'primevue/progressspinner'
 import { ref, onMounted } from 'vue'
-import Panel from 'primevue/panel'
+import Card from 'primevue/card'
 import Badge from 'primevue/badge'
 
 const refs = ref({})
 
+const controller = new AbortController()
+const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+const apidev = import.meta.env.VITE_APP_APIDEV_ENDPOINT ?? 'https://api-dev.neotomadb.org'
+const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+const tiliaapi = import.meta.env.VITE_APP_TILIA_ENDPOINT ?? 'http://tilia.neotomadb.org'
+
 const loadStatus = new Promise(() => {
-  fetch(import.meta.env.VITE_APP_APIDEV_ENDPOINT + '/api-docs/', {
+  fetch(apidev + '/api-docs/', {
     method: 'HEAD',
-    mode: 'no-cors'
+    mode: 'no-cors',
+    signal: controller.signal
   })
     .then((response) => {
       refs.value['apidev'] = {
         name: 'Development API',
         status: response.status === 200,
-        url: import.meta.env.VITE_APP_APIDEV_ENDPOINT + '/api-docs/'
+        url: apidev + '/api-docs/'
       }
     })
-    .catch((err) => console.log(err))
+    .catch((err) => {
+      refs.value['apidev'] = {
+        name: 'Development API',
+        status: false,
+        url: apidev + '/api-docs/'
+      }
+      console.log(err)
+    })
 
-  fetch(import.meta.env.VITE_APP_API_ENDPOINT + '/api-docs/', {
-    method: 'HEAD'
+  fetch(neotomaapi + '/api-docs/', {
+    method: 'HEAD',
+    signal: controller.signal
   })
     .then((response) => {
       refs.value['api'] = {
         name: 'Neotoma API',
         status: response.status === 200,
-        url: import.meta.env.VITE_APP_API_ENDPOINT + '/api-docs/'
+        url: neotomaapi + '/api-docs/'
       }
     })
-    .catch((err) => console.log(err))
+    .catch((err) => {
+      refs.value['api'] = {
+        name: 'Neotoma API',
+        status: false,
+        url: neotomaapi + '/api-docs/'
+      }
+      console.log(err)})
 
-  fetch('https://apps.neotomadb.org/explorer', { mode: 'no-cors', method: 'HEAD' })
+  fetch('https://apps.neotomadb.org/explorer', {
+    mode: 'no-cors', 
+    method: 'HEAD',
+    signal: controller.signal })
     .then((response) => {
       refs.value['explorer'] = {
         name: 'Neotoma Explorer',
-        status: response.status === 0,
+        status: response.status === 200,
         url: 'https://apps.neotomadb.org/explorer'
       }
     })
-    .catch((err) => console.log(err))
+    .catch((err) => {
+      refs.value['explorer'] = {
+        name: 'Neotoma Explorer',
+        status: false,
+        url: 'https://apps.neotomadb.org/explorer'
+      }
+      console.log(err)
+    })
 
-  fetch(import.meta.env.VITE_APP_TILIA_ENDPOINT + '/api', { method: 'HEAD' })
+  fetch(tiliaapi + '/api', {
+    method: 'HEAD',
+    signal: controller.signal })
     .then((response) => {
       refs.value['tilia'] = {
         name: 'Tilia API',
         status: response.status === 200,
-        url: import.meta.env.VITE_APP_TILIA_ENDPOINT + '/api'
+        url: tiliaapi + '/api'
       }
     })
-    .catch((err) => console.log(err))
+    .catch((err) => {
+      refs.value['tilia'] = {
+        name: 'Tilia API',
+        status: false,
+        url: tiliaapi + '/api'}
+      
+      console.log('tilia' + err)
+    })
   return null
 })
 
@@ -60,7 +101,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <Panel header="Neotoma Web Link Status & Reference">
+  <Card header="Neotoma Web Link Status & Reference">
+  <template #content>
     <div
       v-if="
         Object.keys(refs).sort().join() === ['api', 'apidev', 'explorer', 'tilia'].sort().join()
@@ -70,7 +112,7 @@ onMounted(() => {
         <div class="col-4 p-3">
           <div v-for="endpoint in refs" class="row p-1 text-center">
             <a
-              href="https://api.neotomadb.org"
+              :href="refs.url"
               class="p-button"
               style="width: 100%; background: #5D584B"
               target="_blank"
@@ -118,7 +160,8 @@ onMounted(() => {
     <div v-else class="flex flex-wrap justify-content-center align-items-center">
       <ProgressSpinner class="flex-grow-1 w-max" />
     </div>
-  </Panel>
+  </template>
+  </Card>
 </template>
 
 <script>
