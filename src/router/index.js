@@ -3,6 +3,7 @@ import EmptyPage from "@/views/emptypage.vue"
 import PageNotFound from "@/views/pagenotfound.vue"
 import Taxa from "@/views/taxa.vue"
 import Dataset from "@/views/dataset.vue"
+import Database from "@/views/database.vue"
 
 const routes = [
   {
@@ -24,7 +25,12 @@ const routes = [
     path: '/:datasetid',
     name: "Dataset",
     component: Dataset,
-  },
+    },
+    {
+        path: "/database/:databaseid",
+        name: "Database",
+        component: Database,
+    }
 ]
 
 const router = createRouter({
