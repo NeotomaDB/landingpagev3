@@ -32,3 +32,5 @@ playwright-report/
 
 .env
 .vscode/
+*.vsidx
+.vs/
