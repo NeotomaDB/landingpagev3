@@ -6,7 +6,7 @@
   import Card from 'primevue/card'
   const route = useRoute()
   const projection = ref('EPSG:4326')
-  const zoom = ref(2)
+  const zoom = ref(4)
   const rotation = ref(0)
 
 
@@ -15,12 +15,13 @@
   const databasename = ref(null)
   const currentDB = ref(null)
   const modinfo = new Array()
-  const removeEmptyValues = new Array()
+  const nativeland= ref(null)
   var location = ref(null)
 
   const loading = ref(true)
   const error = ref(null)
   const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+  const nativelandapi = 'https://native-land.ca/wp-json/nativeland'
 
   function loadDatabase() {
     return  fetch(neotomaapi + "/v1.5/dbtables/constituentdatabases/",
@@ -80,11 +81,23 @@ function centerMap(location) {
     return location.coordinates
   }
 }
+
+async function callnativeland() {
+  try {
+  const response = await fetch('https://native-land.ca/wp-json/nativeland/v1/api/index.php?maps=territories',
+  { method: "GET", headers: {'content-type': 'application/json'}});
+  const data = await response.json();
+  nativeland.value = data
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
  
     
 onMounted(() => {
 
     loadDatabase()
+    callnativeland()
     
   
 })
@@ -92,17 +105,13 @@ onMounted(() => {
 
 <template>
     <div v-if="!loading">
-
-      <!--<div v-for="(loc, index) in databaseinfo" v-bind:key="loc.id">
-
-      <p>{{index}}{{ loc }}</p>
-    </div> -->
-      <p>{{ modinfo.filter(e => e).length}}</p><br>
+      <p>{{modinfo.filter(e => e)[12].coordinates.flat()[0]}}</p>
+         
       <Panel toggleable collapsed>
       <template #header>
         <h2>About {{databasename}}</h2>
       </template>
-        <p> There are {{databaseinfo.length}} sites returned by the original call. Not all of them are distinct, I think...</p>
+        <p> There are {{databaseinfo.length}} sites returned by the original call. Not all of them are necessarily distinct, I think...</p>
         <div v-for="(value, name, index) in currentDB" :key="name.id">
           <p> {{ name }}: {{ value }}</p>
         </div>
@@ -138,10 +147,12 @@ onMounted(() => {
               <ol-vector-layer>
                 <ol-source-vector v-if="Array.isArray(location.coordinates.flat()[0])">
                   <ol-feature >
-                    <ol-geom-polygon :coordinates="location.coordinates"></ol-geom-polygon>
+                    <ol-geom-point :coordinates="location.coordinates.flat()[0]"></ol-geom-point>
                     <ol-style>
-                      <ol-style-stroke color="rgba(0,0,0,0.8)" width="2"></ol-style-stroke>
-                      <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
+                      <ol-style-circle radius="6">
+                        <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
+                        <ol-style-stroke color="rgba(0,0,0,0.8)" width="6"></ol-style-stroke>
+                      </ol-style-circle>
                     </ol-style>
                   </ol-feature>
                   </ol-source-vector>
@@ -149,7 +160,7 @@ onMounted(() => {
                   <ol-feature>
                     <ol-geom-point :coordinates="location.coordinates"></ol-geom-point>
                     <ol-style>
-                      <ol-style-circle radius="12">
+                      <ol-style-circle radius="6">
                         <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
                         <ol-style-stroke color="rgba(0,0,0,0.8)" width="6"></ol-style-stroke>
                       </ol-style-circle>
@@ -191,6 +202,49 @@ onMounted(() => {
         <template #header>
           <h2>Native Lands</h2>
         </template>
+        
+ <div id="nativelandmap" style="outline-width: 1px">
+        <ol-map
+          :loadTilesWhileAnimating="true"
+          :loadTilesWhileInteracting="true"
+          style="height: 200px"
+        >
+          <ol-view
+            ref="view"
+            :center="centerMap(location)"
+            :rotation="rotation"
+            :zoom=4
+            :projection="projection"
+          />
+          <ol-tile-layer>
+            <ol-source-stadia-maps layer="stamen_terrain" />
+          </ol-tile-layer>
+            <div v-for="location in nativeland" :key = "location">
+              <ol-vector-layer>
+                <ol-source-vector v-if="location.geometry.coordinates.length == 1">
+                  <ol-feature >
+                    <ol-geom-polygon :coordinates="location.geometry.coordinates"></ol-geom-polygon>
+                    <ol-style>
+                      <ol-style-stroke color="rgba(0,0,0,0.8)" width="2"></ol-style-stroke>
+                      <ol-style-fill color="rgba(127,17,224,0.2)"></ol-style-fill>
+                    </ol-style>
+                  </ol-feature>
+                  </ol-source-vector>
+                  <ol-source-vector v-else> 
+                 <div v-for="loc in location.geometry.coordinates" :key="loc.value">
+                      <ol-feature >
+                      <ol-geom-polygon :coordinates="loc"></ol-geom-polygon>
+                      <ol-style>
+                        <ol-style-stroke color="rgba(0,0,0,0.8)" width="2"></ol-style-stroke>
+                        <ol-style-fill color="rgba(127,17,224,0.2)"></ol-style-fill>
+                      </ol-style>
+                    </ol-feature>
+                  </div> 
+                </ol-source-vector>
+              </ol-vector-layer>
+            </div>
+        </ol-map>
+      </div> 
         <p>functions here would use the native-land API</p>
       </Panel>
 
