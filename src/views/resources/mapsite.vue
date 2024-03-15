@@ -7,6 +7,8 @@ delete location.crs
 const projection = ref('EPSG:4326')
 const zoom = ref(9)
 const rotation = ref(0)
+const newlong = ref(0)
+const newlat = ref(0)
 
 function centerMap(location) {
   if (Array.isArray(location.coordinates.flat()[0])) {
@@ -15,6 +17,13 @@ function centerMap(location) {
     return location.coordinates
   }
 }
+
+
+if(Array.isArray(location.coordinates.flat()[0])) {
+  newlat.value = (location.coordinates.flat()[0][1] + location.coordinates.flat()[2][1])/2
+  newlong.value = (location.coordinates.flat()[1][0] + location.coordinates.flat()[0][0])/2
+  }
+
 </script>
 
 <template>
@@ -38,10 +47,12 @@ function centerMap(location) {
         <ol-vector-layer>
           <ol-source-vector v-if="Array.isArray(location.coordinates.flat()[0])">
             <ol-feature >
-              <ol-geom-polygon :coordinates="location.coordinates"></ol-geom-polygon>
+              <ol-geom-point :coordinates="[newlong,newlat]"></ol-geom-point>
               <ol-style>
-                <ol-style-stroke color="rgba(0,0,0,0.8)" width="2"></ol-style-stroke>
-                <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
+                <ol-style-circle radius="12">
+                  <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
+                  <ol-style-stroke color="rgba(0,0,0,0.8)" width="6"></ol-style-stroke>
+                </ol-style-circle>
               </ol-style>
             </ol-feature>
             </ol-source-vector>
