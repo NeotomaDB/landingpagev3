@@ -4,6 +4,7 @@ import PageNotFound from "@/views/pagenotfound.vue"
 import Taxa from "@/views/taxa.vue"
 import Dataset from "@/views/dataset.vue"
 import Database from "@/views/database.vue"
+import Testmap from "@/views/testmap.vue"
 
 const routes = [
   {
@@ -30,7 +31,11 @@ const routes = [
         path: "/database/:databaseid",
         name: "Database",
         component: Database,
-    }
+    },
+    {path: "/testmap/",
+    name: "Testmap",
+    component: Testmap,
+  }
 ]
 
 const router = createRouter({
