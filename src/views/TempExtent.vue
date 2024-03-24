@@ -16,7 +16,7 @@ const props = defineProps(['title'])
 
 allAgerange.value = props.title.flatMap(site =>
           site.site.datasets.flatMap(dataset =>
-          dataset.agerange.map(agerange => agerange)))
+          dataset.agerange[0]))
           
 allAgerange.value = allAgerange.value.filter(agerange => agerange.ageold !== null);
 allAgerange.value = allAgerange.value.sort((a, b) => a.ageold - b.ageold);

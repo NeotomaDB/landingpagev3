@@ -76,25 +76,11 @@ function count() {
 }
 
 
-//allAgerange.value = {datasets: allAgerange.value.map(agerange => ({
-//        data: [
-//          {y: agerange.index, x: agerange.ageyoung },
-//          {y: agerange.index, x:agerange.ageold}
-//        ],
-//        borderWidth: 1,
-//        borderColor: "darkblue",
-//        showLine: true,
-//        pointRadius: 0
-//      }))}
-
-
-//const chartData = allAgerange.value;
 
 
 
 onMounted(async () => {
     await downloadDatasets();
-  //  await count();
     let count = 0;
     const dateCounts = {};
     filteredDatasets.value.forEach(date => {
@@ -112,19 +98,16 @@ onMounted(async () => {
     cumulativeData.value = [];
     let cumulativeValue = 0;
     Object.entries(dateCounts).forEach(([date, value]) => {
-       // const date = Object.keys(entry)[0];
-       // const value = entry[date];
-
         cumulativeValue += value;
         cumulativeData.value.push({ date, value: cumulativeValue });
         console.log(date)
     });
 
     const dates = cumulativeData.value.map(entry => new Date(entry.date));
-    const numdates = dates.map(entry => entry.getFullYear() + (entry.getMonth()-1)/12 + (entry.getDate()-1)/365)
+    const numdates = dates.map(entry => entry.getFullYear() + (entry.getMonth())/12 + (entry.getDate())/365)
     const values = cumulativeData.value.map(entry => entry.value);
     const chartData = cumulativeData.value.map(({ date,value }) => ({
-    x: new Date(date).getFullYear() + (new Date(date).getMonth()-1)/12 + (new Date(date).getDate()-1)/365,
+    x: new Date(date).getFullYear() + (new Date(date).getMonth())/12 + (new Date(date).getDate())/365,
     y: value
 }));
     console.log(chartData)
@@ -132,6 +115,7 @@ onMounted(async () => {
     const myChart = new Chart(chartCanvas.value, {
         type: 'scatter',
        data: {
+       // labels: cumulativeData.value.map(entry => entry.date),
         datasets: [{
             data: chartData,
             borderColor: 'darkblue',
@@ -143,6 +127,15 @@ onMounted(async () => {
       options: {
       scales: {
         x: {
+            ticks: {
+                callback: function(value,index,values) {
+                var test = cumulativeData.value.map(entry => entry.date)[index]
+                var year = Math.floor(value);
+                var decimal = value - Math.floor(value);
+                var month = Math.floor(decimal*12)  + 1
+                var day = Math.round((decimal*12 - Math.floor(decimal*12))*30) + 1
+                return  "" + month + "/" + day + "/" + year}
+            },
             title: {
                 display: true,
                 text: 'Date Contributed' 
