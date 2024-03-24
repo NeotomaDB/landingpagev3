@@ -1,252 +1,185 @@
 <script setup>
+  import TempExtent from '@/views/TempExtent.vue';
+  import DatabaseMap from '@/views/DatabaseMap.vue';
+  import UploadsTime from '@/views/UploadsTime.vue';
   import { ref, onMounted } from 'vue'
   import { useRoute } from 'vue-router'
   import ProgressSpinner from 'primevue/progressspinner'
   import Panel from 'primevue/panel'
-  import Card from 'primevue/card'
+  import DataTable from 'primevue/datatable';
+  import InputText from 'primevue/inputtext';
+  import Column from 'primevue/column';
+
+
+  const datasetids = ref(0)
   const route = useRoute()
-  const projection = ref('EPSG:4326')
-  const zoom = ref(4)
-  const rotation = ref(0)
-
-
+  const contact = ref(0)
+  const contactinfo = ref(0)
+  const filters = ref({name: { value: '', keys: ['name'] }});
   const databaseinfo = ref(null)
+  const datasets = ref(null)
+  const pis = ref(null)
+  const pis_array = ref(null)
+  const datasets_array = ref(null)
+  const uniqueSites = ref(null)
   const databasekeys = ref(null)
   const databasename = ref(null)
   const currentDB = ref(null)
-  const modinfo = new Array()
-  const nativeland= ref(null)
-  var location = ref(null)
-
   const loading = ref(true)
-  const error = ref(null)
   const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
-  const nativelandapi = 'https://native-land.ca/wp-json/nativeland'
+
 
   function loadDatabase() {
-    return  fetch(neotomaapi + "/v1.5/dbtables/constituentdatabases/",
+    return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
       { method: "GET", headers: {'content-type': 'application/json'}})
-      .then(res1 => {
-        return res1.json()
-      })
-      .then(json1 => {
-          databasekeys.value = json1.data  
-          currentDB.value = databasekeys.value.find(element => element.databaseid === Number(route.params.databaseid))
-          databasename.value = currentDB.value.databasename
-          return databasename.value
-      })
-      .then(val => fetch(neotomaapi + "/v2.0/data/datasets/db?limit=10000&offset=0&database=" +val,
+    .then(res1 => {
+      return res1.json()})
+    .then(json1 => {
+      databasekeys.value = json1.data  
+      currentDB.value = databasekeys.value.find(element => element.databaseid === Number(route.params.databaseid))
+         
+      databasename.value = currentDB.value.databasename
+      return databasename.value})
+    .then(val => fetch(neotomaapi + "/v2.0/data/datasets/db?limit=10000&offset=0&database=" +val,
       { method: "GET", headers: {'content-type': 'application/json'}}))
-        .then(res => {
-          if (!res.ok) {
-            const error = new Error(res.statusText)
-            error.json = {'error': res.json(), 'databaseid':route.params.databaseid}
-            throw error;
-          }
-          return res.json()
-        })
-        .then(json => {
-          databaseinfo.value = json.data
-          loading.value = false
-          location.value = databaseinfo.value[0].site.geography
-          location.value = JSON.parse(location.value)
-          delete location.value.crs
-          for (let i = 0; i < databaseinfo.value.length; i++) {
-            if (databaseinfo.value[i].site.geography !== null) {
-              var x = databaseinfo.value[i].site.geography;
-              x = JSON.parse(x);
-              delete x.crs;
-              modinfo[i] = x;
-          
-          }};
-          
-        
-        })
-        .catch(err => {
-          error.value = err
-          if(err.json) {
-            return err.json.then(json => {
-            // set the JSON response message
-            error.value.message = json.message;
-            });
-          }
-        })
-  }
+    .then(res => {
+      if (!res.ok) {
+        const error = new Error(res.statusText)
+        error.json = {'error': res.json(), 'databaseid':route.params.databaseid}
+        throw error;}
+      return res.json()})
+    .then(json => {
+      databaseinfo.value = json.data
+      uniqueSites.value = new Set();
+      databaseinfo.value.forEach(obj => uniqueSites.value.add(obj.site['siteid']));
+      uniqueSites.value = uniqueSites.value.size
 
-  
-function centerMap(location) {
-  if (Array.isArray(location.coordinates.flat()[0])) {
-    return location.coordinates.flat()[0]
-  } else {
-    return location.coordinates
-  }
+
+      datasetids.value = databaseinfo.value.flatMap(site =>
+          site.site.datasets.flatMap(dataset => dataset.datasetid))
+
+      datasets.value = databaseinfo.value.reduce((acc, obj) => {
+        obj.site.datasets.forEach(dataset => {
+          const type = dataset.datasettype;
+          acc[type] = (acc[type] || 0) + 1;})
+          return acc;}, {});
+      pis.value = databaseinfo.value.reduce((acc, obj) => {
+        obj.site.datasets.forEach(dataset => {
+          dataset.datasetpi.forEach(pi => {
+            const type = pi.contactname;
+            acc[type] = (acc[type] || 0) + 1;}) })
+        return acc;}, {});
+
+      datasets_array.value = Object.entries(datasets.value).map(([datasettype,value]) => ({datasettype,value}));
+      pis_array.value = Object.entries(pis.value).map(([name,value]) => ({name,value}));
+      pis_array.value = pis_array.value.filter(obj => obj.name !== 'null')
+      loading.value = false
+
+      return databaseinfo.value})
 }
 
-async function callnativeland() {
-  try {
-  const response = await fetch('https://native-land.ca/wp-json/nativeland/v1/api/index.php?maps=territories',
-  { method: "GET", headers: {'content-type': 'application/json'}});
-  const data = await response.json();
-  nativeland.value = data
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
- 
+function loadContact() {
+  return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
+  { method: "GET", headers: {'content-type': 'application/json'}})
+  .then(res1 => {
+    return res1.json()})
+  .then(json1 => {
+    databasekeys.value = json1.data  
+    currentDB.value = databasekeys.value.find(element => element.databaseid === Number(route.params.databaseid))
+    contact.value = currentDB.value.contactid
+    return contact.value})
+  .then(val => fetch(neotomaapi + "/v1.5/data/contacts/" +val,
+  { method: "GET", headers: {'content-type': 'application/json'}}))
+  .then(res => {
+    if (!res.ok) {
+      const error = new Error(res.statusText)
+      error.json = {'error': res.json(), 'databaseid':route.params.databaseid}
+      throw error;}
+    return res.json()})
+  .then(json => {
+    contactinfo.value = json.data      })}
+
     
 onMounted(() => {
 
-    loadDatabase()
-    callnativeland()
-    
+  loadDatabase()
+  loadContact()
   
 })
+
+
 </script>
 
+
+
 <template>
-    <div v-if="!loading">
-      <p>{{modinfo.filter(e => e)[12].coordinates.flat()[0]}}</p>
-         
-      <Panel toggleable collapsed>
+  <div v-if="!loading">
+    <Panel toggleable>
       <template #header>
         <h2>About {{databasename}}</h2>
       </template>
-        <p> There are {{databaseinfo.length}} sites returned by the original call. Not all of them are necessarily distinct, I think...</p>
-        <div v-for="(value, name, index) in currentDB" :key="name.id">
-          <p> {{ name }}: {{ value }}</p>
+      <p> There are {{uniqueSites}} distinct sites in {{ databasename }}, associated with
+        {{datasets_array.reduce((total,obj) => total + obj['value'], 0) }} datasets. </p>
+      <DataTable paginator :rows="5" :value="datasets_array" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
+        <Column field="datasettype" header="Dataset Type"></Column>
+        <Column field="value" header="Number" sortable></Column>
+      </DataTable>
+        
+      <div v-for="(value, name, index) in contactinfo" :key="name.id">
+        <div v-if="value.url !== null">
+          <p> <span> <strong> Database Contact</strong>: <a :href='value.url'> {{ value.givennames}} {{ value.familyname }} </a> </span></p>
         </div>
+        <div v-else>
+            <p> <span> <strong> Database Contact</strong>: <p> {{ value.givennames}} {{ value.familyname }} </p> </span></p>
+          </div>
+          </div>
+          
         <p>{{databasename}} text here (call some text from somewhere somehow?)</p>
       </Panel>
 
-      <Panel toggleable collapsed>
+      <Panel toggleable>
         <template #header>
           <h2>Spatial and Temporal Extent</h2>
         </template>
-        <p>
-            This is where the map and agerange plot could go eventually.
-            It would be interesting to somehow combine those plots, to show how ageranges are distributed in space.
-        </p>
-        
-   <div id="sitemap" style="outline-width: 1px">
-        <ol-map
-          :loadTilesWhileAnimating="true"
-          :loadTilesWhileInteracting="true"
-          style="height: 200px"
-        >
-          <ol-view
-            ref="view"
-            :center="centerMap(location)"
-            :rotation="rotation"
-            :zoom="zoom"
-            :projection="projection"
-          />
-          <ol-tile-layer>
-            <ol-source-stadia-maps layer="stamen_terrain" />
-          </ol-tile-layer>
-            <div v-for="location in modinfo.filter(e => e)" :key = "location.value">
-              <ol-vector-layer>
-                <ol-source-vector v-if="Array.isArray(location.coordinates.flat()[0])">
-                  <ol-feature >
-                    <ol-geom-point :coordinates="location.coordinates.flat()[0]"></ol-geom-point>
-                    <ol-style>
-                      <ol-style-circle radius="6">
-                        <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
-                        <ol-style-stroke color="rgba(0,0,0,0.8)" width="6"></ol-style-stroke>
-                      </ol-style-circle>
-                    </ol-style>
-                  </ol-feature>
-                  </ol-source-vector>
-                  <ol-source-vector v-else>
-                  <ol-feature>
-                    <ol-geom-point :coordinates="location.coordinates"></ol-geom-point>
-                    <ol-style>
-                      <ol-style-circle radius="6">
-                        <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
-                        <ol-style-stroke color="rgba(0,0,0,0.8)" width="6"></ol-style-stroke>
-                      </ol-style-circle>
-                    </ol-style>
-                  </ol-feature>
-                </ol-source-vector>
-              </ol-vector-layer>
-            </div>
-        </ol-map>
-      </div> 
-
-        <Card>
+          <Panel toggleable collapsed>
+            <template #header>
+              <h3>Spatial Extent</h3>
+            </template>
+          <DatabaseMap :title="databaseinfo"/>
+        </Panel>
+        <Panel toggleable collapsed>
           <template #header>
-            <h3>{{databasename + ' Map'}}</h3>
-          </template>
-          <template #content>    
-            <div class="grid" style="grid-auto-rows: 1fr;">
-              <div v-if="databasename == 'FAUNMAP'" >
-                <p>Pretend FAUNMAP map:</p>
-                <img src='../assets/maps/FAUNMAPmap.JPG' style="max-width:30vw;"> 
-              </div>
-              <div v-if="databasename == 'North American Pollen Database'" >
-                <p>Pretend NAPD map:</p>
-                <img src='../assets/maps/North_American_Pollen_Databasemap.JPG' style="max-width:30vw;"> 
-              </div>   
-            </div>
-          </template>
-        </Card>
+            <h3>Temporal Extent</h3>
+        </template>
+        <TempExtent :title="databaseinfo"/>
+      </Panel>
+
       </Panel>
 
       <Panel toggleable collapsed>
         <template #header>
           <h2>Datasets</h2>
         </template>
-        <p>Here is where the information about uploads over time would go and datasettype.</p>
+        <UploadsTime :title="datasetids" />
+        <DataTable  v-model:globalFilter="filters.name.value" 
+        :globalFilterFields="['name']"
+        :value="pis_array" paginator :rows="5" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
+        <template #header>
+        <div class="flex justify-content-end">
+                <InputText v-model="filters.name.name" placeholder="Keyword Search" />
+        </div>
+    </template>
+          <Column field="name" header="PI Name" :filter="true">
+            <template #body="{ data }">
+            {{ data.name }}
+        </template>
+ 
+      </Column>
+          <Column field="value" header="Number Datasets Uploaded" sortable></Column>
+        </DataTable>
+
       </Panel>
       
-      <Panel toggleable collapsed>
-        <template #header>
-          <h2>Native Lands</h2>
-        </template>
-        
- <div id="nativelandmap" style="outline-width: 1px">
-        <ol-map
-          :loadTilesWhileAnimating="true"
-          :loadTilesWhileInteracting="true"
-          style="height: 200px"
-        >
-          <ol-view
-            ref="view"
-            :center="centerMap(location)"
-            :rotation="rotation"
-            :zoom=4
-            :projection="projection"
-          />
-          <ol-tile-layer>
-            <ol-source-stadia-maps layer="stamen_terrain" />
-          </ol-tile-layer>
-            <div v-for="location in nativeland" :key = "location">
-              <ol-vector-layer>
-                <ol-source-vector v-if="location.geometry.coordinates.length == 1">
-                  <ol-feature >
-                    <ol-geom-polygon :coordinates="location.geometry.coordinates"></ol-geom-polygon>
-                    <ol-style>
-                      <ol-style-stroke color="rgba(0,0,0,0.8)" width="2"></ol-style-stroke>
-                      <ol-style-fill color="rgba(127,17,224,0.2)"></ol-style-fill>
-                    </ol-style>
-                  </ol-feature>
-                  </ol-source-vector>
-                  <ol-source-vector v-else> 
-                 <div v-for="loc in location.geometry.coordinates" :key="loc.value">
-                      <ol-feature >
-                      <ol-geom-polygon :coordinates="loc"></ol-geom-polygon>
-                      <ol-style>
-                        <ol-style-stroke color="rgba(0,0,0,0.8)" width="2"></ol-style-stroke>
-                        <ol-style-fill color="rgba(127,17,224,0.2)"></ol-style-fill>
-                      </ol-style>
-                    </ol-feature>
-                  </div> 
-                </ol-source-vector>
-              </ol-vector-layer>
-            </div>
-        </ol-map>
-      </div> 
-        <p>functions here would use the native-land API</p>
-      </Panel>
 
     </div>
     
@@ -257,13 +190,12 @@ onMounted(() => {
     </div>
 
 </template>
-
 <script>
 export default {
-  data() {
-    return {
-      datasetinfo: "",
-    };
-  },
-}
+  components: {
+    TempExtent,
+    DatabaseMap,
+    UploadsTime
+  }
+};
 </script>
