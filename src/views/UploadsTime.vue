@@ -13,7 +13,7 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 
 Chart.register(zoomPlugin);
-const chartCanvas = ref(null);
+
 const chartCanvas2 = ref(null);
 const filteredDatasets = ref(null);
 const dates = ref(null);
@@ -46,58 +46,6 @@ let myChart;
 const props = defineProps(['title'])
 
 
-
-function loadDatabase() {
-    return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
-      { method: "GET", headers: {'content-type': 'application/json'}})
-    .then(res1 => {
-      return res1.json()})
-    .then(json1 => {
-      databasekeys.value = json1.data  
-      currentDB.value = databasekeys.value.find(element => element.databaseid === Number(route.params.databaseid))
-         
-      databasename.value = currentDB.value.databasename
-      return databasename.value})
-    .then(val => fetch(neotomaapi + "/v2.0/data/datasets/db?limit=10000&offset=0&database=" +val,
-      { method: "GET", headers: {'content-type': 'application/json'}}))
-    .then(res => {
-      if (!res.ok) {
-        const error = new Error(res.statusText)
-        error.json = {'error': res.json(), 'databaseid':route.params.databaseid}
-        throw error;}
-      return res.json()})
-    .then(json => {
-      databaseinfo.value = json.data
-      uniqueSites.value = new Set();
-      databaseinfo.value.forEach(obj => uniqueSites.value.add(obj.site['siteid']));
-      uniqueSites.value = uniqueSites.value.size
-
-
-      datasetids.value = databaseinfo.value.flatMap(site =>
-          site.site.datasets.flatMap(dataset => dataset.datasetid))
-
-      datasets.value = databaseinfo.value.reduce((acc, obj) => {
-        obj.site.datasets.forEach(dataset => {
-          const type = dataset.datasettype;
-          acc[type] = (acc[type] || 0) + 1;})
-          return acc;}, {});
-      pis.value = databaseinfo.value.reduce((acc, obj) => {
-        obj.site.datasets.forEach(dataset => {
-          dataset.datasetpi.forEach(pi => {
-            const type = pi.contactname;
-            acc[type] = (acc[type] || 0) + 1;}) })
-        return acc;}, {});
-
-      datasets_array.value = Object.entries(datasets.value).map(([datasettype,value]) => ({datasettype,value}));
-      pis_array.value = Object.entries(pis.value).map(([name,value]) => ({name,value}));
-      pis_array.value = pis_array.value.filter(obj => obj.name !== 'null')
-     // loading.value = false
-      return pis_array.value})
-        
-
-
-}
-
 function downloadDBSets() {
     return  fetch(neotomaapi + "/v2.0/apps/constdb/datasetuploads?dbid=" + route.params.databaseid,
       { method: "GET", headers: {'content-type': 'application/json'}})
@@ -113,7 +61,6 @@ function downloadDBSets() {
 
 
 onMounted(async () => {
-    await loadDatabase();
     await downloadDBSets();
     
     const filteredPIs = computed(() => {
@@ -146,72 +93,6 @@ onMounted(async () => {
     x: new Date(month).getFullYear() + (new Date(month).getMonth())/12,
     y: count
 }));
-    const myChart = new Chart(chartCanvas.value, {
-        type: 'scatter',
-       data: {
-        datasets: [{
-            data: chartData_new,
-            borderColor: 'darkblue',
-            showLine: true,
-            borderWidth: 1,
-            fill: false,
-            pointRadius:1
-        }]
-       },
-      options: {
-      scales: {
-        x: {
-            ticks: {
-                callback: function(value,index,values) {
-                var test = cumulativeData.value.map(entry => entry.date)[index]
-                var year = Math.floor(value);
-                var decimal = value - Math.floor(value);
-                var month = Math.floor(decimal*12)  + 1
-                var day = Math.round((decimal*12 - Math.floor(decimal*12))*30) + 1
-                return  "" + month + "/" + day + "/" + year}
-            },
-            title: {
-                display: true,
-                text: 'Date Contributed' 
-            }
-        },
-        y: {
-            title: {
-                display: true,
-                text: 'Monthly Uploads' 
-            }
-        }
-    },
-      elements: {
-                    point:{
-                        radius: 0
-                    }
-                },
-      plugins: {
-        legend: {
-          display: false 
-      },
-      zoom: {
-            pan: {
-                enabled: true,
-                mode: 'xy',
-
-            },
-            zoom: {
-                wheel: {
-                    enabled: true,
-                },
-                pinch: {
-                    enabled: true
-                },
-                mode: 'xy'
-            }
-        }
-    }
-  }
-
-}  )
-
 Chart.defaults.font.size = 20;
 
 const myChart2 = new Chart(chartCanvas2.value, {
@@ -301,16 +182,10 @@ loading_this.value = false
         <template #header>
           <h2>Datasets</h2>
         </template>
-    <TabView>
-        <TabPanel header="Cumulative Uploads">
+
             <h3>Cumulative Dataset Uploads by Month</h3>
             <canvas ref="chartCanvas2" width="400" height="300"></canvas> 
-        </TabPanel>
-        <TabPanel header="Noncumulative Uploads">
-            <h3>Dataset Uploads by Month</h3>
-            <canvas ref="chartCanvas" width="400" height="300"></canvas> 
-        </TabPanel>
-    </TabView>
+ 
         <PITable />
         <div>
   </div>
