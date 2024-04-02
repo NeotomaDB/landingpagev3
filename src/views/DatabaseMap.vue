@@ -224,7 +224,6 @@ loading2.value =false
 <template>
 <div v-if="!loading2">
 
-    <h3>Spatial Extent</h3>
     <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
         <div id='map' class="map"> </div>
     </div>  
