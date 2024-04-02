@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watchEffect } from 'vue'
 import Panel from 'primevue/panel';
 import Dialog from 'primevue/dialog';
+import ProgressSpinner from 'primevue/progressspinner'
 import { Map, View } from 'ol';
 import XYZ from 'ol/source/XYZ';
 import Tile from 'ol/layer/Tile.js';
@@ -29,16 +30,15 @@ const rotation = ref(0)
 const newlong = ref(0)
 const newlat = ref(0)
 const natland = ref(null)
-var names = ref([]);
+const map = ref(null);
+const hasFeatures = ref(null);
 var ids = ref([]);
-var descrips = ref([]);
-var uniquenames = ref([]);
-var uniquedescrips = ref([]);
 var features = ref([]);
 var info = ref([]);
-var uniqueids = ref([]);
 var link = ref([]);
 var visible = ref(false);
+const vectorSource2 = ref(null);
+const loadingnat = ref(true);
 
 function centerMap(location) {
   if (Array.isArray(location.coordinates.flat()[0])) {
@@ -104,9 +104,9 @@ const vectorStyle = new Style({
   })
 });
 
-  const vectorSource2 = new VectorSource();
+  vectorSource2.value = new VectorSource();
   const vectorLayer2 = new VectorLayer({
-    source: vectorSource2,
+    source: vectorSource2.value,
     style: function(feature) {
       return new Style({
         fill: new Fill({
@@ -140,15 +140,27 @@ const vectorStyle = new Style({
       const polygonFeature = new Feature({
         geometry: polygonGeometry,
         name: elem.properties.Name,
-        slug: elem.properties.Slug});
-      vectorSource2.addFeature(polygonFeature);}
+        slug: elem.properties.Slug,
+        url: 'https://native-land.ca/maps/territories/' + elem.properties.Slug});
+      vectorSource2.value.addFeature(polygonFeature);}
     else {
       elem.geometry.coordinates.flat().forEach((pol) => {
         var polygonGeometry = new Polygon([pol.map(coord => fromLonLat(coord))]);
         const polygonFeature = new Feature({
           geometry: polygonGeometry,
-          name: elem.properties.Name});
-        vectorSource2.addFeature(polygonFeature);})}});
+          name: elem.properties.Name,
+          slug: elem.properties.Slug,
+          url: 'https://native-land.ca/maps/territories/' + elem.properties.Slug});
+        vectorSource2.value.addFeature(polygonFeature);})}
+      });
+  console.log("features: " + vectorSource2.value.getFeatures().length)
+  if (vectorSource2.value.getFeatures().length > 0) {
+    hasFeatures.value = true
+  }
+  else {
+    hasFeatures.value = false
+  }
+  console.log("has features: " + hasFeatures.value)
   var myMap2 = new Map({
     layers: [
       new Tile({
@@ -161,9 +173,23 @@ const vectorStyle = new Style({
     view: new View({
     center: centerMap(location),
     zoom: 10,}),});
-  const extent = vectorSource2.getExtent();
+
+  if (hasFeatures.value) {
+  const extent = vectorSource2.value.getExtent();
   myMap2.getView().fit(extent)
+
+}
  // myMap2.getView().setZoom(5)       
+
+ console.log("check: " + hasFeatures.value)
+ if (!hasFeatures.value) {
+  console.log('there is none')
+  const extent = vectorSource.getExtent();
+  myMap2.getView().fit(extent)
+  myMap2.getView().setZoom(5)
+
+
+ } 
 
   var displayFeatureInfo = function(pixel, coordinate) {
     features.value = [];
@@ -184,12 +210,18 @@ const vectorStyle = new Style({
     visible.value = true;
     var coordinate = evt.coordinate;
     displayFeatureInfo(evt.pixel, coordinate);});
+
+   
 }
 
 onMounted(() => {
   nativeland();
+
 })
 
+
+
+loadingnat.value=false
 </script>
 
 
@@ -202,12 +234,43 @@ onMounted(() => {
 
 
 <template>
-  <div v-if="location">
+  <div v-if="!loadingnat">
     <Panel toggleable>
         <template #header>
-            <h3>Native Lands</h3>
+            <h3>Indigenous Lands</h3>
         </template>
-    <div id="map2" class="map" style="width:500px;"></div>
+        <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
+          <div id="map2" class="map" ref="map">
+        </div>
+ 
+      </div> 
+      <div v-if="!hasFeatures">
+            <p>This site does not intersect any Indigenous 
+              territorries currently mapped by the Native Land project.
+            </p>
+          </div>
+
+      <div v-if="hasFeatures">
+        <br>
+        <span>This site intersects Indigenous lands. It is part of the territory of the </span>
+      <span v-for="(feat, index) in vectorSource2.getFeatures()">
+        <span v-if="(index +1) != vectorSource2.getFeatures().length && (index + 2) != vectorSource2.getFeatures().length">
+ <a :href="feat.values_.url">{{feat.values_.name}}</a>
+      <span>, </span>
+    </span>
+          <span v-if="(index + 2) == vectorSource2.getFeatures().length">
+         <a :href='feat.values_.url'>{{ feat.values_.name }}</a>
+      <span> and </span>
+          </span>
+    <span v-if="(index +1) == vectorSource2.getFeatures().length">
+  <a :href="feat.values_.url">{{ feat.values_.name}}</a> 
+    </span>
+  </span>
+  <span>, according to the <a href="https://native-land.ca/">Native Land mapping project.</a></span>
+   <p> Neotoma is cataloging the Indigenous cultural affiliation of its data records as an element of its participation in the 
+    <a href="https://eos-rcn.github.io/web/">Ethical Open Science research coordination network</a>.
+    You can learn more about the movement for Indigenous data sovereignty <a href="https://nni.arizona.edu/our-work/research-policy-analysis/indigenous-data-sovereignty-governance">here</a>.</p>
+    </div>
     </Panel>
     <div v-if="features.length == 1">
     <Dialog
@@ -237,6 +300,9 @@ onMounted(() => {
  
     </Dialog>
     </div>
+  </div>
+  <div v-else class="flex flex-wrap justify-content-center align-items-center">
+    <ProgressSpinner class="flex-grow-1 w-max" />
   </div>
 </template>
 
