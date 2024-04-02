@@ -1,9 +1,12 @@
 <script setup>
 import { Map, View } from 'ol';
-import { ref,onMounted } from 'vue';
+import { ref,onMounted, computed } from 'vue';
+import {useRoute} from 'vue-router'
+import Panel from 'primevue/panel';
 import ProgressSpinner from 'primevue/progressspinner';
 import Dialog from 'primevue/dialog';
-import Chip from 'primevue/chip';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
 import XYZ from 'ol/source/XYZ';
 import Tile from 'ol/layer/Tile.js';
 import VectorSource from 'ol/source/Vector';
@@ -16,6 +19,7 @@ import Stroke from 'ol/style/Stroke';
 import Circle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Overlay from 'ol/Overlay';
+const route = useRoute()
 const props = defineProps(['title'])
 const datasets = ref([]);
 var names = ref([]);
@@ -25,9 +29,19 @@ var uniquenames = ref([]);
 var uniquedescrips = ref([]);
 var uniqueids = ref([]);
 var link = ref([]);
-const loading = ref(true)
+const myMap = ref(null);
+const loading2 = ref(true)
 const vectorSource = new VectorSource();
 const visible = ref(false);
+const databaseinfo = ref(null)
+const databasekeys = ref(null)
+const databasename = ref(null)
+const currentDB = ref(null)
+const constDBinfo = ref(null);
+  const uniqueDBsites = ref(null);
+  const uniqueDBsets = ref(null);
+  const datasettypes = ref(null);
+const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const vectorStyle = new Style({
   image: new Circle({
     radius: 12,
@@ -41,36 +55,59 @@ const vectorLayer = new VectorLayer({
     source: vectorSource,
     style: vectorStyle,});
 
-props.title.forEach((pointfull) => {
-    if (pointfull.site.geography !== null) { 
-        if (JSON.parse(pointfull.site.geography).type == "Point") {
-            var point_par = JSON.parse(pointfull.site.geography)        
-            delete point_par.crs
-            var point = point_par.coordinates
-            const lonLat = fromLonLat(point);
-            var feature = new Feature({
-                geometry: new Point(lonLat),
-                name: pointfull.site.sitename,
-                id: pointfull.site.siteid,
-                descrip: pointfull.site.sitedescription,})
-                
-            vectorSource.addFeature(feature); }
 
-        if (JSON.parse(pointfull.site.geography).type == "Polygon") {
-            var point_par = JSON.parse(pointfull.site.geography)        
-            delete point_par.crs
-            var point = point_par.coordinates.flat()[0]
+    function loadconstDB() {
+    return  fetch(neotomaapi + "/v2.0/apps/constdb/datasets?dbid=" + route.params.databaseid,
+      { method: "GET", headers: {'content-type': 'application/json'}})
+    .then(res1 => {
+      return res1.json()})
+    .then(json1 => {
+      constDBinfo.value = json1.data
+      
+   
+      uniqueDBsites.value = new Set();
+      constDBinfo.value.forEach(obj => uniqueDBsites.value.add(obj['siteid']));
+      uniqueDBsites.value = uniqueDBsites.value.size
+
+      uniqueDBsets.value = new Set();
+      constDBinfo.value.forEach(obj => uniqueDBsets.value.add(obj['datasetid']));
+      uniqueDBsets.value = uniqueDBsets.value.size
+      datasettypes.value = constDBinfo.value.reduce((acc, obj) => {
+          const type = obj.datasettype;
+          acc[type] = (acc[type] || 0) + 1;
+          return acc;}, {});
+
+  datasettypes.value = Object.entries(datasettypes.value).map(([datasettype,value]) => ({datasettype,value}));
+  loading2.value=false
+  return constDBinfo.value})
+  .then(values => {
+        values.forEach((pointfull) => {
+    if (pointfull.coords !== null) { 
+          //  var point_par = JSON.parse(pointfull.coords)
+          //  console.log(pointfull)        
+         //   delete point_par.crs
+            var point = pointfull.coords
+        //    console.log(point)
             const lonLat = fromLonLat(point);
+        //    console.log(lonLat)
             var feature = new Feature({
                 geometry: new Point(lonLat),
-                name: pointfull.site.sitename,
-                id: pointfull.site.siteid,
-                descrip: pointfull.site.sitedescription,})
-            vectorSource.addFeature(feature); }}});
+                name: pointfull.sitename,
+                id: pointfull.siteid,
+         //       descrip: pointfull.site.sitedescription,
+        })
+                
+            vectorSource.addFeature(feature);
+
+    }})})
+}
+
 
 
 onMounted(() => {
-    var myMap = new Map({
+    loadconstDB();
+    
+    myMap.value = new Map({
     layers: [
         new Tile({
             source: new XYZ({
@@ -80,7 +117,7 @@ onMounted(() => {
     target: 'map',
     view: new View({
         center: [0,0],
-        zoom: 10,}),
+        zoom: 2,}),
 });
 
 
@@ -94,7 +131,7 @@ var displayFeatureInfo = function(pixel, coordinate) {
     uniqueids.value = [];
     link.value = [];
     datasets.value = [];
-    myMap.forEachFeatureAtPixel(pixel, function(feature, layer) {
+    myMap.value.forEachFeatureAtPixel(pixel, function(feature, layer) {
         features2.push(feature); });
     if (features2.length > 0) {
 
@@ -128,20 +165,49 @@ var displayFeatureInfo = function(pixel, coordinate) {
 } 
 };
 
-myMap.on('click', function(evt) {
+myMap.value.on('click', function(evt) {
     visible.value=true
     console.log("hello?")
     var coordinate = evt.coordinate;
     displayFeatureInfo(evt.pixel, coordinate); })
 
-const extent = vectorSource.getExtent();
-myMap.getView().fit(extent)
-//myMap.getView().setZoom(2)
 
+const extent = computed(() => {
+  if (vectorSource.getExtent()) {
+    myMap.value.getView().fit(vectorSource.getExtent())
+    return vectorSource.getExtent();
+  } else {
+    return [];
+  }
 });
+//console.log(extent)
 
-loading.value=false
+//console.log(myMap.value.getView().projection_.extent_)
 
+myMap.value.on('moveend', function() {
+    var zoom = myMap.value.getView().getZoom()
+ //   console.log(zoom)
+    const newStyle = new Style({
+  image: new Circle({
+    radius: (5/4*zoom+1),
+    fill: new Fill({
+      color: 'rgba(251,205,188,1)',  }),
+    stroke: new Stroke({
+      color: 'rgba(92,84,80,1)',
+      width: (2/3*zoom),}), }),});;
+
+      vectorLayer.setStyle(newStyle);
+
+
+    })
+
+
+
+
+})
+
+
+loading2.value =false
 </script>
 
 
@@ -156,42 +222,45 @@ loading.value=false
 
 
 <template>
-    <div v-if="!loading">
+<div v-if="!loading2">
+
+    <h3>Spatial Extent</h3>
     <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
-    <div id="map" class="map" ></div></div>
+        <div id='map' class="map"> </div>
+    </div>  
     <div v-if="uniquenames.length == 1">
-    <Dialog
-        v-model:visible="visible"
-        modal
-        :header="names[0]"
-        :style="{ width: '50rem' }"
-        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-      >
-      <p>Site ID: {{ ids[0] }}</p>
-      <p>Dataset ID links:</p>
-      <div v-for="(el,index) in link">
-        <a :href="link[index]">{{ datasets[index] }}</a>
-        </div>
-      <p>{{ descrips[0] }}</p>
- 
-      </Dialog>
+        <Dialog
+            v-model:visible="visible"
+            modal
+            :header="names[0]"
+            :style="{ width: '50rem' }"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+        >
+            <p>Site ID: {{ ids[0] }}</p>
+            <p>Dataset ID links:</p>
+            <div v-for="(el,index) in link">
+                <a :href="link[index]">{{ datasets[index] }}</a>
+            </div>
+            <p>{{ descrips[0] }}</p>
+        </Dialog>
     </div>
     <div v-if="uniquenames.length > 1">
-    <Dialog header="Multiple Sites"
-    v-model:visible="visible"
-        modal 
-        :style="{ width: '50rem' }"
-        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-        <strong>Site Names:</strong>
-    <div v-for="site in uniquenames">
-        <p>{{site}}</p>
+        <Dialog header="Multiple Sites"
+            v-model:visible="visible"
+            modal 
+            :style="{ width: '50rem' }"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <strong>Site Names:</strong>
+            <div v-for="site in uniquenames">
+                <p>{{site}}</p>
+            </div>
+        </Dialog>
     </div>
-    </Dialog>
-    </div>
-    </div>
-    <div v-else class="flex flex-wrap justify-content-center align-items-center">
-        <ProgressSpinner class="flex-grow-1 w-max" />
-    </div>
+</div>
+<div v-else class="flex flex-wrap justify-content-center align-items-center">
+    <ProgressSpinner class="flex-grow-1 w-max" />
+</div>
+
 </template>
 
 <script>

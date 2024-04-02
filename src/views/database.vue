@@ -2,14 +2,16 @@
   import TempExtent from '@/views/TempExtent.vue';
   import DatabaseMap from '@/views/DatabaseMap.vue';
   import UploadsTime from '@/views/UploadsTime.vue';
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useRoute } from 'vue-router'
   import ProgressSpinner from 'primevue/progressspinner'
   import Panel from 'primevue/panel'
   import DataTable from 'primevue/datatable';
   import InputText from 'primevue/inputtext';
   import Column from 'primevue/column';
-
+  import AboutDB from '@/views/AboutDB.vue';
+  import TabView from 'primevue/tabview';
+  import TabPanel from 'primevue/tabpanel';
 
   const datasetids = ref(0)
   const route = useRoute()
@@ -26,8 +28,47 @@
   const databasename = ref(null)
   const currentDB = ref(null)
   const loading = ref(true)
+  const loading2 = ref(true)
+  const loading3 = ref(true)
+  const loading4 = ref(true)
+  const loading5 = ref(true)
+  const constDBinfo = ref(null);
+  const uniqueDBsites = ref(null);
+  const uniqueDBsets = ref(null);
+  const datasettypes = ref(null);
   const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
+
+  function loadconstDB() {
+    if (route.params.databaseid) {
+      console.log(route.params.databaseid)
+    return  fetch(neotomaapi + "/v2.0/apps/constdb/datasets?dbid=" + route.params.databaseid,
+      { method: "GET", headers: {'content-type': 'application/json'}})
+    .then(res1 => {
+      return res1.json()})
+    .then(json1 => {
+      constDBinfo.value = json1.data
+      
+   
+      uniqueDBsites.value = new Set();
+      constDBinfo.value.forEach(obj => uniqueDBsites.value.add(obj['siteid']));
+      uniqueDBsites.value = uniqueDBsites.value.size
+
+      uniqueDBsets.value = new Set();
+      constDBinfo.value.forEach(obj => uniqueDBsets.value.add(obj['datasetid']));
+      uniqueDBsets.value = uniqueDBsets.value.size
+      datasettypes.value = constDBinfo.value.reduce((acc, obj) => {
+          const type = obj.datasettype;
+          acc[type] = (acc[type] || 0) + 1;
+          return acc;}, {});
+    //  console.log(datasettypes.value)
+
+  datasettypes.value = Object.entries(datasettypes.value).map(([datasettype,value]) => ({datasettype,value}));
+}) }
+else {
+  console.log("hmmm")
+}
+}
 
   function loadDatabase() {
     return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
@@ -102,8 +143,9 @@ function loadContact() {
     
 onMounted(() => {
 
-  loadDatabase()
+ // loadDatabase()
   loadContact()
+  loadconstDB();
   
 })
 
@@ -113,83 +155,24 @@ onMounted(() => {
 
 
 <template>
-  <div v-if="!loading">
+    <AboutDB/>
     <Panel toggleable>
       <template #header>
-        <h2>About {{databasename}}</h2>
+        <h2>Spatial and Temporal Extent</h2>
       </template>
-      <p> There are {{uniqueSites}} distinct sites in {{ databasename }}, associated with
-        {{datasets_array.reduce((total,obj) => total + obj['value'], 0) }} datasets. </p>
-      <DataTable paginator :rows="5" :value="datasets_array" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
-        <Column field="datasettype" header="Dataset Type"></Column>
-        <Column field="value" header="Number" sortable></Column>
-      </DataTable>
-        
-      <div v-for="(value, name, index) in contactinfo" :key="name.id">
-        <div v-if="value.url !== null">
-          <p> <span> <strong> Database Contact</strong>: <a :href='value.url'> {{ value.givennames}} {{ value.familyname }} </a> </span></p>
-        </div>
-        <div v-else>
-            <p> <span> <strong> Database Contact</strong>: <p> {{ value.givennames}} {{ value.familyname }} </p> </span></p>
-          </div>
-          </div>
-          
-        <p>{{databasename}} text here (call some text from somewhere somehow?)</p>
-      </Panel>
-
-      <Panel toggleable>
-        <template #header>
-          <h2>Spatial and Temporal Extent</h2>
-        </template>
-          <Panel toggleable collapsed>
-            <template #header>
-              <h3>Spatial Extent</h3>
-            </template>
-          <DatabaseMap :title="databaseinfo"/>
-        </Panel>
-        <Panel toggleable collapsed>
-          <template #header>
-            <h3>Temporal Extent</h3>
-        </template>
-        <TempExtent :title="databaseinfo"/>
-      </Panel>
-
-      </Panel>
-
-      <Panel toggleable collapsed>
-        <template #header>
-          <h2>Datasets</h2>
-        </template>
-        <UploadsTime :title="datasetids" />
-        <DataTable  v-model:globalFilter="filters.name.value" 
-        :globalFilterFields="['name']"
-        :value="pis_array" paginator :rows="5" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
-        <template #header>
-        <div class="flex justify-content-end">
-                <InputText v-model="filters.name.name" placeholder="Keyword Search" />
-        </div>
-    </template>
-          <Column field="name" header="PI Name" :filter="true">
-            <template #body="{ data }">
-            {{ data.name }}
-        </template>
- 
-      </Column>
-          <Column field="value" header="Number Datasets Uploaded" sortable></Column>
-        </DataTable>
-
-      </Panel>
-      
-
-    </div>
-    
-
-    <div v-else class="flex flex-wrap justify-content-center align-items-center">
-        <ProgressSpinner class="flex-grow-1 w-max" />
-
-    </div>
+      <TabView>
+        <TabPanel header="Spatial Extent">
+        <DatabaseMap />
+      </TabPanel>
+      <TabPanel header="Temporal Extent">
+          <TempExtent/>
+      </TabPanel>
+    </TabView>
+    </Panel>
+      <UploadsTime/>
 
 </template>
+
 <script>
 export default {
   components: {
