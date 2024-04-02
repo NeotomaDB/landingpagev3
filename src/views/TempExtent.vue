@@ -20,6 +20,35 @@ const units_count = ref(null);
 const units_list = ref(null);
 
 
+function colorpick(type) {
+  if (type == "Calendar years BP") {
+      return "green"
+    }
+    if (type  == "Calibrated radiocarbon years BP") {
+      return "darkblue"
+    }
+    if (type == "Radiocarbon years BP") {
+      return "gold"
+    }
+    if (type == "Calendar years AD/BC") {
+      return "violet"
+    }
+    if (type == "Varve years BP") {
+      return "orange"
+    }
+}
+
+function sizepick(old,young) {
+  
+  let bigdif = (theAges.value[(theAges.value.length-1)].older - theAges.value[0].younger)
+
+  if ((old - young) <= bigdif/216 ) {
+        return 1;
+    } else {
+       return 0; // Change point radius back to 5
+}
+}
+
 //const chartData = allAgerange.value;
 
 function loadDBages() {
@@ -44,17 +73,20 @@ theAges.value = {datasets: theAges.value.map(agerange => ({
           {y: agerange.index, x:agerange.older}
         ],
         borderWidth: 1,
-        borderColor: "darkblue",
+        borderColor: colorpick(agerange.agetype),
         showLine: true,
-        pointRadius: 0
+        pointRadius: sizepick(agerange.older,agerange.younger)
       }))}
 
 })}
 
 
 onMounted(async () => {
+  console.log("mounted")
   await loadDBages();
+  console.log('ages loaded')
   const chartData = await theAges.value;
+  console.log('data assigned')
   // Create the chart
   myChart = new Chart(chartCanvas.value, {
     type: 'scatter',
@@ -103,36 +135,8 @@ onMounted(async () => {
   }
 }  );
 
-chartData.datasets.forEach((one, index) => {
-  
-    let bigdif = (theAges.value.datasets[(theAges.value.datasets.length-1)].data[1].x - theAges.value.datasets[0].data[0].x)
+console.log('chart instantiated')
 
-    if (Math.abs(one.data[0].x - one.data[1].x) <= bigdif/216 ) {
-        chartData.datasets[index].pointRadius = 1;
-        chartData.datasets[index].borderColor = "red"; // Change point radius to 10
-    } else {
-        chartData.datasets[index].pointRadius = 0; // Change point radius back to 5
-    }
-    if (units_list.value[index] == "Calendar years BP") {
-      chartData.datasets[index].borderColor = "green"
-    }
-    if (units_list.value[index] == "Calibrated radiocarbon years BP") {
-      chartData.datasets[index].borderColor = "darkblue"
-    }
-    if (units_list.value[index] == "Radiocarbon years BP") {
-      chartData.datasets[index].borderColor = "gold"
-    }
-    if (units_list.value[index] == "Calendar years AD/BC") {
-      chartData.datasets[index].borderColor = "violet"
-    }
-    if (units_list.value[index] == "Varve years BP") {
-      chartData.datasets[index].borderColor = "orange"
-    }
-});
-
-
-// Update the chart
-myChart.update();
 
 
 });
