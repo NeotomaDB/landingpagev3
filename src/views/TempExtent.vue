@@ -133,6 +133,8 @@ onMounted(async () => {
         }
     }
   }
+
+  
 }  );
 
 console.log('chart instantiated')
