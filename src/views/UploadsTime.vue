@@ -186,7 +186,7 @@ loading_this.value = false
             <h3>Cumulative Dataset Uploads by Month</h3>
             <canvas ref="chartCanvas2" width="400" height="300"></canvas> 
  
-        <PITable />
+
         <div>
   </div>
       </Panel>

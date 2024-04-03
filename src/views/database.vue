@@ -12,6 +12,7 @@
   import AboutDB from '@/views/AboutDB.vue';
   import TabView from 'primevue/tabview';
   import TabPanel from 'primevue/tabpanel';
+  import PITable from '@/views/PITable.vue';
 
   const datasetids = ref(0)
   const route = useRoute()
@@ -66,6 +67,7 @@ onMounted(() => {
 
     </Panel>
       <UploadsTime/>
+      <PITable />
 
 </template>
 
