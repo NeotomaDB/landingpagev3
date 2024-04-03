@@ -99,13 +99,18 @@ const vectorLayer = new VectorLayer({
                 
             vectorSource.addFeature(feature);
 
-    }})})
+    }
+})
+
+})
 }
 
-
+console.log(loading2.value)
 
 onMounted(() => {
+    console.log(loading2.value)
     loadconstDB();
+ 
     
     myMap.value = new Map({
     layers: [
@@ -152,7 +157,9 @@ var displayFeatureInfo = function(pixel, coordinate) {
             })
             .then(int => {
                 var all = int.data
-                var fullsets = all[0].site.datasets
+                var fullsets = all.flatMap(site => site.site.datasets).map(on => on);
+                console.log(fullsets)
+                console.log(all)
                 fullsets.forEach(entry => {
                     datasets.value.push(entry.datasetid)
                     link.value.push(("https://data.neotomadb.org/datasets/" + entry.datasetid))
@@ -204,10 +211,15 @@ myMap.value.on('moveend', function() {
 
 
 
+console.log(loading2.value)
+
+
 })
 
-
 loading2.value =false
+
+
+console.log(loading2.value)
 </script>
 
 
@@ -223,7 +235,6 @@ loading2.value =false
 
 <template>
 <div v-if="!loading2">
-
     <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
         <div id='map' class="map"> </div>
     </div>  
@@ -238,7 +249,7 @@ loading2.value =false
             <p>Site ID: {{ ids[0] }}</p>
             <p>Dataset ID links:</p>
             <div v-for="(el,index) in link">
-                <a :href="link[index]">{{ datasets[index] }}</a>
+                <a :href="link[index]" target="_blank">{{ datasets[index] }}</a>
             </div>
             <p>{{ descrips[0] }}</p>
         </Dialog>
@@ -257,6 +268,7 @@ loading2.value =false
     </div>
 </div>
 <div v-else class="flex flex-wrap justify-content-center align-items-center">
+    <p>any</p>
     <ProgressSpinner class="flex-grow-1 w-max" />
 </div>
 
