@@ -107,7 +107,7 @@ loadDatabases();
     <div v-for="el in databasekeys">
         <Panel toggleable collapsed>
             <template #header>
-                <h2><a :href="el.databaseid">{{ el.databasename }}</a></h2>
+                <h2><a :href="'database/' + el.databaseid" target="_blank">{{ el.databasename }}</a></h2>
             </template>
             <Card header="Summary Info"
              v-model:visible="visible"
