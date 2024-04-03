@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, computed } from 'vue';
 import {useRoute} from 'vue-router';
 import Panel from 'primevue/panel'
 import ProgressSpinner from 'primevue/progressspinner';
@@ -11,7 +11,6 @@ const loading_some = ref(true);
 const globalFilter = ref('');
 const uniqueSites = ref(null);
 const datasets = ref(null);
-const datasetids = ref(null);
 const datasets_array = ref(null);
 const databaseinfo = ref(null)
 const databasekeys = ref(null)
@@ -20,11 +19,7 @@ const currentDB = ref(null)
 const route = useRoute();
 const pis = ref(null)
 const pis_array1 = ref(null)
-const PIarray = ref(null)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
-
-const props = defineProps(['title'])
-
 
 
  function loadDatabase() {
@@ -51,18 +46,6 @@ const props = defineProps(['title'])
         })
         .then(json => {
           databaseinfo.value = json.data
-
-          uniqueSites.value = new Set();
-          databaseinfo.value.forEach(obj => uniqueSites.value.add(obj.site['siteid']));
-          uniqueSites.value = uniqueSites.value.size
-
-          datasets.value = databaseinfo.value.reduce((acc, obj) => {
-            obj.site.datasets.forEach(dataset => {
-              const type = dataset.datasettype;
-              acc[type] = (acc[type] || 0) + 1;
-            })
-            return acc;
-          }, {});
           pis.value = databaseinfo.value.reduce((acc, obj) => {
             obj.site.datasets.forEach(dataset => {
               dataset.datasetpi.forEach(pi => {
@@ -74,16 +57,10 @@ const props = defineProps(['title'])
             })
             return acc;
           }, {});
-
-          datasets_array.value = Object.entries(datasets.value).map(([datasettype,value]) => ({datasettype,value}));
           pis_array1.value = Object.entries(pis.value).map(([name,value]) => ({name,value}));
           pis_array1.value = pis_array1.value.filter(obj => obj.name !== 'null')
-        //  console.log(pis_array1.value)
-        //  loading.value = false
-       
 
-          return databaseinfo.value
-        
+
         })}
 
 
@@ -135,11 +112,3 @@ loading_some.value = false
 
     </div>
 </template>
-
-<script>
-
-export default {
-  name: 'PITable',
-
-};
-</script>

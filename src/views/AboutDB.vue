@@ -2,26 +2,18 @@
 import Panel from 'primevue/panel';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import {useRoute} from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner'
 
 const contact = ref(0)
 const contactinfo = ref(0)
-const props = defineProps(['title','con']);
 const uniqueSites = ref(null);
-const datasets = ref(null);
-const datasetids = ref(null);
-const datasets_array = ref(null);
 const loading_ab = ref(true);
-const databaseinfo = ref(null)
 const databasekeys = ref(null)
 const databasename = ref(null)
 const currentDB = ref(null)
 const route = useRoute();
-const pis = ref(null)
-const pis_array = ref(null)
-const uniquesets = ref(null)
 const constDBinfo = ref(null);
 const uniqueDBsites = ref(null);
 const uniqueDBsets = ref(null);
@@ -74,7 +66,6 @@ function loadconstDB() {
           const type = obj.datasettype;
           acc[type] = (acc[type] || 0) + 1;
           return acc;}, {});
-   //   console.log(datasettypes.value)
 
   datasettypes.value = Object.entries(datasettypes.value).map(([datasettype,value]) => ({datasettype,value}));
   loading_ab.value=false
@@ -118,5 +109,6 @@ onMounted(() => {
          </div>
          
        <div v-else class="flex flex-wrap justify-content-center align-items-center">
-           <ProgressSpinner class="flex-grow-1 w-max" /></div>
+           <ProgressSpinner class="flex-grow-1 w-max" />
+       </div>
 </template>

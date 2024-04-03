@@ -4,7 +4,6 @@ import {useRoute} from 'vue-router';
 import Chart from 'chart.js/auto';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import ProgressSpinner from 'primevue/progressspinner';
-import Panel from 'primevue/panel';
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const route = useRoute()
 const theAges = ref(null);
