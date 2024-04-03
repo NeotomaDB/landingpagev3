@@ -132,7 +132,7 @@ const myChart2 = new Chart(chartCanvas2.value, {
         y: {
             title: {
                 display: true,
-                text: 'Monthly Uploads' 
+                text: 'Cumulative Uploads' 
             }
         }
     },
