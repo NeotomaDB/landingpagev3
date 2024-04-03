@@ -11,8 +11,9 @@ const theAges = ref(null);
 
 Chart.register(zoomPlugin);
 const chartCanvas = ref(null);
-const loading = ref(true);
+const loading_temp = ref(true);
 let myChart;
+const chartReady = ref(false);
 
 
 
@@ -49,7 +50,6 @@ function sizepick(old,young) {
 }
 }
 
-//const chartData = allAgerange.value;
 
 function loadDBages() {
   return  fetch(neotomaapi + "/v2.0/apps/constdb/datasetages?dbid=" + route.params.databaseid,
@@ -67,7 +67,7 @@ function loadDBages() {
           acc[unit] = (acc[unit] || 0) + 1;
           return acc;}, {});
 
-theAges.value = {datasets: theAges.value.map(agerange => ({
+      theAges.value = {datasets: theAges.value.map(agerange => ({
         data: [
           {y: agerange.index, x: agerange.younger },
           {y: agerange.index, x:agerange.older}
@@ -78,19 +78,13 @@ theAges.value = {datasets: theAges.value.map(agerange => ({
         pointRadius: sizepick(agerange.older,agerange.younger)
       }))}
 
-})}
+      return theAges.value
 
-
-onMounted(async () => {
-  console.log("mounted")
-  await loadDBages();
-  console.log('ages loaded')
-  const chartData = await theAges.value;
-  console.log('data assigned')
-  // Create the chart
+})
+.then(ages => {
   myChart = new Chart(chartCanvas.value, {
     type: 'scatter',
-    data: chartData,
+    data: ages,
     options: {
       scales: {
         x: {
@@ -137,18 +131,28 @@ onMounted(async () => {
   
 }  );
 
-console.log('chart instantiated')
-
-
+chartReady.value = true
 
 });
+}
 
-loading.value=false
+
+onMounted(async () => {
+  await loadDBages();
+  
+
+}  );
+
+loading_temp.value =false
+
 </script>
 
 
 <template>
-  <div v-if="!loading">
+  <div v-if="!loading_temp">
+    <div v-if="!chartReady" class="flex flex-wrap justify-content-center align-items-center">
+        <ProgressSpinner class="flex-grow-1 w-max" />
+    </div>
     <canvas ref="chartCanvas" width="400" height="300"></canvas>
     <p style="margin-bottom:0px;margin-top:0px;"><span style="color:darkblue;font-weight:bold;">dark blue</span> 
     points are in units of <strong style="color:darkblue">Calibrated radiocarbon Years BP</strong>;</p>
@@ -161,23 +165,6 @@ loading.value=false
       <p style="margin-bottom:0px;margin-top:0px;"><span style="color:orange;font-weight:bold;">orange</span> 
       points are in units of <strong style="color:orange">Varve Years BP</strong>.</p>
   </div>
-  <div v-else class="flex flex-wrap justify-content-center align-items-center">
-        <ProgressSpinner class="flex-grow-1 w-max" />
 
-    </div>
 </template>
 
-<script>
-
-export default {
-  name: 'TempExtent',
-
-};
-</script>
-
-<style scoped>
-/* Adjust the font size for the chart title */
- #myChart .chartjs-chart .chartjs-text {
-   font-size: 200px; /* Adjust as needed */
-}
-</style>
