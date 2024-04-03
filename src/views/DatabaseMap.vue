@@ -1,12 +1,9 @@
 <script setup>
 import { Map, View } from 'ol';
-import { ref,onMounted, computed } from 'vue';
+import { ref,onMounted} from 'vue';
 import {useRoute} from 'vue-router'
-import Panel from 'primevue/panel';
 import ProgressSpinner from 'primevue/progressspinner';
 import Dialog from 'primevue/dialog';
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
 import XYZ from 'ol/source/XYZ';
 import Tile from 'ol/layer/Tile.js';
 import VectorSource from 'ol/source/Vector';
@@ -18,29 +15,19 @@ import {Style} from 'ol/style';
 import Stroke from 'ol/style/Stroke';
 import Circle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
-import Overlay from 'ol/Overlay';
 const route = useRoute()
-const props = defineProps(['title'])
 const datasets = ref([]);
 var names = ref([]);
 var ids = ref([]);
 var descrips = ref([]);
 var uniquenames = ref([]);
-var uniquedescrips = ref([]);
 var uniqueids = ref([]);
 var link = ref([]);
 const myMap = ref(null);
 const loading2 = ref(true)
 const vectorSource = new VectorSource();
 const visible = ref(false);
-const databaseinfo = ref(null)
-const databasekeys = ref(null)
-const databasename = ref(null)
-const currentDB = ref(null)
 const constDBinfo = ref(null);
-  const uniqueDBsites = ref(null);
-  const uniqueDBsets = ref(null);
-  const datasettypes = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const vectorStyle = new Style({
   image: new Circle({
@@ -51,11 +38,6 @@ const vectorStyle = new Style({
       color: 'rgba(92,84,80,1)',
       width: 6,}), }),});
             
-const vectorLayer = new VectorLayer({
-    source: vectorSource,
-    style: vectorStyle,});
-
-
     function loadconstDB() {
     return  fetch(neotomaapi + "/v2.0/apps/constdb/datasets?dbid=" + route.params.databaseid,
       { method: "GET", headers: {'content-type': 'application/json'}})
@@ -63,38 +45,16 @@ const vectorLayer = new VectorLayer({
       return res1.json()})
     .then(json1 => {
       constDBinfo.value = json1.data
-      
-   
-      uniqueDBsites.value = new Set();
-      constDBinfo.value.forEach(obj => uniqueDBsites.value.add(obj['siteid']));
-      uniqueDBsites.value = uniqueDBsites.value.size
-
-      uniqueDBsets.value = new Set();
-      constDBinfo.value.forEach(obj => uniqueDBsets.value.add(obj['datasetid']));
-      uniqueDBsets.value = uniqueDBsets.value.size
-      datasettypes.value = constDBinfo.value.reduce((acc, obj) => {
-          const type = obj.datasettype;
-          acc[type] = (acc[type] || 0) + 1;
-          return acc;}, {});
-
-  datasettypes.value = Object.entries(datasettypes.value).map(([datasettype,value]) => ({datasettype,value}));
-  loading2.value=false
   return constDBinfo.value})
   .then(values => {
         values.forEach((pointfull) => {
     if (pointfull.coords !== null) { 
-          //  var point_par = JSON.parse(pointfull.coords)
-          //  console.log(pointfull)        
-         //   delete point_par.crs
             var point = pointfull.coords
-        //    console.log(point)
             const lonLat = fromLonLat(point);
-        //    console.log(lonLat)
             var feature = new Feature({
                 geometry: new Point(lonLat),
                 name: pointfull.sitename,
                 id: pointfull.siteid,
-         //       descrip: pointfull.site.sitedescription,
         })
                 
             vectorSource.addFeature(feature);
@@ -102,37 +62,57 @@ const vectorLayer = new VectorLayer({
     }
 })
 
+const vectorLayer = new VectorLayer({
+    source: vectorSource,
+    style: vectorStyle,});
+
+
+return vectorLayer
 })
-}
-
-console.log(loading2.value)
-
-onMounted(() => {
-    console.log(loading2.value)
-    loadconstDB();
- 
-    
-    myMap.value = new Map({
+.then(vl => {
+  myMap.value = new Map({
     layers: [
         new Tile({
             source: new XYZ({
             url: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png'
         }),}),
-        vectorLayer,],
+        vl,],
     target: 'map',
     view: new View({
         center: [0,0],
         zoom: 2,}),
-});
+})
 
 
+myMap.value.on('moveend', function() {
+    var zoom = myMap.value.getView().getZoom()
+    const newStyle = new Style({
+  image: new Circle({
+    radius: (5/4*zoom+1),
+    fill: new Fill({
+      color: 'rgba(251,205,188,1)',  }),
+    stroke: new Stroke({
+      color: 'rgba(92,84,80,1)',
+      width: (2/3*zoom),}), }),});;
+
+      vl.setStyle(newStyle);
+
+
+    })
+;
+})
+}
+
+onMounted(async () => {
+    await loadconstDB();
+    var extent2 = vectorSource.getExtent()
+    myMap.value.getView().fit(extent2);
+ 
 var displayFeatureInfo = function(pixel, coordinate) {
     var features2 = [];
     names.value = [];
     ids.value = [];
-    descrips.value = [];
     uniquenames.value = [];
-    uniquedescrips.value = [];
     uniqueids.value = [];
     link.value = [];
     datasets.value = [];
@@ -142,10 +122,8 @@ var displayFeatureInfo = function(pixel, coordinate) {
 
         for (var i = 0, ii = features2.length; i < ii; ++i) {
             names.value.push(features2[i].get('name'));
-            ids.value.push(features2[i].get('id'));
-            descrips.value.push(features2[i].get('descrip'));}
+            ids.value.push(features2[i].get('id'));}
         uniquenames.value = [... new Set(names.value.map(item => item))];
-        uniquedescrips.value = [... new Set(descrips.value.map(item => item))];
         uniqueids.value = [... new Set(ids.value.map(item => item))];
         if (uniquenames.value.length == 1) {
             var sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' + uniqueids.value[0] + '/datasets')
@@ -167,59 +145,22 @@ var displayFeatureInfo = function(pixel, coordinate) {
                 return datasets.value
                 
             })
-            console.log(sets)
         }
 } 
 };
 
 myMap.value.on('click', function(evt) {
     visible.value=true
-    console.log("hello?")
     var coordinate = evt.coordinate;
     displayFeatureInfo(evt.pixel, coordinate); })
 
 
-const extent = computed(() => {
-  if (vectorSource.getExtent()) {
-    myMap.value.getView().fit(vectorSource.getExtent())
-    return vectorSource.getExtent();
-  } else {
-    return [];
-  }
-});
-//console.log(extent)
-
-//console.log(myMap.value.getView().projection_.extent_)
-
-myMap.value.on('moveend', function() {
-    var zoom = myMap.value.getView().getZoom()
- //   console.log(zoom)
-    const newStyle = new Style({
-  image: new Circle({
-    radius: (5/4*zoom+1),
-    fill: new Fill({
-      color: 'rgba(251,205,188,1)',  }),
-    stroke: new Stroke({
-      color: 'rgba(92,84,80,1)',
-      width: (2/3*zoom),}), }),});;
-
-      vectorLayer.setStyle(newStyle);
-
-
-    })
-
-
-
-
-console.log(loading2.value)
 
 loading2.value =false
 
 })
 
 
-
-console.log(loading2.value)
 </script>
 
 
@@ -273,11 +214,3 @@ console.log(loading2.value)
 
 
 </template>
-
-<script>
-
-export default {
-  name: 'DatabaseMap',
-
-};
-</script>
