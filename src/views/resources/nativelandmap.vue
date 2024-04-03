@@ -255,21 +255,21 @@ loadingnat.value=false
         <span>This site intersects Indigenous lands. It is part of the territory of the </span>
       <span v-for="(feat, index) in vectorSource2.getFeatures()">
         <span v-if="(index +1) != vectorSource2.getFeatures().length && (index + 2) != vectorSource2.getFeatures().length">
- <a :href="feat.values_.url">{{feat.values_.name}}</a>
+ <a :href="feat.values_.url" target="_blank">{{feat.values_.name}}</a>
       <span>, </span>
     </span>
           <span v-if="(index + 2) == vectorSource2.getFeatures().length">
-         <a :href='feat.values_.url'>{{ feat.values_.name }}</a>
+         <a :href='feat.values_.url' target="_blank">{{ feat.values_.name }}</a>
       <span> and </span>
           </span>
     <span v-if="(index +1) == vectorSource2.getFeatures().length">
-  <a :href="feat.values_.url">{{ feat.values_.name}}</a> 
+  <a :href="feat.values_.url" target="_blank">{{ feat.values_.name}}</a> 
     </span>
   </span>
-  <span>, according to the <a href="https://native-land.ca/">Native Land mapping project.</a></span>
+  <span>, according to the <a href="https://native-land.ca/" target="_blank">Native Land mapping project.</a></span>
    <p> Neotoma is cataloging the Indigenous cultural affiliation of its data records as an element of its participation in the 
-    <a href="https://eos-rcn.github.io/web/">Ethical Open Science research coordination network</a>.
-    You can learn more about the movement for Indigenous data sovereignty <a href="https://nni.arizona.edu/our-work/research-policy-analysis/indigenous-data-sovereignty-governance">here</a>.</p>
+    <a href="https://eos-rcn.github.io/web/" target="_blank">Ethical Open Science research coordination network</a>.
+    You can learn more about the movement for Indigenous data sovereignty <a href="https://nni.arizona.edu/our-work/research-policy-analysis/indigenous-data-sovereignty-governance" target="_blank">here</a>.</p>
     </div>
     </Panel>
     <div v-if="features.length == 1">
@@ -282,7 +282,7 @@ loadingnat.value=false
       >
       <p>Native Land links:</p>
       <div v-for="(el,index) in link">
-        <a :href="link[index]">{{ info[index] }}</a>
+        <a :href="link[index]" target="_blank">{{ info[index] }}</a>
         </div>
  
       </Dialog>
@@ -295,7 +295,7 @@ loadingnat.value=false
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <strong>Territories:</strong>
         <div v-for="(el,index) in link">
-        <a :href="link[index]">{{ info[index] }}</a>
+        <a :href="link[index]" target="_blank">{{ info[index] }}</a>
         </div>
  
     </Dialog>
