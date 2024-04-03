@@ -213,10 +213,10 @@ myMap.value.on('moveend', function() {
 
 console.log(loading2.value)
 
+loading2.value =false
 
 })
 
-loading2.value =false
 
 
 console.log(loading2.value)
@@ -234,9 +234,12 @@ console.log(loading2.value)
 
 
 <template>
-<div v-if="!loading2">
+<div>
     <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
-        <div id='map' class="map"> </div>
+      <div v-if="loading2" class="flex flex-wrap justify-content-center align-items-center">
+         <ProgressSpinner class="flex-grow-1 w-max" />
+       </div>
+      <div id='map' class="map"> </div>
     </div>  
     <div v-if="uniquenames.length == 1">
         <Dialog
@@ -267,10 +270,7 @@ console.log(loading2.value)
         </Dialog>
     </div>
 </div>
-<div v-else class="flex flex-wrap justify-content-center align-items-center">
-    <p>any</p>
-    <ProgressSpinner class="flex-grow-1 w-max" />
-</div>
+
 
 </template>
 
