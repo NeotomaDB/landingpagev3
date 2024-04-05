@@ -2,6 +2,7 @@
 import Panel from 'primevue/panel';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import textobj from '@/views/dbdescrips.json'
 import { ref, onMounted } from 'vue'
 import {useRoute} from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner'
@@ -18,6 +19,8 @@ const constDBinfo = ref(null);
 const uniqueDBsites = ref(null);
 const uniqueDBsets = ref(null);
 const datasettypes = ref(null);
+const textDB = ref(null);
+const htmlString = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 
@@ -76,6 +79,13 @@ function loadconstDB() {
 onMounted(() => {
     loadContact()
     loadconstDB()
+    if (textobj.filter(a => a.dbID == route.params.databaseid).length != 0) {
+      let texttry = textobj.filter(a => a.dbID == route.params.databaseid)[0].dbDescrip
+      textDB.value = texttry}
+      else {
+        textDB.value = ""
+      }
+      htmlString.value = textDB.value
     
 })
 
@@ -89,6 +99,7 @@ onMounted(() => {
          <template #header>
           <h2>About {{ databasename }}</h2>
          </template>
+         <div v-html="htmlString"></div>
          <p> There are {{uniqueDBsites}} distinct sites in {{ databasename }}, associated with {{ uniqueDBsets }} datasets.</p>
          <DataTable paginator :rows="5" :value="datasettypes" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
            <Column field="datasettype" header="Dataset Type"></Column>
@@ -103,8 +114,7 @@ onMounted(() => {
                <p> <span> <strong> Database Contact</strong>: <p> {{ value.givennames}} {{ value.familyname }} </p> </span></p>
              </div>
              </div>
-             
-           <p>{{databasename}} text here (call some text from somewhere somehow?)</p>
+            
          </Panel>
          </div>
          
