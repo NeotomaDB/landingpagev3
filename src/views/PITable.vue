@@ -9,9 +9,6 @@ import Column from 'primevue/column'
 
 const loading_some = ref(true);
 const globalFilter = ref('');
-const uniqueSites = ref(null);
-const datasets = ref(null);
-const datasets_array = ref(null);
 const databaseinfo = ref(null)
 const databasekeys = ref(null)
 const databasename = ref(null)
