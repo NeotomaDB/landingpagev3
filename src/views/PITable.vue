@@ -65,6 +65,7 @@ const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotoma
 
  const filteredPIs = computed(() => {
   if (pis_array1.value) {
+
     return pis_array1.value.filter(car => {
       return Object.values(car).some(value =>
         value.toString().toLowerCase().includes(globalFilter.value.toLowerCase())
