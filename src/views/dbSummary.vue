@@ -148,7 +148,7 @@ const filteredDBs = computed(() => {
             </div>
             <p>Database Contact: {{ contact }}</p>
             <p>{{name}} currently contains {{uniqueSites}} unique sites, associated with {{ uniqueDBsets }}
-          unique datasets. See below for a summary of the kinds of datasets {{ el.databasename }} contains. </p>
+          unique datasets. See below for a summary of the kinds of datasets {{ name }} contains. </p>
 
     
            <DataTable paginator :rows="5" :value="datasettypes" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
