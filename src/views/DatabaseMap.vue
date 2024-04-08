@@ -86,6 +86,7 @@ return vectorLayer
 
 myMap.value.on('moveend', function() {
     var zoom = myMap.value.getView().getZoom()
+    //console.log(zoom)
     const newStyle = new Style({
   image: new Circle({
     radius: (5/4*zoom+1),
