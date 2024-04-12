@@ -12,7 +12,13 @@ import "primeflex/primeflex.css";
 import 'primeicons/primeicons.css';
 import './assets/ol-main.css';
 
+import Tooltip from 'primevue/tooltip';
+
 const app = createApp(App)
+
+app.directive('tooltip', Tooltip);
+
+
 
 app.use(createPinia())
 app.use(router)
