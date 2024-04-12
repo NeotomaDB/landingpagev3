@@ -8,8 +8,12 @@ import textobj from '@/views/dbdescrips.json'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext'
+import Tooltip from 'primevue/tooltip'
+import { getCenter } from 'ol/extent';
+//app.directive('tooltip', Tooltip);
 const databasekeys = ref(null);
 const visible = ref(false);
+const tooltipVisible = ref(false);
 const contact = ref(0)
 const contactinfo = ref(0)
 const uniqueSites = ref(null);
@@ -21,6 +25,7 @@ const dbkey2 = ref(null);
 const htmlString = ref(null);
 const name = ref(null);
 const globalFilter = ref('')
+const typesString = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 function loadDatabases() {
@@ -32,25 +37,8 @@ function loadDatabases() {
       databasekeys.value = json1.data  
       return databasekeys.value
     })
-    //.then(keys => {
-     //   deluxe.value = keys.map(obj => ({...obj, length: fetch(neotomaapi + "/v2.0/apps/constdb/datasets?dbid=" + obj.databaseid).json().data.length}))
-    //})
-
     }
 
-
-  async function loadContact(contactid) {
-  return await fetch(neotomaapi + "/v1.5/data/contacts/" +contactid,
-  { method: "GET", headers: {'content-type': 'application/json'}})
-  .then(async res => {
-    if (!res.ok) {
-      const error = new Error(res.statusText)
-      error.json = {'error': res.json(), 'databaseid':route.params.databaseid}
-      throw error;}
-    return await res.json()})
-  .then(async json => {
-    contactinfo.value = await json.data  
-    return contactinfo.value})}
 
 
 
@@ -90,16 +78,17 @@ async function loadSumSites(id) {
           return acc;}, {});
 
       datasettypes.value = Object.entries(datasettypes.value).map(([datasettype,value]) => ({datasettype,value}));
-      thisOneActive.value = id.databaseid
-      thisOneActive.value = id.databaseid
-      visible.value=true
-}
+      datasettypes.value =datasettypes.value.sort((a,b) => b.value - a.value)
+      console.log(datasettypes.value)
+      typesString.value = datasettypes.value.map(item => `${item.datasettype}: ${item.value}`).join('\n')
 
+  
+}
 
 
 loadDatabases();
 
- 
+
 const filteredDBs = computed(() => {
   if (databasekeys.value) {
     return databasekeys.value.filter(car => {
@@ -116,29 +105,63 @@ const filteredDBs = computed(() => {
   }
 });
 
+function gotodb(el) {
+  let id = el.databaseid
+  const url = `https://data.neotomadb.org/database/${id}`
+  window.open(url,'_blank');
+}
+
+
 
 </script>
 
+
 <template>
-    <h1>Constituent Databases Landing Pages</h1>
-    <p>These are the landing pages for Neotoma's constituent databases. 
+    <h1 style="text-align:center;">Constituent Databases</h1>
+    <Panel>
+    <p style="font-size:20px;">Neotoma is federated: a database of databases. Each constituent database in Neotoma 
+      focuses on curating paleoecological data from some particular specification of 
+      time, space, and proxy type. For instance, the main focus of the North American Pollen Database
+      is on late Quaternary pollen records from North America (as the name suggests!). That said, if you 
+      explore the North American Pollen Database, you will notice it also includes 
+      records from other continents and concerning other kinds of proxies. 
+      These landing pages for Neotoma's constituent databases are meant to facilitate that kind of data exploration. 
       These pages provide database-specific information on dataset types,
-    spatial and temporal coverage, upload history, and data contributors.</p>
-    <div class="flex justify-content-end">
+    spatial and temporal coverage, upload history, and data contributors. 
+    </p>
+  </Panel>
+    <Panel>
+      <template #header>
+    <div class="flex justify-content-center">
                 <InputText v-model="globalFilter" placeholder="Search Databases" />
         </div>
-    <div v-for="(el,index) in filteredDBs">
-        <Card>
-            <template #title>
-                <h2><a :href="'https://data.neotomadb.org/database/' + el.databaseid" target="_blank">{{ el.databasename }}</a></h2>
-            </template>
-            <template #content>
-            <Button @click="loadSumSites(el)">Summary Information</Button>
-            <div>
-      
-            </div>
-          </template>
-          </Card>
+      </template>
+      <div class="flex flex-wrap">
+     
+     
+    <div v-for="(el,index) in filteredDBs" class="col-4">
+            <Button 
+            style="width:100%;height:100%;justify-content:center;background-color:rgb(232,229,222);border-color:rgb(221,205,188);" class="col" 
+            v-tooltip="{ value: String(uniqueDBsets) + ' unique datasets\n' + typesString, showDelay: 750,
+          pt: {
+            arrow: 
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}" 
+            @mouseover="loadSumSites(el)" @click="gotodb(el)">
+              <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.databasename }}</p>
+            </Button>
+         
           <Dialog v-model:visible="visible"
               modal
               :header = 'name'
@@ -146,6 +169,7 @@ const filteredDBs = computed(() => {
               :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
               <div id="about" v-html="htmlString">
             </div>
+        
             <p>Database Contact: {{ contact }}</p>
             <p>{{name}} currently contains {{uniqueSites}} unique sites, associated with {{ uniqueDBsets }}
           unique datasets. See below for a summary of the kinds of datasets {{ name }} contains. </p>
@@ -156,7 +180,9 @@ const filteredDBs = computed(() => {
            <Column field="value" header="Number" sortable></Column>
          </DataTable>
         </Dialog>
-    </div>
-  
+   
+  </div>
 
+</div> 
+</Panel>
 </template>
