@@ -85,7 +85,7 @@ return vectorSource;})
 
 const clusterSource = new Cluster({
   distance: 18,
-  minDistance: 8,
+  minDistance: 18,
   source:source});
 
   const styleCache = {};
@@ -109,7 +109,7 @@ const clusterSource = new Cluster({
         else {
         style = new Style({
           image: new Circle({
-            radius: size**(1/5.35)+5,
+            radius: size**(1/3)+5,
             stroke: new Stroke({
               color: 'rgb(60,50,40)',
             }),
@@ -122,7 +122,7 @@ const clusterSource = new Cluster({
             fill: new Fill({
               color: 'rgb(60,50,40)',
             }),
-            font: 'bold ' + (size**(1/12.35)/3.5 + 7) + 'px Helvetica',
+            font: 'bold ' + (size**(1/6.35)/3.5 + 8) + 'px Helvetica',
           }),
         })};
         styleCache[size] = style;
