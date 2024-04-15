@@ -23,12 +23,15 @@ const route = useRoute()
 const datasets = ref([]);
 var names = ref([]);
 var ids = ref([]);
+var coords = ref([]);
 var descrips = ref([]);
 var uniquenames = ref([]);
 var uniqueids = ref([]);
+var siteids = ref([]);
 var link = ref([]);
 const myMap = ref(null);
 const loading2 = ref(true)
+const threshold = 70;
 
 
 const vectorSource = new VectorSource();
@@ -81,8 +84,8 @@ return vectorSource;})
 .then(source => {
 
 const clusterSource = new Cluster({
-  distance: 50,
-  minDistance: 50,
+  distance: 18,
+  minDistance: 8,
   source:source});
 
   const styleCache = {};
@@ -106,7 +109,7 @@ const clusterSource = new Cluster({
         else {
         style = new Style({
           image: new Circle({
-            radius: size**(1/2.35)+5,
+            radius: size**(1/5.35)+5,
             stroke: new Stroke({
               color: 'rgb(60,50,40)',
             }),
@@ -119,7 +122,7 @@ const clusterSource = new Cluster({
             fill: new Fill({
               color: 'rgb(60,50,40)',
             }),
-            font: 'bold ' + (size**(1/4.35) + 8) + 'px Helvetica',
+            font: 'bold ' + (size**(1/12.35)/3.5 + 7) + 'px Helvetica',
           }),
         })};
         styleCache[size] = style;
@@ -179,6 +182,43 @@ myMap.value.on('click', (e) => {
 })
 }
 
+function areObjectsIdentical(obj1, obj2) {
+    // Get the keys of the objects
+    var keys1 = Object.keys(obj1);
+    var keys2 = Object.keys(obj2);
+
+    // Check if the number of keys is the same
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    // Check if all keys and values are the same
+    for (var key of keys1) {
+        if (obj1[key] !== obj2[key]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function areAllIdentical(array) {
+    if (array.length === 0) {
+        return true;
+    }
+
+    var firstElement = array[0];
+
+    for (var i = 1; i < array.length; i++) {
+        if (!areObjectsIdentical(firstElement, array[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 onMounted(async () => {
     await loadconstDB();
     var extent2 = vectorSource.getExtent()
@@ -192,25 +232,34 @@ var displayFeatureInfo = function(pixel, coordinate) {
     var features2 = [];
     names.value = [];
     ids.value = [];
+    coords.value = [];
     uniquenames.value = [];
     uniqueids.value = [];
     link.value = [];
     datasets.value = [];
     myMap.value.forEachFeatureAtPixel(pixel, function(feature, layer) {
         console.log(feature);
-        feature.values_.features.forEach(el => {features2.push(el); });});
+        feature.values_.features.forEach(el => {
+          features2.push(el); });});
     
-    if (features2.length == 1) {
+    if (features2.length > 0) {
       console.log('true')
 
         for (var i = 0, ii = features2.length; i < ii; ++i) {
+            coords.value.push(features2[i].getGeometry().getCoordinates());
             names.value.push(features2[i].get('name'));
             ids.value.push(features2[i].get('id'));}
+        console.log(coords.value)
         uniquenames.value = [... new Set(names.value.map(item => item))];
         uniqueids.value = [... new Set(ids.value.map(item => item))];
-        if (uniquenames.value.length == 1) {
+  
+
+        if (areAllIdentical(coords.value) && uniqueids.value.length < threshold) {
+          console.log('yes ident')
+          var stringIDs = uniqueids.value.join(",");
           visible.value=true
-            var sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' + uniqueids.value[0] + '/datasets')
+          console.log(stringIDs)
+          var sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' +stringIDs + '/datasets?limit=2000')
             .then(res =>{
                 var inter = res.json()
                 console.log(inter)
@@ -220,7 +269,14 @@ var displayFeatureInfo = function(pixel, coordinate) {
             .then(int => {
                 var all = int.data
                 var fullsets = all.flatMap(site => site.site.datasets).map(on => on);
+                siteids.value = [];
+                all.forEach(function(site) {
+                  site.site.datasets.forEach(function(dataset) {
+                    siteids.value.push(site.site.sitename)
+                  })
+                })
                 console.log(fullsets)
+                console.log(siteids)
                 console.log(all)
                 fullsets.forEach(entry => {
                     datasets.value.push(entry.datasetid)
@@ -229,7 +285,11 @@ var displayFeatureInfo = function(pixel, coordinate) {
                 return datasets.value
                 
             })
-        
+
+        }
+
+        if (areAllIdentical(coords.value) && uniquenames.value.length >= threshold) {
+          visible.value = true;
         }
 } 
 };
@@ -284,6 +344,30 @@ loading2.value =false
                 <a :href="link[index]" target="_blank">{{ datasets[index] }}</a>
             </div>
             <p>{{ descrips[0] }}</p>
+        </Dialog>
+    </div>
+    <div v-if="uniquenames.length > 1 && uniquenames.length < threshold">
+        <Dialog header="Multiple Sites with same location"
+            v-model:visible="visible"
+            modal 
+            :style="{ width: '50rem' }"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <strong>Sites and Datasets</strong>
+            <div v-for="(site,index) in siteids">
+                <span>{{site}}: <a :href="link[index]" target="_blank">{{ datasets[index] }}</a></span>
+            </div>
+        </Dialog>
+    </div>
+    <div v-if="uniquenames.length >= threshold ">
+        <Dialog header="Many many sites with same coordinates"
+            v-model:visible="visible"
+            modal 
+            :style="{ width: '50rem' }"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <strong>Site Names:</strong>
+            <div v-for="site in uniquenames">
+                <p>{{site}}</p>
+            </div>
         </Dialog>
     </div>
 </div>
