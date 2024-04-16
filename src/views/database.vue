@@ -1,10 +1,11 @@
 <script setup>
-  import TempExtent from '@/views/TempExtent.vue';
-  import DatabaseMap2 from '@/views/DatabaseMap2.vue';
-  import UploadsTime from '@/views/UploadsTime.vue';
+  import TempExtent from '@/views/resources/databaseelements/TempExtent.vue';
+  import DatabaseMap2 from '@/views/resources/databaseelements/DatabaseMap2.vue';
+  import UploadsTime from '@/views/resources/databaseelements/UploadsTime.vue';
+  import AboutDB from '@/views/resources/databaseelements/AboutDB.vue';
+  import PITable from '@/views/resources/databaseelements/PITable.vue';
+  
   import Panel from 'primevue/panel'
-  import AboutDB from '@/views/AboutDB.vue';
-  import PITable from '@/views/PITable.vue';
 </script>
 
 

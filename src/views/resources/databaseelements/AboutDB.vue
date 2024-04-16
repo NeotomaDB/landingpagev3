@@ -2,7 +2,7 @@
 import Panel from 'primevue/panel';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import textobj from '@/views/dbdescrips.json'
+import textobj from '@/views/resources/databaseelements/dbdescrips.json'
 import { ref, onMounted } from 'vue'
 import {useRoute} from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner'

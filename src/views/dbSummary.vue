@@ -3,7 +3,7 @@ import {ref, computed} from 'vue';
 import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import textobj from '@/views/dbdescrips.json'
+//import textobj from '@/views/dbdescrips.json'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext'
@@ -112,48 +112,6 @@ function loadDatabases() {
 
 
 
-async function loadSumSites(id) {
-      if (textobj.filter(a => a.dbID == id.databaseid).length != 0) {
-      let texttry = textobj.filter(a => a.dbID == id.databaseid)[0].dbDescrip
-      textDB.value = texttry}
-      else {
-        textDB.value = ""
-      }
-      htmlString.value = textDB.value
-      let itsall = await fetch(neotomaapi + "/v2.0/apps/constdb/datasets?dbid=" + id.databaseid)
-      name.value = id.databasename
-      if (id.contactid) {
-        let con = await fetch(neotomaapi + "/v1.5/data/contacts/" +id.contactid)
-        con = await con.json();
-        con = await con.data;
-        contact.value = con.flatMap(con => con.contactname);
-        contact.value = contact.value[0]}
-      else {
-        contact.value = "No Contact"
-      }
-
-      itsall = await itsall.json()
-      itsall = await itsall.data
-      let uniques = new Set()
-      itsall.forEach(obj => uniques.add(obj['siteid']));
-      uniques = uniques.size
-   //   console.log(id.databaseid)
-      uniqueSites.value = uniques
-      uniqueDBsets.value = new Set();
-      itsall.forEach(obj => uniqueDBsets.value.add(obj['datasetid']));
-      uniqueDBsets.value = uniqueDBsets.value.size
-      datasettypes.value = itsall.reduce((acc, obj) => {
-          const type = obj.datasettype;
-          acc[type] = (acc[type] || 0) + 1;
-          return acc;}, {});
-
-      datasettypes.value = Object.entries(datasettypes.value).map(([datasettype,value]) => ({datasettype,value}));
-      datasettypes.value =datasettypes.value.sort((a,b) => b.value - a.value)
-   //   console.log(datasettypes.value)
-      typesString.value = datasettypes.value.map(item => `${item.datasettype}: ${item.value}`).join('\n')
-
-  
-}
 
 
 loadDatabases();
