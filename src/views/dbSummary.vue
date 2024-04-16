@@ -7,10 +7,14 @@ import textobj from '@/views/dbdescrips.json'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext'
+import Slider from 'primevue/slider'
 
 import Badge from 'primevue/badge';
 
+const slide = ref([-1000,60000000]);
 const databasekeys = ref(null);
+const show = ref(false);
+const dbsums = ref(null);
 const visible = ref(false);
 const contact = ref(0)
 const uniqueSites = ref(null);
@@ -76,7 +80,34 @@ function loadDatabases() {
       databasekeys.value = json1.data  
       return databasekeys.value
     })
+    .then(val => {
+      return  fetch(neotomaapi + "/v2.0/apps/constdb/",
+      { method: "GET", headers: {'content-type': 'application/json'}})
+    })
+    .then(res1 => {
+      return res1.json()})
+    .then(json1 => {
+      dbsums.value = json1.data  
+      return dbsums.value
+    })
+    .then(db => {
+      databasekeys.value = databasekeys.value.map(item1 => {
+        const matchingItem = db.find(item2 => item1['databasename'] === item2['databasename']);
+        return matchingItem ? { ...item1, ...matchingItem } : item1;
+    }).concat(db.filter(item2 => !databasekeys.value.some(item1 => item1['databasename'] === item2['databasename'])))
+    databasekeys.value.string = databasekeys.value.map(el => {
+      el.datasettypes.join('/n')
+    })
+    databasekeys.value = databasekeys.value.map(obj => ({
+      ...obj,
+      string: obj['datasettypes'].join('\n')
+    }));
+    console.log(databasekeys.value)
+    show.value = true
+    })
+
     }
+
 
 
 
@@ -144,8 +175,10 @@ function buttonfilter(dtype) {
 
 filteredDBs.value = computed(() => {
   if (databasekeys.value) {
-    console.log(globalFilter.value)
+
+    console.log(slide.value)
     return databasekeys.value.filter(car => {
+      console.log(car.younger)
       const matchString = Object.values(car).some(value => {
         // Check if the value is not null before converting to string
         if (value !== null) {
@@ -161,11 +194,21 @@ filteredDBs.value = computed(() => {
       const someValueIncludesAll = Object.values(car).some(value => {
         if (value!== null) {
 
-        return Object.values(datafilter.value).every(filter => value.toString().toLowerCase().includes(filter));}
+        return Object.values(datafilter.value).every(filter => value.toString().includes(filter));}
         return false;
   });
 
-      return matchString && someValueIncludesAll
+      var timeMatch = false
+      if (car.younger != null && car.older != null) {
+      if ((car.younger <= slide.value[1] && car.younger >= slide.value[0]) || 
+      (car.older >= slide.value[0] && car.older <= slide.value[1]) || (car.younger <= slide.value[0] && car.older >= slide.value[1]) ) {
+        timeMatch = true;
+      }}
+
+      if (car.younger == null && car.older == null) {
+        timeMatch = true;
+      }
+      return matchString && someValueIncludesAll && timeMatch
     });
   } else {
     return [];
@@ -183,6 +226,9 @@ function gotodb(el) {
 </script>
 
 <style>
+:root {
+  --vw: 10px;
+}
 .not {
   background-color:#837c6c;
   cursor: pointer;
@@ -198,10 +244,47 @@ function gotodb(el) {
   line-height:1.5
  /* font-weight:bold; */
 }
+
+.clicked:hover {
+  background-color:rgb(170,110,192);
+}
+
+.not:hover {
+  background-color:#e4c3a2;
+}
+
+
+.p-slider {
+  background: rgb(258, 201, 152);
+  height: 10px;
+  align-self:center;
+  justify-self:center;
+  justify-content:center;
+  justify-items:center;
+  text-align:center;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.p-slider .p-slider-range {
+  background: rgb(198, 161, 132);
+}
+
+.p-slider .p-slider-handle {
+ border: 2px solid rgb(198, 161, 132);
+ top: 0px;
+ height: 20px;
+ width: 20px;
+}
+
+.p-slider-horizontal {
+ /* top: 3px; */
+}
 </style>
 
 
 <template> 
+
     <Panel toggleable>
       <template #header>
         <h1 style="text-align:center;">Constituent Databases</h1>
@@ -226,6 +309,16 @@ function gotodb(el) {
       To explore any database in more detail, simply click its button below.
     </p>
   </Panel>
+  <Panel toggleable >
+    <template #header>
+      <h2>Time Filter</h2>
+    </template>
+    <Slider v-model="slide" range class="w-100rem" :min='Number(-1000)' :max='Number(60000000)'/>
+    <br>
+    <div style="max-width:405px;margin-left:auto;margin-right:auto;">
+<span>Younger Age: <InputText v-model.number="slide[0]" style="max-width:100px;"/> Older Age: <InputText  style="max-width:120px;" v-model.number="slide[1]" /></span>
+</div>
+  </Panel>
   <Panel toggleable collapsed>
     <template #header>
       <h2>Dataset Type Filter</h2>
@@ -244,11 +337,11 @@ function gotodb(el) {
       </template>
       <div class="flex flex-wrap">
      
-     
+
     <div v-for="(el,index) in filteredDBs.value" class="col-4">
             <Button 
             style="width:100%;height:100%;justify-content:center;background-color:rgb(232,229,222);border-color:rgb(221,205,188);" class="col" 
-            v-tooltip="{ value: String(uniqueDBsets) + ' unique datasets\n' + typesString, showDelay: 750,
+            v-tooltip="{ value: ('Number of datasets: ' + el.datasets + '\n Types:\n' + el.string + '\nage range: ' + el.younger + ' to ' + el.older),
           pt: {
             arrow: 
             {
@@ -264,7 +357,7 @@ function gotodb(el) {
             }
           },
           }}" 
-            @mouseover="loadSumSites(el)" @click="gotodb(el)">
+            @click="gotodb(el)">
               <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.databasename }}</p>
             </Button>
          
@@ -288,6 +381,7 @@ function gotodb(el) {
         </Dialog>
    
   </div>
+
 
 </div> 
 </Panel>
