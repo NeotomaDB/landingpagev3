@@ -134,13 +134,10 @@ function buttonfilter(dtype) {
 filteredDBs.value = computed(() => {
   if (databasekeys.value) {
 
-    console.log(slide.value)
     return databasekeys.value.filter(car => {
-      console.log(car.younger)
       const matchString = Object.values(car).some(value => {
         // Check if the value is not null before converting to string
         if (value !== null) {
-          console.log("here")
           let a = value.toString().toLowerCase().includes(globalFilter.value.toLowerCase());
          // let b = value.toString().toLowerCase().includes(Object.values(datafilter.value))
           return a
@@ -148,13 +145,20 @@ filteredDBs.value = computed(() => {
         return false; // Skip null values
       });
 
+      var matchData = false;
+if (car.datasettypes != null) {
+    matchData = Object.values(datafilter.value).every(filter => {
+        return Object.values(car.datasettypes).some(value => {
+            if (value !== null) {
+                return value.toString() === filter;
+            }
+            return false;
+        });
+    });
+} else {
+    return false;
+}
 
-      const someValueIncludesAll = Object.values(car).some(value => {
-        if (value!== null) {
-
-        return Object.values(datafilter.value).every(filter => value.toString().includes(filter));}
-        return false;
-  });
 
       var timeMatch = false
       if (car.younger != null && car.older != null) {
@@ -166,7 +170,7 @@ filteredDBs.value = computed(() => {
       if (car.younger == null && car.older == null) {
         timeMatch = true;
       }
-      return matchString && someValueIncludesAll && timeMatch
+      return matchString && matchData && timeMatch
     });
   } else {
     return [];
@@ -248,7 +252,7 @@ function gotodb(el) {
         <h1 style="text-align:center;">Constituent Databases</h1>
       </template>
     <p style="font-size:20px;">Neotoma is a database of databases. Each constituent database in Neotoma 
-      specializes in the curation of paleoecological data from some particular specification of 
+      specializes in the curation of paleoecological data from some particular configuration of 
       time, space, and proxy type. For instance, the main focus of the North American Pollen Database
       is on late Quaternary pollen records from North America (as the name suggests!). 
     </p>
@@ -267,7 +271,7 @@ function gotodb(el) {
       To explore any database in more detail, simply click its button below.
     </p>
   </Panel>
-  <Panel toggleable >
+  <Panel toggleable collapsed>
     <template #header>
       <h2>Time Filter</h2>
     </template>
