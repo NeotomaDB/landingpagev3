@@ -7,7 +7,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const route = useRoute()
 const theAges = ref(null);
-
+const theAges2 = ref(null);
 Chart.register(zoomPlugin);
 const chartCanvas = ref(null);
 const loading_temp = ref(true);
@@ -19,6 +19,7 @@ const chartReady = ref(false);
 const units_count = ref(null);
 const units_list = ref(null);
 
+Chart.defaults.plugins.tooltip.enabled = false;
 
 function colorpick(type) {
   if (type == "Calendar years BP") {
@@ -50,6 +51,35 @@ function sizepick(old,young) {
 }
 
 
+function addCommasToNumber(number) {
+    // Convert the number to a string
+    let str = number.toString();
+    
+    // Insert commas every three characters from the end of the string
+    let result = '';
+    let count = 0;
+    if (str[0] == "-") {
+    for (let i = str.length - 1; i >= 0; i--) {
+        result = str[i] + result;
+        count++;
+        if (count % 3 === 0 && i !== 0 && i !== 1) {
+            result = ',' + result;
+        }
+    }
+  }
+    else {
+    for (let i = str.length - 1; i >= 0; i--) {
+        result = str[i] + result;
+        count++;
+        if (count % 3 === 0 && i !== 0) {
+            result = ',' + result;
+        }
+    }}
+    
+    return result;
+}
+
+
 function loadDBages() {
   return  fetch(neotomaapi + "/v2.0/apps/constdb/datasetages?dbid=" + route.params.databaseid,
       { method: "GET", headers: {'content-type': 'application/json'}})
@@ -66,10 +96,10 @@ function loadDBages() {
           acc[unit] = (acc[unit] || 0) + 1;
           return acc;}, {});
 
-      theAges.value = {datasets: theAges.value.map(agerange => ({
+      theAges2.value = {datasets: theAges.value.map(agerange => ({
         data: [
-          {y: agerange.index, x: agerange.younger },
-          {y: agerange.index, x:agerange.older}
+          {y: agerange.index, x: Math.log10(agerange.younger + 20000)  },
+          {y: agerange.index, x: Math.log10(agerange.older + 20000) }
         ],
         borderWidth: 1,
         borderColor: colorpick(agerange.agetype),
@@ -77,7 +107,7 @@ function loadDBages() {
         pointRadius: sizepick(agerange.older,agerange.younger)
       }))}
 
-      return theAges.value
+      return theAges2.value
 
 })
 .then(ages => {
@@ -87,6 +117,20 @@ function loadDBages() {
     options: {
       scales: {
         x: {
+          ticks: {
+            callback: function(value,index,values) {
+                var newLab = Math.pow(10,value) - 20000;
+                if (newLab < 0) {
+                var sizer = String(Math.round(newLab)).length - 1
+              }
+              if (newLab >= 0) {
+                var sizer = String(Math.round(newLab)).length
+              }
+              sizer = Math.pow(10,sizer)/1000
+              if (sizer < 1) {sizer = 1}
+                newLab = addCommasToNumber(Math.round(newLab/sizer)*sizer)
+                return  newLab + " "}
+          },
             title: {
                 display: true,
                 text: 'Age (Years)',
@@ -106,6 +150,9 @@ function loadDBages() {
                     }
                 },
       plugins: {
+        tooltips: {
+            enabled: false // Disable tooltips
+        },
         legend: {
           display: false 
       },
@@ -131,6 +178,7 @@ function loadDBages() {
 }  );
 
 chartReady.value = true
+console.log(Chart.version)
 
 });
 }
