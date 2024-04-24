@@ -21,6 +21,7 @@ import Fill from 'ol/style/Fill';
 import Text from 'ol/style/Text';
 const route = useRoute()
 const datasets = ref([]);
+const dataindexer = ref([]);
 var names = ref([]);
 var ids = ref([]);
 var coords = ref([]);
@@ -28,7 +29,9 @@ var descrips = ref([]);
 var uniquenames = ref([]);
 var uniqueids = ref([]);
 var siteids = ref([]);
+var idxlist = ref([]);
 var link = ref([]);
+const datatypes = ref([]);
 const myMap = ref(null);
 const loading2 = ref(true)
 const threshold = 70;
@@ -237,6 +240,7 @@ var displayFeatureInfo = function(pixel, coordinate) {
     uniqueids.value = [];
     link.value = [];
     datasets.value = [];
+    datatypes.value = [];
     myMap.value.forEachFeatureAtPixel(pixel, function(feature, layer) {
         console.log(feature);
         feature.values_.features.forEach(el => {
@@ -270,15 +274,37 @@ var displayFeatureInfo = function(pixel, coordinate) {
                 var all = int.data
                 var fullsets = all.flatMap(site => site.site.datasets).map(on => on);
                 siteids.value = [];
+                idxlist.value = [];
+                var idx = 0;
                 all.forEach(function(site) {
+                  
                   site.site.datasets.forEach(function(dataset) {
-                    siteids.value.push(site.site.sitename)
+                    idx = idx + 1
+                    siteids.value.push({name: site.site.sitename, index: idx})
+                    idxlist.value.push(idx)
                   })
                 })
-                console.log(fullsets)
+
+                dataindexer.value = {};
+
+                siteids.value.forEach(item => {
+    // Extract name and index from each item
+                  const { name, index } = item;
+    
+    // If the name doesn't exist in the result object, initialize it with an empty array
+                   if (!dataindexer.value[name]) {
+                  dataindexer.value[name] = [];
+                    }
+    
+    // Push the index into the array corresponding to the name
+                      dataindexer.value[name].push(index);
+                });
+
+                console.log('dt indexer: ' + dataindexer.value)
                 console.log(siteids)
                 console.log(all)
                 fullsets.forEach(entry => {
+                    datatypes.value.push(entry.datasettype)
                     datasets.value.push(entry.datasetid)
                     link.value.push(("https://data.neotomadb.org/datasets/" + entry.datasetid))
                 })
@@ -323,6 +349,7 @@ loading2.value =false
 
 
 <template>
+  <p>{{ dataindexer.value }}</p>
 <div>
     <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
       <div v-if="loading2" class="flex flex-wrap justify-content-center align-items-center">
@@ -341,20 +368,23 @@ loading2.value =false
             <p>Site ID: {{ ids[0] }}</p>
             <p>Dataset ID links:</p>
             <div v-for="(el,index) in link">
-                <a :href="link[index]" target="_blank">{{ datasets[index] }}</a>
+                <span><a :href="link[index]" target="_blank">{{ datasets[index] }}</a> ({{ datatypes[index] }})</span>
             </div>
             <p>{{ descrips[0] }}</p>
         </Dialog>
     </div>
     <div v-if="uniquenames.length > 1 && uniquenames.length < threshold">
-        <Dialog header="Multiple Sites with same location"
+        <Dialog header="Multiple sites with same location"
             v-model:visible="visible"
             modal 
             :style="{ width: '50rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <strong>Sites and Datasets</strong>
-            <div v-for="(site,index) in siteids">
-                <span>{{site}}: <a :href="link[index]" target="_blank">{{ datasets[index] }}</a></span>
+            <div v-for="(site,index) in Object.keys(dataindexer)">
+              <p><i>{{ site }}:</i></p>
+              <span v-for="el in dataindexer[site]">
+                <span> <a :href="link[(el-1)]" target="_blank">{{ datasets[(el-1)] }}</a> ({{ datatypes[(el-1)] }}), </span>
+              </span>
             </div>
         </Dialog>
     </div>
@@ -366,7 +396,7 @@ loading2.value =false
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <strong>Site Names:</strong>
             <div v-for="site in uniquenames">
-                <p>{{site}}</p>
+                <p><i>{{site}}</i></p>
             </div>
         </Dialog>
     </div>
