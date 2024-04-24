@@ -1,5 +1,5 @@
 <script setup>
-import {ref, computed} from 'vue';
+import {ref, computed, watch, shallowReactive} from 'vue';
 import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -11,7 +11,13 @@ import Slider from 'primevue/slider'
 
 import Badge from 'primevue/badge';
 
-const slide = ref([-1000,60000000]);
+const min = -469897000
+const logmin = ref("-50,000")
+const logmax =  ref("50,000,000")
+const logmin_num = ref(-50000)
+const logmax_num = ref(50000000)
+const max = 769897000
+const slide = ref([min,max]);
 const databasekeys = ref(null);
 const show = ref(false);
 const dbsums = ref(null);
@@ -102,7 +108,6 @@ function loadDatabases() {
       ...obj,
       string: obj['datasettypes'].join('\n')
     }));
-    console.log(databasekeys.value)
     show.value = true
     })
 
@@ -119,13 +124,10 @@ loadDatabases();
 function buttonfilter(dtype) {
   const index = datafilter.value.indexOf(dtype.value);
   dtype.clicked = !dtype.clicked;
-  console.log(dtype)
   if (index === -1) {
     datafilter.value.push(dtype.value)
-    console.log(datafilter.value);
   } else {
-    datafilter.value.splice(index, 1)
-  console.log(datafilter.value)}
+    datafilter.value.splice(index, 1)}
 }
 
 
@@ -162,8 +164,8 @@ if (car.datasettypes != null) {
 
       var timeMatch = false
       if (car.younger != null && car.older != null) {
-      if ((car.younger <= slide.value[1] && car.younger >= slide.value[0]) || 
-      (car.older >= slide.value[0] && car.older <= slide.value[1]) || (car.younger <= slide.value[0] && car.older >= slide.value[1]) ) {
+      if ((car.younger <= logmax_num.value && car.younger >= logmin_num.value) || 
+      (car.older >= logmin_num.value && car.older <= logmax_num.value) || (car.younger <= logmin_num.value && car.older >= logmax_num.value) ) {
         timeMatch = true;
       }}
 
@@ -177,13 +179,96 @@ if (car.datasettypes != null) {
   }
 });
 
+function addCommasToNumber(number) {
+    // Convert the number to a string
+    let str = number.toString();
+    
+    // Insert commas every three characters from the end of the string
+    let result = '';
+    let count = 0;
+    if (str[0] == "-") {
+    for (let i = str.length - 1; i >= 0; i--) {
+        result = str[i] + result;
+        count++;
+        if (count % 3 === 0 && i !== 0 && i !== 1) {
+            result = ',' + result;
+        }
+    }
+  }
+    else {
+    for (let i = str.length - 1; i >= 0; i--) {
+        result = str[i] + result;
+        count++;
+        if (count % 3 === 0 && i !== 0) {
+            result = ',' + result;
+        }
+    }}
+    
+    return result;
+}
+
+
 function gotodb(el) {
   let id = el.databaseid
   const url = `https://data.neotomadb.org/database/${id}`
   window.open(url,'_blank');
 }
 
+watch([logmin_num,logmax_num], () => {
+  logmin.value = addCommasToNumber(logmin_num.value)
+  logmax.value = addCommasToNumber(logmax_num.value)
+if (logmin_num.value > 0) {
+  slide.value[0] = 99999999.9*Math.log10(logmin_num.value)
 
+}
+
+if (logmin_num.value < 0) {
+  slide.value[0] = -99999999.9*Math.log10(0-logmin_num.value)
+
+}
+
+if (logmax_num.value > 0) {
+  slide.value[1] = 99999999.9*Math.log10(logmax_num.value)
+}
+
+
+if (logmax_num.value < 0) {
+  slide.value[1] = -99999999.9*Math.log10(0-logmax_num.value)
+}
+
+if (logmax_num.value == 0) {
+  slide.value[1] = 0.01
+}
+
+if (logmin_num.value == 0) {
+  slide.value[0] = 0.01
+}
+})
+
+
+watch(slide, () => {
+  if (slide.value[0] <= 0) {
+  logmin_num.value = 0- Math.round(Math.pow(10, 0 -slide.value[0] / 99999999.9))
+ logmin.value = addCommasToNumber(logmin_num.value)
+
+
+}
+
+if (slide.value[1] <= 0) {
+  logmax_num.value = 0- Math.round(Math.pow(10, 0 -slide.value[1] / 99999999.9))
+ logmax.value = addCommasToNumber(logmax_num.value)
+}
+
+if (slide.value[0] > 0) {
+  logmin_num.value = Math.round(Math.pow(10,  slide.value[0] / 99999999.9))
+  logmin.value = addCommasToNumber(logmin_num.value)
+}
+
+if (slide.value[1] > 0) {
+  logmax_num.value = Math.round(Math.pow(10,  slide.value[1] / 99999999.9))
+  logmax.value = addCommasToNumber(logmax_num.value)
+}
+})
 
 </script>
 
@@ -239,13 +324,19 @@ function gotodb(el) {
  width: 20px;
 }
 
-.p-slider-horizontal {
- /* top: 3px; */
+.p-slider:not(.p-disabled) .p-slider-handle:hover {
+  background: rgb(198,161,132);
+  border-color: #eabf93
+}
+
+.p-slider .p-slider-handle:focus {
+ box-shadow: 0 0 0 0.2rem #eabf93
 }
 </style>
 
 
 <template> 
+
 
     <Panel toggleable>
       <template #header>
@@ -263,7 +354,7 @@ function gotodb(el) {
       The landing pages for Neotoma's constituent databases (linked to below) are meant to 
       facilitate data exploration by constituent database, in order to make the 
       sometimes unexpected holdings of any given database more transparent to 
-      Neotoma's public. 
+      Neotoma's users. 
       These pages provide database-specific information on dataset types,
     spatial and temporal coverage, upload history, and data contributors. 
     </p>
@@ -275,10 +366,12 @@ function gotodb(el) {
     <template #header>
       <h2>Time Filter</h2>
     </template>
-    <Slider v-model="slide" range class="w-100rem" :min='Number(-1000)' :max='Number(60000000)'/>
+    <Slider v-model="slide" range class="w-100rem" :min='min' :max='max'/>
     <br>
-    <div style="max-width:405px;margin-left:auto;margin-right:auto;">
-<span>Younger Age: <InputText v-model.number="slide[0]" style="max-width:100px;"/> Older Age: <InputText  style="max-width:120px;" v-model.number="slide[1]" /></span>
+    <div style="max-width:580px;margin-left:auto;margin-right:auto;">
+<span>Younger Age: <InputText v-model.number="logmin_num" style="max-width:100px;"/> ({{ logmin }}). 
+   Older Age: <InputText  style="max-width:120px;" 
+   v-model.number="logmax_num" /> ({{ logmax }}). </span>
 </div>
   </Panel>
   <Panel toggleable collapsed>
