@@ -351,14 +351,14 @@ if (slide.value[1] > 0) {
       they tend over the years to have accumulated other data which arguably fall outside their ambit. 
       (If you explore the North American Pollen Database, you will notice it also includes 
       records from other continents and concerning a variety of proxies.) 
-      The landing pages for Neotoma's constituent databases (linked to below) are meant to 
+      The landing pages for Neotoma's constituent databases (linked below) are meant to 
       facilitate data exploration by constituent database, in order to make the 
       sometimes unexpected holdings of any given database more transparent to 
       Neotoma's users. 
       These pages provide database-specific information on dataset types,
     spatial and temporal coverage, upload history, and data contributors. 
     </p>
-    <p style="font-size:20px;"> On this page, you may filter by database name and dataset types to find Neotoma constituent databases that may be of interest to you. 
+    <p style="font-size:20px;"> On this page, you may filter by database name, dataset type, and temporal coverage, to find Neotoma constituent databases that may be of interest to you. 
       To explore any database in more detail, simply click its button below.
     </p>
   </Panel>
