@@ -266,21 +266,25 @@ loadingnat.value=false
   <a :href="feat.values_.url" target="_blank">{{ feat.values_.name}}</a> 
     </span>
   </span>
-  <span>, according to the <a href="https://native-land.ca/" target="_blank">Native Land mapping project.</a></span>
+  <span>, according to the <a href="https://native-land.ca/" target="_blank">Native Land</a> mapping project.</span>
   <p>Neotoma’s stewards and users come from all over the world. 
     Wherever we are and wherever we collect and curate data, 
     we acknowledge that we are on Indigenous land. </p>
 
-<p>Neotoma is committed to Indigenous sovereignty; 
-  we believe that naming the ways that our data have been and are now entangled with the violences of 
-  settler-colonialism is a necessary component 
-  of ethical data stewardship. We acknowledge that Neotoma’s archive has resulted in 
-  part from a process of colonial extraction, by which scientists exploit the natural 
-  and cultural wealth of Indigenous nations without consultation or provision of reciprocal
-   benefit. As well, we acknowledge that Neotoma's data model/taxonomies can 
-   objectify entities sacred to Indigenous peoples, thereby harming them.
+<p>Naming the ways that Neotoma’s 
+  data have been and are now entangled with the violences of 
+  settler-colonialism is a necessary component of 
+  ethical data stewardship. We acknowledge that Neotoma’s archive 
+  has resulted in part from a process of colonial extraction, 
+  by which scientists exploit 
+  the natural and cultural wealth of Indigenous nations 
+  without consultation or provision of reciprocal benefit. 
+  As well, we acknowledge that Neotoma's data model 
+  can objectify entities sacred to Indigenous peoples, 
+  thereby harming them.
 </p>
-   <p> We have a responsibility to support Indigenous peoples, communities, and organizations. 
+   <p>We respect the sovereign status of the Indigenous peoples from whose lands our data derive, 
+    and we hold ourselves accountable to those peoples.
     Neotoma is cataloging the Indigenous cultural affiliation of its data records as an element of its participation in the 
     <a href="https://eos-rcn.github.io/web/home" target="_blank">Ethical Open Science research coordination network</a>,
     in order to work toward more ethical stewardship of Indigenous data. </p>
