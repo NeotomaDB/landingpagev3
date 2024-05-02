@@ -7,7 +7,7 @@ import { Map, View } from 'ol';
 import XYZ from 'ol/source/XYZ';
 import Tile from 'ol/layer/Tile.js';
 import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'ol/layer/vector';
+import VectorLayer from 'ol/layer/Vector';
 import {fromLonLat} from 'ol/proj';
 import Point from 'ol/geom/Point';
 import Feature from "ol/Feature";
