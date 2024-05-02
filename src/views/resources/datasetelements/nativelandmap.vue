@@ -280,12 +280,12 @@ loadingnat.value=false
   the natural and cultural wealth of Indigenous nations 
   without consultation or provision of reciprocal benefit. 
   As well, we acknowledge that Neotoma's data model 
-  can objectify entities sacred to Indigenous peoples, 
-  thereby harming them.
+  can objectify the sacred kin of Indigenous peoples.
 </p>
    <p>We respect the sovereign status of the Indigenous peoples from whose lands our data derive, 
     and we hold ourselves accountable to those peoples.
-    Neotoma is cataloging the Indigenous cultural affiliation of its data records as an element of its participation in the 
+    Neotoma is cataloging the Indigenous cultural affiliation of 
+    its data records and exploring new ways to represent those records as an element of its participation in the 
     <a href="https://eos-rcn.github.io/web/home" target="_blank">Ethical Open Science research coordination network</a>,
     in order to work toward more ethical stewardship of Indigenous data. </p>
     </div>
