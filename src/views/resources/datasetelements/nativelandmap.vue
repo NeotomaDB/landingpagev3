@@ -54,6 +54,17 @@ if(Array.isArray(location.coordinates.flat()[0])) {
   newlong.value = (location.coordinates.flat()[1][0] + location.coordinates.flat()[0][0])/2
 }
   
+function getColor(source) {
+  var length = source.length
+  var color = null;
+  var colorList = ['#D94120','#92bb20','#20BB82', '#484D5C']
+ for (var i = 0; i < length; i++) {
+  color = colorList[i];
+ }
+ return color;
+}
+
+
 
 async function nativeland() {
   if(Array.isArray(location.coordinates.flat()[0])) {
@@ -100,9 +111,11 @@ const vectorStyle = new Style({
   }),
   stroke: new Stroke({
     color: 'rgba(92, 84, 80, 1)', // Specify the border color for the polygon
-    width: 3 // Specify the border width for the polygon
+    width: 1 // Specify the border width for the polygon
   })
 });
+
+
 
   vectorSource2.value = new VectorSource();
   const vectorLayer2 = new VectorLayer({
@@ -110,10 +123,10 @@ const vectorStyle = new Style({
     style: function(feature) {
       return new Style({
         fill: new Fill({
-          color: 'rgba(232,229, 222, 0.5)'}),
+          color: feature.getProperties().fillColor}),
         stroke: new Stroke({
-          color: 'rgba(92, 84, 80, 1)',
-          width: 3 }),
+          color: 'rgba(92, 84, 80, 0)',
+          width: 0 }),
         text: new Text({
           text: feature.get('name'),
           font: '20px Calibri,sans-serif',
@@ -124,20 +137,25 @@ const vectorStyle = new Style({
             color: 'rgba(92, 84, 80, 1)',
             width: 1
           }),
-          offsetX: 0,
-          offsetY: -10,
+          //offsetX: 0,
+          //offsetY: -10,
+          overflow: true,
           textAlign: 'center',
           textBaseline: 'middle',
-          placement: 'point',
+         // placement: 'point',
+         placement: 'line',
           maxAngle: Math.PI /4
 
         })
       })
     }});
-  natland.value.forEach((elem) => {
+  natland.value.forEach((elem,index) => {
     if (elem.geometry.coordinates.flat().length != 1) {
       var polygonGeometry = new Polygon([elem.geometry.coordinates.flat().map(coord => fromLonLat(coord))]);
+      var choices = ['rgba(127, 201, 127, 0.8)', 'rgba(190, 174, 212, 0.8)', 'rgba(253, 192, 134, 0.8)', 'rgba(255, 255, 153, 0.8)', 'rgba(56, 108, 176, 0.8)']
+      var fillColor = choices[(index % 5)] 
       const polygonFeature = new Feature({
+        fillColor: fillColor,
         geometry: polygonGeometry,
         name: elem.properties.Name,
         slug: elem.properties.Slug,
@@ -211,6 +229,49 @@ const vectorStyle = new Style({
     var coordinate = evt.coordinate;
     displayFeatureInfo(evt.pixel, coordinate);});
 
+
+
+    const popupContainer = document.createElement('div');
+popupContainer.className = 'popup';
+document.body.appendChild(popupContainer);
+
+// Create an overlay with the popup container
+const popupOverlay = new Overlay({
+    element: popupContainer,
+    positioning: 'bottom-center',
+    stopEvent: false,
+    offset: [0, -15] // Offset to position the popup above the pointer
+});
+myMap2.addOverlay(popupOverlay);
+    // Add a pointermove event listener to the map
+myMap2.on('pointermove', function(event) {
+    // Get the pixel coordinates of the pointer from the event
+    const pixel = myMap2.getEventPixel(event.originalEvent);
+    const featureInfo = [];
+
+    // Perform an action when hovering over a feature
+    myMap2.forEachFeatureAtPixel(pixel, function(feature, layer) {
+        // Check if the feature exists
+        if (feature) {
+            // Do something when hovering over the feature
+            const featureProperties = feature.getProperties();
+            const text = featureProperties.name || 'Feature';
+            if (layer == vectorLayer2) {
+            featureInfo.push(text)}
+
+        }
+    });
+    if (featureInfo.length > 0) {
+        popupContainer.innerHTML = featureInfo.join('<br>'); // Separate feature information with line breaks
+        const coordinate = myMap2.getEventCoordinate(event.originalEvent);
+        popupOverlay.setPosition(coordinate);
+        popupOverlay.setMap(myMap2);
+    } else {
+        // If no feature is found, hide the popup overlay
+        popupOverlay.setMap(null);
+    }
+
+});
    
 }
 
@@ -229,6 +290,11 @@ loadingnat.value=false
 .map {
   width: 100%;
   height: 400px; /* Adjust the height as needed */
+}
+
+.popup {
+  background-color: white;
+  padding: 3px;
 }
 </style>
 
