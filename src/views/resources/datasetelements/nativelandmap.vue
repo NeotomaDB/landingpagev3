@@ -152,7 +152,8 @@ const vectorStyle = new Style({
   natland.value.forEach((elem,index) => {
     if (elem.geometry.coordinates.flat().length != 1) {
       var polygonGeometry = new Polygon([elem.geometry.coordinates.flat().map(coord => fromLonLat(coord))]);
-      var choices = ['rgba(127, 201, 127, 0.8)', 'rgba(190, 174, 212, 0.8)', 'rgba(253, 192, 134, 0.8)', 'rgba(255, 255, 153, 0.8)', 'rgba(56, 108, 176, 0.8)']
+      var choices = ['rgba(227, 181, 0, 0.7)', 'rgba(90, 253, 101, 0.7)','rgba(134, 192, 253, 0.7)', 'rgba(255, 0, 185, 0.5)','rgba(0, 0, 10, 0.5)']
+      //, , , , , 
       var fillColor = choices[(index % 5)] 
       const polygonFeature = new Feature({
         fillColor: fillColor,
