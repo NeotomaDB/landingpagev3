@@ -12,17 +12,13 @@ const contactinfo = ref(0)
 const uniqueSites = ref(null);
 const loading_ab = ref(true);
 const databasekeys = ref(null)
-const dbkeys2 = ref(null)
 const databasename = ref(null)
 const currentDB = ref(null)
-const currentDB2 = ref(null)
 const route = useRoute();
 const constDBinfo = ref(null);
 const uniqueDBsites = ref(null);
 const uniqueDBsets = ref(null);
 const datasettypes = ref(null);
-const email = ref(null);
-const url = ref(null);
 const textDB = ref(null);
 const htmlString = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
@@ -38,8 +34,10 @@ function loadContact() {
   .then(json1 => {
     databasekeys.value = json1.data  
     currentDB.value = databasekeys.value.find(element => element.databaseid === Number(route.params.databaseid))
-    return currentDB.value.databasename})
-  .then(val => fetch(neotomaapi + "/v2.0/apps/constdb/",
+    contact.value = currentDB.value.contactid
+    databasename.value = currentDB.value.databasename
+    return contact.value})
+  .then(val => fetch(neotomaapi + "/v1.5/data/contacts/" +val,
   { method: "GET", headers: {'content-type': 'application/json'}}))
   .then(res => {
     if (!res.ok) {
@@ -48,13 +46,7 @@ function loadContact() {
       throw error;}
     return res.json()})
   .then(json => {
-    dbkeys2.value = json.data 
-    currentDB2.value = dbkeys2.value.find(element => element.databasename == currentDB.value.databasename)
-    contactinfo.value = currentDB2.value.contactname
-    databasename.value = currentDB2.value.databasename
-    url.value = currentDB2.value.url
-    email.value = 'mailto:' + currentDB2.value.email
-    return contact.value     })}
+    contactinfo.value = json.data      })}
 
 
 function loadconstDB() {
@@ -80,8 +72,6 @@ function loadconstDB() {
 
   datasettypes.value = Object.entries(datasettypes.value).map(([datasettype,value]) => ({datasettype,value}));
   loading_ab.value=false
-
-
 })
 }
 
@@ -110,22 +100,19 @@ onMounted(() => {
           <h2>About {{ databasename }}</h2>
          </template>
          <div v-html="htmlString"></div>
-         <div v-if="url != null">
-        <span><strong>Website:</strong> {{ url }}</span></div>
-         <div v-if="email != 'mailto:null' && contactinfo != null">
-         <span><strong>Database Contact: </strong><a :href='email'>{{ contactinfo }}</a></span>
-        </div>
-        <div v-if="email == 'mailto:null' && contactinfo != null">
-          <span><strong>Database Contact: </strong>{{ contactinfo }}</span>
-        </div>
          <p> There are {{uniqueDBsites}} distinct sites in {{ databasename }}, associated with {{ uniqueDBsets }} datasets.</p>
          <DataTable paginator :rows="5" :value="datasettypes" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
            <Column field="datasettype" header="Dataset Type"></Column>
            <Column field="value" header="Number" sortable></Column>
          </DataTable>
-  
+           
          <div v-for="(value, name, index) in contactinfo" :key="name.id">
-
+           <div v-if="value.url !== null">
+             <p> <span> <strong> Database Contact</strong>: <a :href='value.url'> {{ value.givennames}} {{ value.familyname }} </a> </span></p>
+           </div>
+           <div v-else>
+               <p> <span> <strong> Database Contact</strong>: <p> {{ value.givennames}} {{ value.familyname }} </p> </span></p>
+             </div>
              </div>
             
          </Panel>

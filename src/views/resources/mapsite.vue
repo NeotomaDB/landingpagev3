@@ -21,7 +21,6 @@ var location = JSON.parse(props.location)
 delete location.crs
 const projection = ref('EPSG:4326')
 const zoom = ref(9)
-const currentZoom = ref(9)
 const rotation = ref(0)
 const newlong = ref(0)
 const newlat = ref(0)
@@ -60,24 +59,14 @@ if(Array.isArray(location.coordinates.flat()[0])) {
           :rotation="rotation"
           :zoom="zoom"
           :projection="projection"
-          @change:resolution="resolutionChanged"
         />
         <ol-tile-layer>
-          <ol-source-xyz url="https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <ol-source-stadia-maps layer="stamen_terrain" />
         </ol-tile-layer>
         <ol-vector-layer>
-          <ol-source-vector v-if="Array.isArray(location.coordinates.flat()[0]) && currentZoom > 9">
+          <ol-source-vector v-if="Array.isArray(location.coordinates.flat()[0])">
             <ol-feature >
-              <ol-geom-polygon :coordinates="location.coordinates"></ol-geom-polygon>
-              <ol-style>
-                <ol-style-stroke color="rgba(0,0,0,0.8)" width="2"></ol-style-stroke>
-                <ol-style-fill color="rgba(255,0,0,0.2)"></ol-style-fill>
-              </ol-style>
-            </ol-feature>
-            </ol-source-vector>
-            <ol-source-vector v-else-if="Array.isArray(location.coordinates.flat()[0]) && currentZoom <= 9">
-              <ol-feature>
-              <ol-geom-point :coordinates="location.coordinates[0][0]"></ol-geom-point>
+              <ol-geom-point :coordinates="[newlong,newlat]"></ol-geom-point>
               <ol-style>
                 <ol-style-circle radius="12">
                   <ol-style-fill color="rgba(251,205,188,0.8)"></ol-style-fill>
@@ -88,7 +77,7 @@ if(Array.isArray(location.coordinates.flat()[0])) {
             </ol-source-vector>
             <ol-source-vector v-else>
             <ol-feature>
-              <ol-geom-point :coordinates="location.coordinates[0]"></ol-geom-point>
+              <ol-geom-point :coordinates="location.coordinates"></ol-geom-point>
               <ol-style>
                 <ol-style-circle radius="12">
                   <ol-style-fill color="rgba(251,205,188,0.8)"></ol-style-fill>
