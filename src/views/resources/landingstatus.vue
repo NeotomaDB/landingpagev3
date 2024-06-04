@@ -11,7 +11,7 @@ const timeoutId = setTimeout(() => controller.abort(), 5000)
 
 const apidev = import.meta.env.VITE_APP_APIDEV_ENDPOINT ?? 'https://api-dev.neotomadb.org'
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
-const tiliaapi = import.meta.env.VITE_APP_TILIA_ENDPOINT ?? 'http://tilia.neotomadb.org'
+const tiliaapi = import.meta.env.VITE_APP_TILIA_ENDPOINT ?? 'https://tilia.neotomadb.org'
 
 const loadStatus = new Promise(() => {
   fetch(apidev + '/api-docs/', {
@@ -128,7 +128,6 @@ onMounted(() => {
             </a>
           </div>
         </div>
-
         <div class="col-4 p-3 align-self-end">
           <div style="width:100%;text-align:center"><i class="pi pi-database" style="font-size: 2.5rem;padding:10px;"/></div>
           <p>The Neotoma Database Schema is a navigable representation of the data tables within the Neotoma Postgres database.</p>
