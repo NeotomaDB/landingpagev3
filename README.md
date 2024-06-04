@@ -11,6 +11,7 @@ The page leverages the [Neotoma v2 API](http://github.com/NeotomaDB/api_nodetest
 This project is an open project, and contributions are welcome from any individual.  All contributors to this project are bound by a [code of conduct](CODE_OF_CONDUCT.md).  Please review and follow this code of conduct as part of your contribution.
 
 * [![orcid](https://img.shields.io/badge/orcid-0000--0002--2700--4605-brightgreen.svg)](https://orcid.org/0000-0002-2700-4605) [Simon Goring](http://goring.org)
+* [![orcid](https://img.shields.io/badge/orcid-0000--0002--6626--5015-brightgreen.svg)](https://orcid.org/0000-0002-6626-5015) Nick Hoffman
 * Michael Stryker
 * [The Neotoma Paleoecology Database](http://neotomadb.org)
 
