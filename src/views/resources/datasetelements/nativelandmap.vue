@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, watchEffect } from 'vue'
 import Panel from 'primevue/panel';
+import Avatar from 'primevue/avatar';
 import Dialog from 'primevue/dialog';
 import ProgressSpinner from 'primevue/progressspinner'
 import { Map, View } from 'ol';
@@ -302,9 +303,13 @@ loadingnat.value=false
 
 <template>
   <div v-if="!loadingnat">
-    <Panel toggleable>
+    <Panel toggleable collapsed>
         <template #header>
-            <h3>Indigenous Lands</h3>
+          <div class="flex align-items-center gap-2">
+            
+            <img src="https://149613070.v2.pressablecdn.com/wp-content/themes/NLD-2021/assets/nld-logo.png" height=40 />
+            <span><h3>Native Land Digital Data</h3></span>
+          </div>
         </template>
         <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
           <div id="map2" class="map" ref="map">
@@ -312,8 +317,7 @@ loadingnat.value=false
  
       </div> 
       <div v-if="!hasFeatures">
-            <p>This site does not intersect any Indigenous 
-              territorries currently mapped by the Native Land project.
+            <p>This site does not intersect any Indigenous territorries currently mapped by the Native Land project.
             </p>
           </div>
 
