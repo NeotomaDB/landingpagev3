@@ -1,7 +1,7 @@
 <script setup>
  import { ref, onMounted } from 'vue';
  import { useRoute } from 'vue-router';
- import DatabaseMap from '@/views/DatabaseMap.vue';
+ import DatabaseMap from '@/views/resources/databaseelements/DatabaseMap2.vue';
 
  
   const route = useRoute()
