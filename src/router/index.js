@@ -38,7 +38,7 @@ const routes = [
       name: "DatabaseSelect",
       component: DatabaseSelect,
   },
-    {path: "/testmap/",
+    {path: "/testmap/:databaseid",
     name: "Testmap",
     component: Testmap,
   }
