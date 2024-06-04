@@ -37,7 +37,7 @@ function loadContact() {
     contact.value = currentDB.value.contactid
     databasename.value = currentDB.value.databasename
     return contact.value})
-  .then(val => fetch(neotomaapi + "/v1.5/data/contacts/" +val,
+  .then(val => fetch(neotomaapi + "/v1.5/data/contacts/" + val,
   { method: "GET", headers: {'content-type': 'application/json'}}))
   .then(res => {
     if (!res.ok) {
@@ -94,31 +94,31 @@ onMounted(() => {
 
 
 <template>
-    <div v-if="!loading_ab">  
-       <Panel toggleable>
-         <template #header>
-          <h2>About {{ databasename }}</h2>
-         </template>
-         <div v-html="htmlString"></div>
-         <p> There are {{uniqueDBsites}} distinct sites in {{ databasename }}, associated with {{ uniqueDBsets }} datasets.</p>
-         <DataTable paginator :rows="5" :value="datasettypes" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
-           <Column field="datasettype" header="Dataset Type"></Column>
-           <Column field="value" header="Number" sortable></Column>
-         </DataTable>
-           
-         <div v-for="(value, name, index) in contactinfo" :key="name.id">
-           <div v-if="value.url !== null">
-             <p> <span> <strong> Database Contact</strong>: <a :href='value.url'> {{ value.givennames}} {{ value.familyname }} </a> </span></p>
-           </div>
-           <div v-else>
-               <p> <span> <strong> Database Contact</strong>: <p> {{ value.givennames}} {{ value.familyname }} </p> </span></p>
-             </div>
-             </div>
-            
-         </Panel>
-         </div>
+  <Panel toggleable>
+    <template #header>
+      <h2>About {{ databasename }}</h2>
+    </template>
+    <div v-if="!loading_ab"> 
+      <div v-html="htmlString"></div>
+      <p>There are {{uniqueDBsites}} distinct sites in {{ databasename }}, associated with {{ uniqueDBsets }} datasets.</p>
+      <DataTable paginator :rows="5" :value="datasettypes" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
+        <Column field="datasettype" header="Dataset Type"></Column>
+        <Column field="value" header="Number" sortable></Column>
+      </DataTable>
+        
+      <div v-for="(value, name, index) in contactinfo" :key="name.id">
+        <div v-if="value.url !== null">
+          <p> <span> <strong> Database Contact</strong>: <a :href='value.url'> {{ value.givennames}} {{ value.familyname }} </a> </span></p>
+        </div>
+        <div v-else>
+            <p> <span> <strong> Database Contact</strong>: <p> {{ value.givennames}} {{ value.familyname }} </p> </span></p>
+        </div>
+      </div>
+    </div>
+    <div v-else class="flex flex-wrap justify-content-center align-items-center">
+      <ProgressSpinner class="flex-grow-1 w-max" />
+    </div>
+  </Panel>
          
-       <div v-else class="flex flex-wrap justify-content-center align-items-center">
-           <ProgressSpinner class="flex-grow-1 w-max" />
-       </div>
+       
 </template>

@@ -44,9 +44,6 @@ const visible = ref(false);
 const constDBinfo = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
-
-
-
 const vectorStyle = new Style({
   image: new Circle({
     radius: 12,
@@ -349,14 +346,13 @@ loading2.value =false
 
 
 <template>
-  <p>{{ dataindexer.value }}</p>
 <div>
     <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
       <div v-if="loading2" class="flex flex-wrap justify-content-center align-items-center">
          <ProgressSpinner class="flex-grow-1 w-max" />
        </div>
       <div id='map2' class="map"> </div>
-    </div>  
+    </div>
     <div v-if="uniquenames.length == 1">
         <Dialog
             v-model:visible="visible"
