@@ -55,7 +55,6 @@ onMounted(() => {
   <Panel toggleable collapsed>
     <template #header>
       <h3>Taxa and Variables Reported</h3>
-      
     </template>
     <div class="grid" style="grid-auto-rows: 1fr;">
     <div v-for="element in datasetinfo">

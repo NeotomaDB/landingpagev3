@@ -32,3 +32,7 @@ playwright-report/
 
 .env
 .vscode/
+*.vsidx
+.vs/
+src/views/testmap.vue
+src/views/testmap.vue

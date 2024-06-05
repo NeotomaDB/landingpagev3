@@ -1,5 +1,6 @@
 <script setup>
 import SiteMap from '@/views/resources/mapsite.vue'
+import NativeMap from '@/views/resources/datasetelements/nativelandmap.vue'
 import Panel from 'primevue/panel'
 const props = defineProps(['title'])
 </script>
@@ -30,6 +31,8 @@ const props = defineProps(['title'])
           <SiteMap :location="props.title.site.geography" />
         </div>
       </div>
+      <br>
+      <NativeMap :location="props.title.site.geography" />
     </div>
   </Panel>
 </template>
