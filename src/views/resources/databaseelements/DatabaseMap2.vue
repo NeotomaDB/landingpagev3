@@ -36,148 +36,132 @@ const myMap = ref(null);
 const loading2 = ref(true)
 const threshold = 70;
 
-
 const vectorSource = new VectorSource();
-
 
 const visible = ref(false);
 const constDBinfo = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
-
-const vectorStyle = new Style({
-  image: new Circle({
-    radius: 12,
-    fill: new Fill({
-      color: 'rgba(251,205,188,1)',  }),
-    stroke: new Stroke({
-      color: 'rgba(92,84,80,1)',
-      width: 6,}), }),});
-            
-    function loadconstDB() {
-    return  fetch(neotomaapi + "/v2.0/apps/constdb/datasets?dbid=" + route.params.databaseid,
+        
+function loadconstDB() {
+  return  fetch(neotomaapi + "/v2.0/apps/constdb/datasets?dbid=" + route.params.databaseid,
       { method: "GET", headers: {'content-type': 'application/json'}})
     .then(res1 => {
       return res1.json()})
     .then(json1 => {
       constDBinfo.value = json1.data
-  return constDBinfo.value})
+      return constDBinfo.value})
   .then(values => {
     let ids = [];
         values.forEach((pointfull) => {
-    if (pointfull.coords !== null) { 
-      if (!ids.includes(pointfull.siteid)) {
-            var point = pointfull.coords
-            const lonLat = fromLonLat(point);
-            var feature = new Feature({
-                geometry: new Point(lonLat),
-                name: pointfull.sitename,
-                id: pointfull.siteid,
+          if (pointfull.coords !== null) { 
+            if (!ids.includes(pointfull.siteid)) {
+                  var point = pointfull.coords
+                  const lonLat = fromLonLat(point);
+                  var feature = new Feature({
+                      geometry: new Point(lonLat),
+                      name: pointfull.sitename,
+                      id: pointfull.siteid,
+              })
+                ids.push(pointfull.siteid)
+                vectorSource.addFeature(feature);
+            }
+          }
         })
-          ids.push(pointfull.siteid)
-                
-            vectorSource.addFeature(feature);
 
-    }}
-})
+    return vectorSource;})
+  .then(source => {
+    const clusterSource = new Cluster({
+      distance: 18,
+      minDistance: 18,
+      source:source});
 
-return vectorSource;})
-.then(source => {
+    const styleCache = {};
 
-const clusterSource = new Cluster({
-  distance: 18,
-  minDistance: 18,
-  source:source});
-
-  const styleCache = {};
-
-  const clusters = new VectorLayer ({
-    source:clusterSource,
-    style: function (feature) {
-      const size = feature.get('features').length;
-      let style = styleCache[size];
-      if (!style) {
-        if (size==1) {
-          style = new Style({
-  image: new Circle({
-    radius: (5/4*4+1),
-    fill: new Fill({
-      color: 'rgba(251,205,188,1)',  }),
-    stroke: new Stroke({
-      color: 'rgba(92,84,80,1)',
-      width: (2/3*4),}), }),})
-        }
-        else {
-        style = new Style({
-          image: new Circle({
-            radius: size**(1/3)+5,
-            stroke: new Stroke({
-              color: 'rgb(60,50,40)',
-            }),
-            fill: new Fill({
-              color: 'rgb(221,205,188)',
-            }),
-          }),
-          text: new Text({
-            text: size.toString(),
-            fill: new Fill({
-              color: 'rgb(60,50,40)',
-            }),
-            font: 'bold ' + (size**(1/6.35)/3.5 + 8) + 'px Helvetica',
-          }),
-        })};
-        styleCache[size] = style;
-      }
-      return style;
-    },
+    const clusters = new VectorLayer ({
+      source: clusterSource,
+      style: function (feature) {
+        const size = feature.get('features').length;
+        let style = styleCache[size];
+        if (!style) {
+          if (size == 1) {
+            style = new Style({
+              image: new Circle({
+                radius: (5/4*4+1),
+                fill: new Fill({
+                  color: 'rgba(251,205,188,1)',  }),
+                stroke: new Stroke({
+                  color: 'rgba(92,84,80,1)',
+                  width: (2/3*4),}), 
+                }),
+              })
+            } else {
+              style = new Style({
+                image: new Circle({
+                  radius: size**(1/3)+5,
+                  stroke: new Stroke({
+                    color: 'rgb(60,50,40)',
+                  }),
+                  fill: new Fill({
+                    color: 'rgb(221,205,188)',
+                  }),
+                }),
+                text: new Text({
+                  text: size.toString(),
+                  fill: new Fill({
+                    color: 'rgb(60,50,40)',
+                  }),
+                  font: 'bold ' + (size**(1/6.35)/3.5 + 8) + 'px Helvetica',
+                }),
+              })
+            };
+            styleCache[size] = style;
+          }
+          return style;
+        },
+      })
+    return clusters;
+  })
+  .then(vl => {
+    myMap.value = new Map({
+      layers: [
+          new Tile({
+              source: new XYZ({
+              url: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png'
+          }),}),
+          vl,],
+      target: 'map2',
+      view: new View({
+          center: [0,0],
+          zoom: 2,}),
   })
 
-return clusters})
-.then(vl => {
-  myMap.value = new Map({
-    layers: [
-        new Tile({
-            source: new XYZ({
-            url: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png'
-        }),}),
-        vl,],
-    target: 'map2',
-    view: new View({
-        center: [0,0],
-        zoom: 2,}),
-})
+  myMap.value.on('moveend', function() {
+      var zoom = myMap.value.getView().getZoom()
+      console.log(zoom)
+      const newStyle = new Style({
+    image: new Circle({
+      radius: (5/4*zoom+1),
+      fill: new Fill({
+        color: 'rgba(251,205,188,1)',  }),
+      stroke: new Stroke({
+        color: 'rgba(92,84,80,1)',
+        width: (2/3*zoom),}), }),});
+      });
 
-
-myMap.value.on('moveend', function() {
-    var zoom = myMap.value.getView().getZoom()
-    console.log(zoom)
-    const newStyle = new Style({
-  image: new Circle({
-    radius: (5/4*zoom+1),
-    fill: new Fill({
-      color: 'rgba(251,205,188,1)',  }),
-    stroke: new Stroke({
-      color: 'rgba(92,84,80,1)',
-      width: (2/3*zoom),}), }),});;
-
-    //  vl.setStyle(newStyle);
-
-
-    });
-
-myMap.value.on('click', (e) => {
-  vl.getFeatures(e.pixel).then((clickedFeatures) => {
-    if (clickedFeatures.length) {
-      // Get clustered Coordinates
-      const features = clickedFeatures[0].get('features');
-      if (features.length > 1) {
-        const extent = boundingExtent(
-          features.map((r) => r.getGeometry().getCoordinates()),
-        );
-        myMap.value.getView().fit(extent, {duration: 1000, padding: [50, 50, 50, 50]});
+  myMap.value.on('click', (e) => {
+    vl.getFeatures(e.pixel).then((clickedFeatures) => {
+      if (clickedFeatures.length) {
+        // Get clustered Coordinates
+        const features = clickedFeatures[0].get('features');
+        if (features.length > 1) {
+          const extent = boundingExtent(
+            features.map((r) => r.getGeometry().getCoordinates()),
+          );
+          myMap.value.getView().fit(extent, {duration: 1000, padding: [50, 50, 50, 50]});
+        }
       }
-    }
+    });
   });
-});
   
 })
 }
