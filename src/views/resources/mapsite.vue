@@ -24,7 +24,7 @@ const zoom = ref(9)
 const rotation = ref(0)
 const newlong = ref(0)
 const newlat = ref(0)
-const natland = ref(null)
+const natland = ref(null) 
 
 function centerMap(location) {
   if (Array.isArray(location.coordinates.flat()[0])) {
@@ -61,7 +61,7 @@ if(Array.isArray(location.coordinates.flat()[0])) {
           :projection="projection"
         />
         <ol-tile-layer>
-          <ol-source-stadia-maps layer="stamen_terrain" />
+          <ol-source-osm />
         </ol-tile-layer>
         <ol-vector-layer>
           <ol-source-vector v-if="Array.isArray(location.coordinates.flat()[0])">
