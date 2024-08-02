@@ -36,3 +36,5 @@ playwright-report/
 .vs/
 src/views/testmap.vue
 src/views/testmap.vue
+
+package-lock.json
