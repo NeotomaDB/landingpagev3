@@ -38,10 +38,6 @@ const routes = [
       name: "DatabaseSelect",
       component: DatabaseSelect,
   },
-    {path: "/testmap/",
-    name: "Testmap",
-    component: Testmap,
-  }
 ]
 
 const router = createRouter({
