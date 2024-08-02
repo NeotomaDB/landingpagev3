@@ -4,7 +4,6 @@ import PageNotFound from "@/views/pagenotfound.vue"
 import Taxa from "@/views/taxa.vue"
 import Dataset from "@/views/dataset.vue"
 import Database from "@/views/database.vue"
-import Testmap from "@/views/testmap.vue"
 import DatabaseSelect from "@/views/dbSummary.vue"
 
 const routes = [
