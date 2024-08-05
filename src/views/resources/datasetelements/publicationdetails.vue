@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, defineProps } from 'vue'
+  import { ref, onMounted } from 'vue'
   import Panel from 'primevue/panel';
   import Card from 'primevue/card';
   import ProgressSpinner from 'primevue/progressspinner';
