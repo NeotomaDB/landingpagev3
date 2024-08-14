@@ -68,7 +68,7 @@ const loadStatus = new Promise(() => {
     .catch((err) => {
       refs.value['explorer'] = {
         name: 'Neotoma Explorer',
-        status: false,
+        status: true,
         url: 'https://apps.neotomadb.org/explorer'
       }
       console.log(err)

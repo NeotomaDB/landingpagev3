@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import Panel from 'primevue/panel';
   import Card from 'primevue/card';
   import ProgressSpinner from 'primevue/progressspinner';
@@ -53,7 +53,7 @@ onMounted(() => {
                 <template #content>
                   <strong>Dataset Type:</strong> {{ dsets.datasettype }}<br>
                   <div v-if="dsets.doi[0]">
-                  <strong>DOI:</strong> <a href="https://doi.org/{{ dsets.doi[0] }}">{{dsets.doi[0]}}</a><br>
+                  <strong>DOI:</strong> <a :href="'https://doi.org/' + dsets.doi[0]">{{dsets.doi[0]}}</a><br>
                   </div>
                   <div v-else><strong>DOI:</strong> None Minted.</div>
                 </template>

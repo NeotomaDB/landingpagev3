@@ -57,10 +57,10 @@ onMounted(() => {
       <h3>Taxa and Variables Reported</h3>
     </template>
     <div class="grid" style="grid-auto-rows: 1fr;">
-    <div v-for="element in datasetinfo">
+    <div v-for="element in datasetinfo" :key="element.taxonname">
       <Chip :label="element.taxonname" @click="visible = true" style="cursor:pointer">
       </Chip>
-      <Dialog
+      <!--<Dialog
         v-model:visible="visible"
         modal
         :header="element.taxonname"
@@ -68,7 +68,7 @@ onMounted(() => {
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
       >
       <pre>{{ JSON.stringify(element, null, 2) }}</pre>
-      </Dialog>
+      </Dialog> -->
     </div>
 </div>
   </Panel>

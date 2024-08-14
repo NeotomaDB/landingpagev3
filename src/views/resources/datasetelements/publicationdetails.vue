@@ -49,7 +49,7 @@ onMounted(() => {
         <div class="grid">
           <div class="flex flex-row flex-wrap">
             <div v-for="pub in publication">
-              <Card class="max-w-30rem h-full">
+              <Card class="max-w-25rem h-full">
                   <template #content>
                       {{ pub.publication.citation}}<br>
                       <div v-if="pub.publication.doi">
