@@ -63,7 +63,7 @@
             <div v-for="name in props.title.site.datasets[0].datasetpi" class="col-6">
               <div class="text-center p-3 border-round-sm surface-ground hover:surface-500 font-bold">{{ name.contactname }}</div>
             </div>
-            </div>
+          </div>
         </div>
         <div v-else>None Reported</div>
       </div>

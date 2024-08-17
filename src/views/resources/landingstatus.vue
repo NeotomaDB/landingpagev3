@@ -109,12 +109,13 @@ onMounted(() => {
       "
     >
       <div class="grid">
-        <div class="col-4 p-3">
-          <div v-for="endpoint in refs" class="row p-1 text-center">
+        <div class="col-4">
+          <div v-for="endpoint in refs" class="row">
+            <div class="text-left">
             <a
               :href="refs.url"
-              class="p-button"
-              style="width: 100%; background: #5D584B"
+              class="p-button w-full justify-content-left"
+              style="background: #5D584B"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -126,6 +127,7 @@ onMounted(() => {
               <Badge v-if="!endpoint.status" severity="danger" style="margin: 5px" />
               <strong>{{ endpoint.name }}</strong>
             </a>
+          </div>
           </div>
         </div>
 

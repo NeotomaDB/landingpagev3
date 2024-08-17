@@ -3,7 +3,7 @@
   import Panel from 'primevue/panel';
   import Card from 'primevue/card';
   import ProgressSpinner from 'primevue/progressspinner';
-  const props = defineProps(['siteid'])
+  const props = defineProps(['siteid', 'datasetid'])
   let otherDatasets = ref(null)
   let loading = ref(true)
   const error = ref(null)
@@ -47,17 +47,13 @@ onMounted(() => {
     </template>
       <div v-if="!loading">
         <div class="grid">
-          <div class="flex flex-row flex-wrap">
-            <div v-for="dsets in otherDatasets">
-              <Card>
-                <template #content>
-                  <strong>Dataset Type:</strong> {{ dsets.datasettype }}<br>
-                  <div v-if="dsets.doi[0]">
-                  <strong>DOI:</strong> <a :href="'https://doi.org/' + dsets.doi[0]">{{dsets.doi[0]}}</a><br>
-                  </div>
-                  <div v-else><strong>DOI:</strong> None Minted.</div>
-                </template>
-              </Card>
+          <div v-for="dsets in otherDatasets" class="col-6">
+            <div class="text-left p-3 border-round surface-ground hover:surface-500">
+              <strong>Dataset Type:</strong> {{ dsets.datasettype }} <span v-if="dsets.datasetid==props.datasetid">(this dataset)</span><br>
+              <div v-if="dsets.doi[0]">
+              <strong>DOI:</strong> <a :href="'https://doi.org/' + dsets.doi[0]">{{dsets.doi[0]}}</a><br> 
+              </div>
+              <div v-else><strong>DOI:</strong> None Minted.</div>
             </div>
           </div>
         </div>
