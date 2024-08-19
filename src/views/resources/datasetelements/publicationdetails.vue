@@ -47,16 +47,12 @@ onMounted(() => {
     </template>
       <div v-if="!loading">
         <div class="grid">
-          <div class="flex flex-row flex-wrap">
-            <div v-for="pub in publication">
-              <Card class="max-w-25rem h-full">
-                  <template #content>
-                      {{ pub.publication.citation}}<br>
-                      <div v-if="pub.publication.doi">
-                        <strong>DOI:</strong> <a href="https://doi.org/{{ pub.publication.doi}}">https://doi.org/{{ pub.publication.doi}}</a>
-                      </div>
-                  </template>
-              </Card>
+          <div v-for="pub in publication" class="col-6">
+            <div class="text-left p-3 border-round surface-ground hover:surface-500">
+              {{ pub.publication.citation}}<br>
+              <div v-if="pub.publication.doi">
+                <strong>DOI:</strong> <a :href="'https://doi.org/' + pub.publication.doi" target="_blank">https://doi.org/{{ pub.publication.doi}}</a>
+              </div>
             </div>
           </div>
         </div>
