@@ -626,6 +626,11 @@ dompurify@^2.2.0:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.5.6.tgz#8402b501611eaa7fb3786072297fcbe2787f8592"
   integrity sha512-zUTaUBO8pY4+iJMPE1B9XlO2tXVYIcEA4SNGtvDELzTSCQO7RzH+j7S180BmhmJId78lqGU2z19vgVx2Sxs/PQ==
 
+downloadjs@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/downloadjs/-/downloadjs-1.4.7.tgz#f69f96f940e0d0553dac291139865a3cd0101e3c"
+  integrity sha512-LN1gO7+u9xjU5oEScGFKvXhYf7Y/empUIIEAGBs1LzUq/rg5duiDrkuH5A2lQGd5jfMOb9X9usDa2oVXwJ0U/Q==
+
 earcut@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/earcut/-/earcut-3.0.0.tgz#a8d5bf891224eaea8287201b5e787c6c0318af89"
@@ -1003,10 +1008,22 @@ ol-contextmenu@^5.4.0:
   dependencies:
     tiny-emitter "^2.1.0"
 
+ol-contextmenu@^5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/ol-contextmenu/-/ol-contextmenu-5.5.0.tgz#277b097b79ce78e52ef9332b62f3cf7c4971da42"
+  integrity sha512-IglB0OfzSmcP++dykqrQU62lJAn/4O61hxyD0s5V03HE70Efm6EgSaNq8YOlgEbnqfUL+7F3fS7VI3UV+0+NZg==
+  dependencies:
+    tiny-emitter "^2.1.0"
+
 ol-ext@^4.0.21:
   version "4.0.21"
   resolved "https://registry.yarnpkg.com/ol-ext/-/ol-ext-4.0.21.tgz#78ba613d1b95e66629c3ce252da6f8367ba0f3eb"
   integrity sha512-xP4oVD5KBvJW6P9UQwmPcgqMDh6nzUrHjle4qhNqzRW7OkP02mObw5UMGAgz+uhIW8doJ3hYCwy2HcpU1JFpig==
+
+ol-ext@^4.0.22:
+  version "4.0.22"
+  resolved "https://registry.yarnpkg.com/ol-ext/-/ol-ext-4.0.22.tgz#6cc5453df31e9ec7df0303749b969e5ad56a09a8"
+  integrity sha512-ljujTaJK3TX9jzjAqyDw9vl5WRGTMpNLfTS2GsFeKZqohByHb8OurvnOwGlJtQExnSHEjqyyqh9K57TYqxoRDA==
 
 ol@^10.0.0:
   version "10.0.0"
@@ -1289,10 +1306,10 @@ vue-router@4:
   dependencies:
     "@vue/devtools-api" "^6.6.3"
 
-vue3-openlayers@^11.0.0:
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/vue3-openlayers/-/vue3-openlayers-11.0.0.tgz#3662c16085e4edf004c2bd8e6677c5e11741ed13"
-  integrity sha512-CAO5asL5V5VzG12aIbquNTFqiO6aV6uD+IOExf7lCkVrtiCY65IXXrcHKBZ2vv7X1JGI4CI5e4c+tCq7lEeEqw==
+vue3-openlayers@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/vue3-openlayers/-/vue3-openlayers-11.1.0.tgz#367e9b308bbeb2c33695b0ad037f8013daddce2c"
+  integrity sha512-svjE8qNVOAZFhV44Hr669a2hcABtZVtEBXGwhscKxILu8ocGmXySv3cn6RPGsavPHVcOPDtYQckJeZmb8qNxTA==
   dependencies:
     "@turf/buffer" "^7.0.0"
     "@turf/helpers" "^7.0.0"
