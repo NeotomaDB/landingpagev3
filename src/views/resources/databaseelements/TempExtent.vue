@@ -117,6 +117,7 @@ function loadDBages() {
     options: {
       scales: {
         x: {
+          min: Math.log10(1950 - new Date().getFullYear() + 20000),
           ticks: {
             callback: function(value,index,values) {
                 var newLab = Math.pow(10,value) - 20000;
@@ -156,21 +157,21 @@ function loadDBages() {
         legend: {
           display: false 
       },
-      zoom: {
-            pan: {
-              enabled: true,
-              mode: 'xy'
-            },
-            zoom: {
-                wheel: {
-                    enabled: true,
-                },
-                pinch: {
-                    enabled: true
-                },
-                mode: 'xy'
-            }
-        }
+     // zoom: {
+     //       pan: {
+     //         enabled: true,
+     //         mode: 'xy'
+     //       },
+     //       zoom: {
+     //           wheel: {
+     //               enabled: true,
+     //           },
+     //           pinch: {
+     //               enabled: true
+     //           },
+      //          mode: 'xy'
+      //      }
+      //  }
     }
   }
 

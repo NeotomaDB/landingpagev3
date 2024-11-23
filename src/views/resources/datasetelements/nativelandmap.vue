@@ -291,19 +291,25 @@ loadingnat.value=false
 <style>
 .map {
   width: 100%;
-  height: 400px; /* Adjust the height as needed */
+  height: 395px; /* Adjust the height as needed */
 }
 
 .popup {
   background-color: white;
   padding: 3px;
 }
+
+.custom .p-panel-header {
+  background-color:gray;
+}
+.norm .p-panel-header {
+}
 </style>
 
 
 <template>
   <div v-if="!loadingnat">
-    <Panel toggleable collapsed>
+    <Panel id='nativeland' :class="{custom: !hasFeatures, norm: hasFeatures}" toggleable collapsed>
         <template #header>
           <div class="flex align-items-center gap-2">
             
@@ -311,7 +317,8 @@ loadingnat.value=false
             <span><h3>Native Land Digital Data</h3></span>
           </div>
         </template>
-        <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
+        <div id="griddiv_nlm" style="display:grid;grid-template-columns:1fr 1fr;">
+        <div style="height:400px;width:450px;margin-left:0%;margin-right:auto;border:3px solid rgb(92,84,80);">
           <div id="map2" class="map" ref="map">
         </div>
  
@@ -321,7 +328,7 @@ loadingnat.value=false
             </p>
           </div>
 
-      <div v-if="hasFeatures">
+      <div v-if="hasFeatures" style="font-size:13px;">
         <br>
         <span>This site intersects Indigenous lands. It is part of the territory of the </span>
       <span v-for="(feat, index) in vectorSource2.getFeatures()">
@@ -359,7 +366,9 @@ loadingnat.value=false
     its data records and exploring new ways to represent those records as an element of its participation in the 
     <a href="https://eos-rcn.github.io/web/home" target="_blank">Ethical Open Science research coordination network</a>,
     in order to work toward more ethical stewardship of Indigenous data. </p>
+    <p>This language has been borrowed in part from <a target="_blank" href="https://localcontexts.org/">Local Contexts</a>.</p>
     </div>
+  </div>
     </Panel>
     <div v-if="features.length == 1">
     <Dialog

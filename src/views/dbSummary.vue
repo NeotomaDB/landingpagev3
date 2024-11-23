@@ -11,13 +11,8 @@ import Slider from 'primevue/slider'
 
 import Badge from 'primevue/badge';
 
-const min = -469897000
-const logmin = ref("-50,000")
-const logmax =  ref("50,000,000")
-const logmin_num = ref(-50000)
-const logmax_num = ref(50000000)
-const max = 769897000
-const slide = ref([min,max]);
+const slide = ref([(1950 - new Date().getFullYear()),50000000]);
+
 const databasekeys = ref(null);
 const show = ref(false);
 const dbsums = ref(null);
@@ -77,50 +72,70 @@ const datasettypes_master = ref([
   { value: "X-ray fluorescence (XRF)", clicked: false }
 ]);
 
-function loadDatabases() {
-    return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
-      { method: "GET", headers: {'content-type': 'application/json'}})
-    .then(res1 => {
-      return res1.json()})
-    .then(json1 => {
-      databasekeys.value = json1.data  
-      return databasekeys.value
-    })
-    .then(val => {
+//function loadDatabases() {
+//    return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
+//      { method: "GET", headers: {'content-type': 'application/json'}})
+//    .then(res1 => {
+//      return res1.json()})
+//    .then(json1 => {
+//      databasekeys.value = json1.data  
+//      return databasekeys.value
+//    })
+//    .then(val => {
+//      return  fetch(neotomaapi + "/v2.0/apps/constdb/",
+//      { method: "GET", headers: {'content-type': 'application/json'}})
+//    })
+//    .then(res1 => {
+//      return res1.json()})
+//    .then(json1 => {
+//      dbsums.value = json1.data  
+//      return dbsums.value
+//    })
+//    .then(db => {
+//      databasekeys.value = databasekeys.value.map(item1 => {
+//        const matchingItem = db.find(item2 => item1['databasename'] === item2['databasename']);
+//        return matchingItem ? { ...item1, ...matchingItem } : item1;
+//    }).concat(db.filter(item2 => !databasekeys.value.some(item1 => item1['databasename'] === item2['databasename'])))
+//    databasekeys.value.string = databasekeys.value.map(el => {
+//      el.datasettypes.join('/n')
+ //   })
+    
+ //   databasekeys.value = databasekeys.value.map(obj => ({
+ //     ...obj,
+ //     string: obj['datasettypes'].join('\n')
+ //   }));
+ //   show.value = true
+ //   })
+
+   // }
+
+
+    function loadDatabases() {
       return  fetch(neotomaapi + "/v2.0/apps/constdb/",
       { method: "GET", headers: {'content-type': 'application/json'}})
-    })
     .then(res1 => {
       return res1.json()})
     .then(json1 => {
-      dbsums.value = json1.data  
+      dbsums.value = json1.data 
       return dbsums.value
     })
     .then(db => {
-      databasekeys.value = databasekeys.value.map(item1 => {
-        const matchingItem = db.find(item2 => item1['databasename'] === item2['databasename']);
-        return matchingItem ? { ...item1, ...matchingItem } : item1;
-    }).concat(db.filter(item2 => !databasekeys.value.some(item1 => item1['databasename'] === item2['databasename'])))
-    databasekeys.value.string = databasekeys.value.map(el => {
-      el.datasettypes.join('/n')
-    })
-    databasekeys.value = databasekeys.value.map(obj => ({
+    databasekeys.value = db.map(obj => {
+      return {
       ...obj,
-      string: obj['datasettypes'].join('\n')
-    }));
+      string: obj.datasettypes
+      .map(type => type.datasettype)
+      .filter(Boolean)
+      .join("\n")
+    };
+      
+    });
     show.value = true
-    })
+    console.log(databasekeys.value)
+    })}
 
-    }
-
-
-
-
-
-
-
+ 
 loadDatabases();
-
 function buttonfilter(dtype) {
   const index = datafilter.value.indexOf(dtype.value);
   dtype.clicked = !dtype.clicked;
@@ -132,12 +147,12 @@ function buttonfilter(dtype) {
 
 
 
-
 filteredDBs.value = computed(() => {
   if (databasekeys.value) {
 
     return databasekeys.value.filter(car => {
-      const matchString = Object.values(car).some(value => {
+      console.log(Object.values(car))
+      const matchString = Object.values(car.database).some(value => {
         // Check if the value is not null before converting to string
         if (value !== null) {
           let a = value.toString().toLowerCase().includes(globalFilter.value.toLowerCase());
@@ -150,13 +165,11 @@ filteredDBs.value = computed(() => {
       var matchData = false;
 if (car.datasettypes != null) {
     matchData = Object.values(datafilter.value).every(filter => {
-        return Object.values(car.datasettypes).some(value => {
-            if (value !== null) {
-                return value.toString() === filter;
-            }
-            return false;
-        });
-    });
+  return car.datasettypes.some(dataset => {
+    return dataset.datasettype !== null && dataset.datasettype.toString() === filter;
+  });  
+  
+  });
 } else {
     return false;
 }
@@ -164,20 +177,26 @@ if (car.datasettypes != null) {
 
       var timeMatch = false
       if (car.younger != null && car.older != null) {
-      if ((car.younger <= logmax_num.value && car.younger >= logmin_num.value) || 
-      (car.older >= logmin_num.value && car.older <= logmax_num.value) || (car.younger <= logmin_num.value && car.older >= logmax_num.value) ) {
+      if ((car.younger <= slide.value[1] && car.younger >= slide.value[0]) || 
+      (car.older >= slide.value[0] && car.older <= slide.value[1]) || (car.younger <= slide.value[0] && car.older >= slide.value[1]) ) {
         timeMatch = true;
       }}
 
       if (car.younger == null && car.older == null) {
         timeMatch = true;
       }
+   //   console.log("matchstring: " + matchString)
+   //   console.log("matchData: " + matchData)
+      console.log("matchtime: " + timeMatch)
       return matchString && matchData && timeMatch
     });
   } else {
     return [];
   }
 });
+
+
+console.log(filteredDBs.value)
 
 function addCommasToNumber(number) {
     // Convert the number to a string
@@ -207,68 +226,14 @@ function addCommasToNumber(number) {
     return result;
 }
 
-
+const currentYear = 1950 - new Date().getFullYear();
 function gotodb(el) {
-  let id = el.databaseid
+  let id = el.database.databaseid
   const url = `https://data.neotomadb.org/database/${id}`
   window.open(url,'_blank');
 }
 
-watch([logmin_num,logmax_num], () => {
-  logmin.value = addCommasToNumber(logmin_num.value)
-  logmax.value = addCommasToNumber(logmax_num.value)
-if (logmin_num.value > 0) {
-  slide.value[0] = 99999999.9*Math.log10(logmin_num.value)
 
-}
-
-if (logmin_num.value < 0) {
-  slide.value[0] = -99999999.9*Math.log10(0-logmin_num.value)
-
-}
-
-if (logmax_num.value > 0) {
-  slide.value[1] = 99999999.9*Math.log10(logmax_num.value)
-}
-
-
-if (logmax_num.value < 0) {
-  slide.value[1] = -99999999.9*Math.log10(0-logmax_num.value)
-}
-
-if (logmax_num.value == 0) {
-  slide.value[1] = 0.01
-}
-
-if (logmin_num.value == 0) {
-  slide.value[0] = 0.01
-}
-})
-
-
-watch(slide, () => {
-  if (slide.value[0] <= 0) {
-  logmin_num.value = 0- Math.round(Math.pow(10, 0 -slide.value[0] / 99999999.9))
- logmin.value = addCommasToNumber(logmin_num.value)
-
-
-}
-
-if (slide.value[1] <= 0) {
-  logmax_num.value = 0- Math.round(Math.pow(10, 0 -slide.value[1] / 99999999.9))
- logmax.value = addCommasToNumber(logmax_num.value)
-}
-
-if (slide.value[0] > 0) {
-  logmin_num.value = Math.round(Math.pow(10,  slide.value[0] / 99999999.9))
-  logmin.value = addCommasToNumber(logmin_num.value)
-}
-
-if (slide.value[1] > 0) {
-  logmax_num.value = Math.round(Math.pow(10,  slide.value[1] / 99999999.9))
-  logmax.value = addCommasToNumber(logmax_num.value)
-}
-})
 
 </script>
 
@@ -336,8 +301,6 @@ if (slide.value[1] > 0) {
 
 
 <template> 
-
-
     <Panel toggleable>
       <template #header>
         <h1 style="text-align:center;">Constituent Databases</h1>
@@ -362,18 +325,21 @@ if (slide.value[1] > 0) {
       To explore any database in more detail, simply click its button below.
     </p>
   </Panel>
-  <Panel toggleable collapsed>
+  <!-- <Panel toggleable>
     <template #header>
       <h2>Time Filter</h2>
     </template>
-    <Slider v-model="slide" range class="w-100rem" :min='min' :max='max'/>
+    <p>Neotoma's datasets use a variety of age types (calendar years AD/BC, calibrated and uncalibrated radiocarbon years...)
+      but most datasets are in radiocarbon years, so this time filter uses radiocarbon years too. The year 0 corresponds to 1950 AD.
+    </p>
+    <Slider v-model="slide" range class="w-100rem" :min='currentYear' :max='50000000' />
     <br>
     <div style="max-width:580px;margin-left:auto;margin-right:auto;">
-<span>Younger Age: <InputText v-model.number="logmin_num" style="max-width:100px;"/> ({{ logmin }}). 
+<span>Younger Age: <InputText v-model.number="slide[0]" style="max-width:100px;"/> ({{ addCommasToNumber(slide[0])  }}). 
    Older Age: <InputText  style="max-width:120px;" 
-   v-model.number="logmax_num" /> ({{ logmax }}). </span>
+   v-model.number="slide[1]" />({{ addCommasToNumber(slide[1]) }})</span>
 </div>
-  </Panel>
+  </Panel> -->
   <Panel toggleable collapsed>
     <template #header>
       <h2>Dataset Type Filter</h2>
@@ -394,9 +360,10 @@ if (slide.value[1] > 0) {
      
 
     <div v-for="(el,index) in filteredDBs.value" class="col-4">
+      <div v-if="el.string != ''" style="height:100%;">
             <Button 
             style="width:100%;height:100%;justify-content:center;background-color:rgb(232,229,222);border-color:rgb(221,205,188);" class="col" 
-            v-tooltip="{ value: ('Number of datasets: ' + el.datasets + '\n Types:\n' + el.string + '\nage range: ' + el.younger + ' to ' + el.older),
+            v-tooltip="{ value: ('Datasets: \n' + el.string),
           pt: {
             arrow: 
             {
@@ -413,10 +380,36 @@ if (slide.value[1] > 0) {
           },
           }}" 
             @click="gotodb(el)">
-              <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.databasename }}</p>
+  
+              <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.database.databasename }}</p>
             </Button>
+          </div>
+          <div v-if="el.string == ''" style="height:100%;">
+            <Button 
+            style="width:100%;height:100%;justify-content:center;background-color:rgb(202,209,202);border-color:rgb(171,170,178);" class="col" 
+            v-tooltip="{ value: ('no datasets yet'),
+          pt: {
+            arrow: 
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}" 
+            @click="gotodb(el)">
+  
+              <p style="font-size:20px;color:rgb(150,157,151);font-weight:bold;">{{ el.database.databasename }}</p>
+            </Button>
+          </div>
          
-          <Dialog v-model:visible="visible"
+        <!--  <Dialog v-model:visible="visible"
               modal
               :header = 'name'
               :style="{ width: '50rem' }"
@@ -433,8 +426,8 @@ if (slide.value[1] > 0) {
            <Column field="datasettype" header="Dataset Type"></Column>
            <Column field="value" header="Number" sortable></Column>
          </DataTable>
-        </Dialog>
-   
+        </Dialog>-->
+     
   </div>
 
 

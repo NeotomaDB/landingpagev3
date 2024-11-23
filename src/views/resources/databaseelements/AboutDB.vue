@@ -80,7 +80,7 @@ onMounted(() => {
     </ul>
     <h3>Sites and Datasets</h3>      
       <p>There are {{uniqueDBsites}} distinct sites in {{ databasename }}.</p>
-      <DataTable paginator :rows="5" :value="datasettypes" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
+      <DataTable paginator :rows="5" :value="datasettypes" :sort-field="'datasets'" :sort-order="-1" tableStyle="min-width: 20rem">
         <Column field="datasettype" header="Dataset Type"></Column>
         <Column field="datasets" header="Number of Datasets" sortable></Column>
       </DataTable>
