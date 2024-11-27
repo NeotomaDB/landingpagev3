@@ -13,7 +13,7 @@
 
   const calljson = () => {
     let datasetid = props.title.site.datasets[0].datasetid
-    let url = 'https:/api.neotomadb.org/v2.0/data/downloads/' + datasetid
+    let url = 'https://api.neotomadb.org/v2.0/data/downloads/' + datasetid
     fetch(url, 
       { method: 'GET', 
         headers: {'content-type': 'application/json'}})

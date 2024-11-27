@@ -155,7 +155,6 @@ onMounted(() => {
             rel="noopener noreferrer"
             >Database Manual</a
           >
-        
         </div>
       </div>
     </div>
