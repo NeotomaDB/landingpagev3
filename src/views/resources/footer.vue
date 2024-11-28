@@ -30,6 +30,18 @@ import Avatar from 'primevue/avatar';
         </div>
       </div>
       </div>
+      <Card>
+        <template #content>
+        <div class="grid" style="justify-content:space-between;">
+          <div class="col-1">
+            <a href="https://localcontexts.org/notice/open-to-collaborate/"><img src="../../assets/Open_To_Collaborate.svg" width=50></a>
+          </div>
+          <div class="col-11">
+            <strong>Our institution is committed to the development of new modes of collaboration, engagement, and partnership with Indigenous peoples for the care and stewardship of past and future heritage collections.</strong>
+          </div>
+        </div>
+      </template>
+      </Card>
     </template>
   </Card>
 </template>

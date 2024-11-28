@@ -33,7 +33,9 @@ function callTaxa() {
       return res.json()
     })
     .then((json) => {
-      datasetinfo.value = json.data
+      let taxon_list = json.data
+      taxon_list.sort((a,b) => (a.ecolgroup > b.ecolgroup) ? 1 : ((b.ecolgroup > a.ecolgroup) ? -1 : 0))
+      datasetinfo.value = taxon_list
       loading.value = false
     })
     .catch((err) => {
@@ -57,20 +59,20 @@ onMounted(() => {
       <h3>Taxa and Variables Reported</h3>
     </template>
     <div class="grid" style="grid-auto-rows: 1fr;">
-    <div v-for="element in datasetinfo">
-      <Chip :label="element.taxonname" @click="visible = true" style="cursor:pointer">
-      </Chip>
-      <Dialog
-        v-model:visible="visible"
-        modal
-        :header="element.taxonname"
-        :style="{ width: '50rem' }"
-        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-      >
-      <pre>{{ JSON.stringify(element, null, 2) }}</pre>
-      </Dialog>
-    </div>
-</div>
+      <div v-for="element in datasetinfo" :key="element.taxonname">
+        <Chip :label="element.taxonname" @click="visible = true" class="m-1" style="cursor:pointer">
+        </Chip>
+        <!--<Dialog
+          v-model:visible="visible"
+          modal
+          :header="element.taxonname"
+          :style="{ width: '50rem' }"
+          :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+        >
+        <pre>{{ JSON.stringify(element, null, 2) }}</pre>
+        </Dialog> -->
+      </div>
+  </div>
   </Panel>
 </template>
 

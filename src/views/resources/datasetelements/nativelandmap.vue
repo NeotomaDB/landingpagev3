@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed, watchEffect } from 'vue'
+import OSM from 'ol/source/OSM.js';
 import Panel from 'primevue/panel';
 import Avatar from 'primevue/avatar';
 import Dialog from 'primevue/dialog';
@@ -185,7 +186,7 @@ const vectorStyle = new Style({
     layers: [
       new Tile({
         source: new XYZ({
-            url: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png'
+            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
         }),}),
       vectorLayer2, vectorLayer],
     target: 'map2',
@@ -345,8 +346,7 @@ loadingnat.value=false
     </span>
   </span>
   <span>, according to the <a href="https://native-land.ca/" target="_blank">Native Land</a> mapping project.</span>
-  <p>Neotoma’s stewards and users come from all over the world. 
-    Wherever we are and wherever we collect and curate data, 
+  <p>Neotoma’s stewards and users come from all over the world. Wherever we are and wherever we collect and curate data, 
     we acknowledge that we are on Indigenous land. </p>
 
 <p>Naming the ways that Neotoma’s 

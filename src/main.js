@@ -11,10 +11,10 @@ import PrimeVue from 'primevue/config';
 import "primeflex/primeflex.css";
 import 'primeicons/primeicons.css';
 import './assets/ol-main.css';
+import Nora from '@primevue/themes/nora';
 
 import Tooltip from 'primevue/tooltip';
 import BadgeDirective from 'primevue/badgedirective';
-
 
 const app = createApp(App)
 
@@ -25,7 +25,17 @@ app.directive('badge', BadgeDirective);
 
 app.use(createPinia())
 app.use(router)
-app.use(PrimeVue, { unstyled: false });
+app.use(PrimeVue, {
+    // Default theme configuration
+    theme: {
+        preset: Nora,
+        options: {
+            prefix: 'p',
+            darkModeSelector: 'system',
+            cssLayer: false
+        }
+    }
+ });
 app.use(OpenLayersMap /* options */);
 
 app.mount('#app')

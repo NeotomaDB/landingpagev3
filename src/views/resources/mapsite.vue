@@ -15,7 +15,6 @@ import Circle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Overlay from 'ol/Overlay';
 
-
 let props = defineProps(['location'])
 var location = JSON.parse(props.location)
 delete location.crs
@@ -34,16 +33,12 @@ function centerMap(location) {
   }
 }
 
-
 if(Array.isArray(location.coordinates.flat()[0])) {
   newlat.value = (location.coordinates.flat()[0][1] + location.coordinates.flat()[2][1])/2
   newlong.value = (location.coordinates.flat()[1][0] + location.coordinates.flat()[0][0])/2
 }
   
 </script>
-
-
-
 
 <template>
   <div v-if="location">
@@ -52,6 +47,7 @@ if(Array.isArray(location.coordinates.flat()[0])) {
         :loadTilesWhileAnimating="true"
         :loadTilesWhileInteracting="true"
         style="height: 200px"
+        ref="smallmap"
       >
         <ol-view
           ref="view"
@@ -61,7 +57,7 @@ if(Array.isArray(location.coordinates.flat()[0])) {
           :projection="projection"
         />
         <ol-tile-layer>
-          <ol-source-stadia-maps layer="stamen_terrain" />
+          <ol-source-osm />
         </ol-tile-layer>
         <ol-vector-layer>
           <ol-source-vector v-if="Array.isArray(location.coordinates.flat()[0])">

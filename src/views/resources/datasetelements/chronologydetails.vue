@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, defineProps } from 'vue'
+  import { ref, onMounted } from 'vue'
   import Panel from 'primevue/panel';
   import Card from 'primevue/card';
   const props = defineProps(['datasetid'])
@@ -47,21 +47,14 @@ onMounted(() => {
     </template>
       <div v-if="!loading">
         <div class="grid">
-          <div class="flex flex-row flex-wrap">
-            <div v-for="chron in chronology">
-              <Card>
-                <template #header>
-                  <h3>{{ chron.chronology.chronologyName }}</h3>
-                </template>
-                <template #content>
-                  <strong>Chronology ID:</strong> {{ chron.chronology.chronologyid }}<br>
-                  <strong>Date Prepared:</strong> {{ chron.chronology.datePrepared }}<br>
-                  <strong>Chronological Controls Used:</strong> {{ chron.chronology.controls.length }} <br>
-                  <strong>Reliable Age Range:</strong> {{ chron.chronology.reliableagespan.younger }} - {{ chron.chronology.reliableagespan.older }} {{ chron.chronology.agetype }}<br>
-                  <strong>Model Basis:</strong> {{ chron.chronology.modelType }}
-                
-                </template>
-              </Card>
+          <div v-for="chron in chronology" class="col-6">
+            <div class="text-left p-3 border-round surface-ground hover:surface-500">
+              <h3>{{ chron.chronology.chronologyName }}</h3>
+              <strong>Chronology ID:</strong> {{ chron.chronology.chronologyid }}<br>
+              <strong>Date Prepared:</strong> {{ chron.chronology.datePrepared }}<br>
+              <strong>Chronological Controls Used:</strong> {{ chron.chronology.controls.length }} <br>
+              <strong>Reliable Age Range:</strong> {{ chron.chronology.reliableagespan.younger }} - {{ chron.chronology.reliableagespan.older }} {{ chron.chronology.agetype }}<br>
+              <strong>Model Basis:</strong> {{ chron.chronology.modelType }}
             </div>
           </div>
         </div>
