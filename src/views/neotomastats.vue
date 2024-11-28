@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import Badge from 'primevue/badge'
 import Card from 'primevue/card'
 import ProgressSpinner from 'primevue/progressspinner'
-import Dialog from 'primevue/dialog'
 const rawstats = ref(null)
 const loaderror = ref(null)
 const visible = ref(false)
@@ -33,7 +32,7 @@ fetch(neotomaapi + '/v2.0/data/summary/rawbymonth?end=999999', {
 <template>
   <Card>
     <template #content>
-      <div v-if="rawstats" @click="visible = true">
+      <div v-if="rawstats">
         <div v-if="loaderror" class="flex justify-content-center">
           <i class="pi pi-exclamation-circle"></i> Current Neotoma Statistics are unavailable.
         </div>
@@ -59,16 +58,6 @@ fetch(neotomaapi + '/v2.0/data/summary/rawbymonth?end=999999', {
       </div>
     </template>
   </Card>
-  <Dialog
-    v-model:visible="visible"
-    header="Error Message"
-    :style="{ width: '50rem' }"
-    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-    :modal="true"
-    :draggable="false"
-  >
-    <p class="m-0">{{ loaderror }}</p>
-  </Dialog>
 </template>
 
 <script>

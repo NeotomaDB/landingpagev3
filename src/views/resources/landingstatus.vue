@@ -110,20 +110,21 @@ onMounted(() => {
     >
       <div class="grid">
         <div class="col-4 p-3">
-          <div v-for="endpoint in refs" class="row p-1 text-center">
+          <div v-for="endpoint in refs" class="row m-1">
             <a
               :href="refs.url"
               class="p-button"
-              style="width: 100%; background: #5D584B"
+              style="width: auto; background: #5D584B; display:block;"
               target="_blank"
               rel="noopener noreferrer"
             >
               <Badge
                 v-if="endpoint.status"
                 severity="success"
-                style="color: #000000; margin: 5px"
+                style="color: #000000"
+                class="p-2 mr-5 ml-5"
               />
-              <Badge v-if="!endpoint.status" severity="danger" style="margin: 5px" />
+              <Badge v-if="!endpoint.status" severity="danger" class="p-2 mr-5 ml-5" />
               <strong>{{ endpoint.name }}</strong>
             </a>
           </div>
@@ -136,7 +137,7 @@ onMounted(() => {
             href="https://open.neotomadb.org/dbschema"
             class="p-button"
             target="_blank"
-            style="width: 100%; background: #5D584B"
+            style="width: auto; display:block; text-align: center; background: #5D584B"
             rel="noopener noreferrer"
             >Database Schema</a
           >
@@ -149,7 +150,7 @@ onMounted(() => {
             href="https://open.neotomadb.org/manual"
             class="p-button"
             target="_blank"
-            style="width: 100%; background: #5D584B"
+            style="width: auto; display:block; text-align: center; background: #5D584B"
             rel="noopener noreferrer"
             >Database Manual</a
           >
