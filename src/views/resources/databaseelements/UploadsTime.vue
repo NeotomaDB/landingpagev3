@@ -29,6 +29,9 @@ function downloadDBSets() {
     .then(setjson => {
         datasetsDB.value = setjson.data;
     })
+    .catch(err => {
+        console.log(err)
+    })
 }
 
 
@@ -99,22 +102,22 @@ const myChart2 = new Chart(chartCanvas2.value, {
         legend: {
           display: false 
       },
-      zoom: {
-            pan: {
-                enabled: true,
-                mode: 'xy',
+     // zoom: {
+     //       pan: {
+     //           enabled: true,
+     //           mode: 'xy',
 
-            },
-            zoom: {
-                wheel: {
-                    enabled: true,
-                },
-                pinch: {
-                    enabled: true
-                },
-                mode: 'xy'
-            }
-        }
+     //       },
+    //        zoom: {
+     //           wheel: {
+    //                enabled: true,
+    //            },
+    //            pinch: {
+    //                enabled: true
+    //            },
+    //            mode: 'xy'
+    //        }
+    //    }
     }
   }
 

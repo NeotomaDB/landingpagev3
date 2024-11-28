@@ -9,7 +9,7 @@
 
   const imageref = computed(() => {
     var random = Math.floor(Math.random() * images.value.length);
-        return new URL('../assets/maps/' + images.value[random], import.meta.url).href;
+        return new URL('../../maps/' + images.value[random], import.meta.url).href;
   })
 
 </script>

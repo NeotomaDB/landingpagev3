@@ -13,7 +13,7 @@
 
   const calljson = () => {
     let datasetid = props.title.site.datasets[0].datasetid
-    let url = 'https:/api.neotomadb.org/v2.0/data/downloads/' + datasetid
+    let url = 'https://api.neotomadb.org/v2.0/data/downloads/' + datasetid
     fetch(url, 
       { method: 'GET', 
         headers: {'content-type': 'application/json'}})
@@ -49,14 +49,16 @@
             <h3>Constituent Database: </h3>
             <span v-if="props.title.site.datasets[0].database" class="m-0">
               {{ props.title.site.datasets[0].database }}
-          </span>
-          <span v-else>None Reported</span>
+            </span>
+            <span v-else>None Reported</span>
           </div>
-          <br><strong>Dataset Notes: </strong>
-        <span v-if="props.title.site.datasets[0].datasetnotes">
-          <em>{{props.title.site.datasets[0].datasetnotes}}</em>
-        </span>
-        <span v-else>None Reported</span>
+          <div style="display:flex; justify-content:space-between; align-items:baseline;">
+            <h3>Dataset Notes: </h3>
+            <span v-if="props.title.site.datasets[0].datasetnotes" class="m-0">
+              <em>{{props.title.site.datasets[0].datasetnotes}}</em>
+            </span>
+            <span v-else>None Reported</span>
+          </div>
         <h3>Dataset PIs</h3>    
         <div v-if="props.title.site.datasets[0].datasetpi">
           <div class="grid">

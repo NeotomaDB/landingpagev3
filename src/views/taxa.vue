@@ -19,7 +19,10 @@ export default {
         .then((response) => {
             response.json().then((data) => {
             this.taxoninfo = data.data[0];
-          });
+          })
+          .catch(err =>
+            console.log(err)
+          );
         })
         .catch((err) => {
           console.error(err);
@@ -31,7 +34,10 @@ export default {
         .then((response) => {
             response.json().then((data) => {
             this.sitecount = data.data.length;
-          });
+          })
+          .catch(err =>
+            console.log(err)
+          );
         })
         .catch((err) => {
           console.error(err);

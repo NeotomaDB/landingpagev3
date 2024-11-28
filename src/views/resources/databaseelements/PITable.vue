@@ -19,51 +19,52 @@ const pis_array1 = ref(null)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 
- function loadDatabase() {
-    return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
-      { method: "GET", headers: {'content-type': 'application/json'}})
-    .then(res1 => {
-      return res1.json()})
-    .then(json1 => {
-      databasekeys.value = json1.data  
-      currentDB.value = databasekeys.value.find(element => element.databaseid === Number(route.params.databaseid))
-         
-      databasename.value = currentDB.value.databasename
-      return databasename.value})
-      .then(val => fetch("https://api.neotomadb.org/v2.0/data/datasets/db?limit=10000&offset=0&database=" + val,
-      { method: "GET", headers: {'content-type': 'application/json'}}))
-    .then(res => {
-          if (!res.ok) {
-            const error = new Error(res.statusText)
-            error.json = {'error': res.json(), 'databaseid':route.params.databaseid}
-            throw error;
-          }
-          else {
-            return res.json()   }
+function loadDatabase() {
+  return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
+    { method: "GET", headers: {'content-type': 'application/json'}})
+  .then(res1 => {
+    return res1.json()})
+  .then(json1 => {
+    databasekeys.value = json1.data  
+    currentDB.value = databasekeys.value.find(element => element.databaseid === Number(route.params.databaseid))
+        
+    databasename.value = currentDB.value.databasename
+    return databasename.value})
+    .then(val => fetch("https://api.neotomadb.org/v2.0/data/datasets/db?limit=10000&offset=0&database=" + val,
+    { method: "GET", headers: {'content-type': 'application/json'}}))
+  .then(res => {
+        if (!res.ok) {
+          const error = new Error(res.statusText)
+          error.json = {'error': res.json(), 'databaseid':route.params.databaseid}
+          throw error;
+        }
+        else {
+          return res.json()   }
+      })
+    .then(json => {
+      databaseinfo.value = json.data
+      pis.value = databaseinfo.value.reduce((acc, obj) => {
+        obj.site.datasets.forEach(dataset => {
+          dataset.datasetpi.forEach(pi => {
+            const type = pi.contactname;
+            acc[type] = (acc[type] || 0) + 1;
+
+          })
+          
         })
-        .then(json => {
-          databaseinfo.value = json.data
-          pis.value = databaseinfo.value.reduce((acc, obj) => {
-            obj.site.datasets.forEach(dataset => {
-              dataset.datasetpi.forEach(pi => {
-                const type = pi.contactname;
-                acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      }, {});
+      pis_array1.value = Object.entries(pis.value).map(([name,value]) => ({name,value}));
+      pis_array1.value = pis_array1.value.filter(obj => obj.name !== 'null')
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  }
 
-              })
-              
-            })
-            return acc;
-          }, {});
-          pis_array1.value = Object.entries(pis.value).map(([name,value]) => ({name,value}));
-          pis_array1.value = pis_array1.value.filter(obj => obj.name !== 'null')
+loadDatabase();
 
-
-        })}
-
-
- loadDatabase();
-
- const filteredPIs = computed(() => {
+const filteredPIs = computed(() => {
   if (pis_array1.value) {
 
     return pis_array1.value.filter(car => {
@@ -75,6 +76,7 @@ const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotoma
     return [];
   }
 });
+
 loading_some.value = false
 
 </script>

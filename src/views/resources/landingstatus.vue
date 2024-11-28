@@ -55,20 +55,20 @@ const loadStatus = new Promise(() => {
       console.log(err)})
 
   fetch('https://apps.neotomadb.org/explorer', {
-    method: 'GET'
-  }).then((response) => {
-      const result = response.text()
-      return(result)}).then((result)=> {
-        console.log(result)
-        refs.value['explorer'] = {
+    mode: 'no-cors', 
+    method: 'HEAD',
+    signal: controller.signal })
+    .then((response) => {
+      refs.value['explorer'] = {
         name: 'Neotoma Explorer',
-        status: result.search('Explorer') > 0,
-        url: 'https://apps.neotomadb.org/explorer'}
+        status: response.status === 200,
+        url: 'https://apps.neotomadb.org/explorer'
+      }
     })
     .catch((err) => {
       refs.value['explorer'] = {
         name: 'Neotoma Explorer',
-        status: true,
+        status: false,
         url: 'https://apps.neotomadb.org/explorer'
       }
       console.log(err)
@@ -109,25 +109,24 @@ onMounted(() => {
       "
     >
       <div class="grid">
-        <div class="col-4">
-          <div v-for="endpoint in refs" class="row">
-            <div class="text-left">
+        <div class="col-4 p-3">
+          <div v-for="endpoint in refs" class="row m-1">
             <a
               :href="refs.url"
-              class="p-button w-full justify-content-left"
-              style="background: #5D584B"
+              class="p-button"
+              style="width: auto; background: #5D584B; display:block;"
               target="_blank"
               rel="noopener noreferrer"
             >
               <Badge
                 v-if="endpoint.status"
                 severity="success"
-                style="color: #000000; margin: 5px"
+                style="color: #000000"
+                class="p-2 mr-5 ml-5"
               />
-              <Badge v-if="!endpoint.status" severity="danger" style="margin: 5px" />
+              <Badge v-if="!endpoint.status" severity="danger" class="p-2 mr-5 ml-5" />
               <strong>{{ endpoint.name }}</strong>
             </a>
-          </div>
           </div>
         </div>
 
@@ -138,7 +137,7 @@ onMounted(() => {
             href="https://open.neotomadb.org/dbschema"
             class="p-button"
             target="_blank"
-            style="width: 100%; background: #5D584B"
+            style="width: auto; display:block; text-align: center;background: #5D584B"
             rel="noopener noreferrer"
             >Database Schema</a
           >
@@ -151,7 +150,7 @@ onMounted(() => {
             href="https://open.neotomadb.org/manual"
             class="p-button"
             target="_blank"
-            style="width: 100%; background: #5D584B"
+            style="width: auto; display:block; background: #5D584B"
             rel="noopener noreferrer"
             >Database Manual</a
           >
