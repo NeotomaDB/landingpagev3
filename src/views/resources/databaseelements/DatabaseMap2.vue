@@ -133,37 +133,43 @@ function loadconstDB() {
       view: new View({
           center: [0,0],
           zoom: 2,}),
-  })
+    })
 
-  myMap.value.on('moveend', function() {
-      var zoom = myMap.value.getView().getZoom()
-      console.log(zoom)
-      const newStyle = new Style({
-    image: new Circle({
-      radius: (5/4*zoom+1),
-      fill: new Fill({
-        color: 'rgba(251,205,188,1)',  }),
-      stroke: new Stroke({
-        color: 'rgba(92,84,80,1)',
-        width: (2/3*zoom),}), }),});
-      });
+    myMap.value.on('moveend', function() {
+        var zoom = myMap.value.getView().getZoom()
+        console.log(zoom)
+        const newStyle = new Style({
+      image: new Circle({
+        radius: (5/4*zoom+1),
+        fill: new Fill({
+          color: 'rgba(251,205,188,1)',  }),
+        stroke: new Stroke({
+          color: 'rgba(92,84,80,1)',
+          width: (2/3*zoom),}), }),});
+        });
 
-  myMap.value.on('click', (e) => {
-    vl.getFeatures(e.pixel).then((clickedFeatures) => {
-      if (clickedFeatures.length) {
-        // Get clustered Coordinates
-        const features = clickedFeatures[0].get('features');
-        if (features.length > 1) {
-          const extent = boundingExtent(
-            features.map((r) => r.getGeometry().getCoordinates()),
-          );
-          myMap.value.getView().fit(extent, {duration: 1000, padding: [50, 50, 50, 50]});
+    myMap.value.on('click', (e) => {
+      vl.getFeatures(e.pixel)
+        .then((clickedFeatures) => {
+        if (clickedFeatures.length) {
+          // Get clustered Coordinates
+          const features = clickedFeatures[0].get('features');
+          if (features.length > 1) {
+            const extent = boundingExtent(
+              features.map((r) => r.getGeometry().getCoordinates()),
+            );
+            myMap.value.getView().fit(extent, {duration: 1000, padding: [50, 50, 50, 50]});
+          }
         }
-      }
-    });
-  });
-  
-})
+      })
+      .catch(err => {
+        console.log(err)
+      });
+    });  
+  })
+  .catch(err => {
+    console.log(err)
+  })
 }
 
 function areObjectsIdentical(obj1, obj2) {
@@ -292,6 +298,9 @@ var displayFeatureInfo = function(pixel, coordinate) {
                 return datasets.value
                 
             })
+          .catch(err => {
+            console.log(err)
+          })
 
         }
 
@@ -314,20 +323,14 @@ loading2.value =false
 
 
 })
-
-
 </script>
 
-
-
 <style>
-.map {
-  width: 100%;
-  height: 400px; /* Adjust the height as needed */
-}
-
+  .map {
+    width: 100%;
+    height: 400px; /* Adjust the height as needed */
+  }
 </style>
-
 
 <template>
 <div>
@@ -381,6 +384,5 @@ loading2.value =false
         </Dialog>
     </div>
 </div>
-
 
 </template>

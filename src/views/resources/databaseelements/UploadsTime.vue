@@ -29,6 +29,9 @@ function downloadDBSets() {
     .then(setjson => {
         datasetsDB.value = setjson.data;
     })
+    .catch(err => {
+        console.log(err)
+    })
 }
 
 

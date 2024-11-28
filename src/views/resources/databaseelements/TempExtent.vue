@@ -40,16 +40,13 @@ function colorpick(type) {
 }
 
 function sizepick(old,young) {
-  
   let bigdif = (theAges.value[(theAges.value.length-1)].older - theAges.value[0].younger)
-
   if ((old - young) <= bigdif/216 ) {
         return 1;
     } else {
        return 0; // Change point radius back to 5
+  }
 }
-}
-
 
 function addCommasToNumber(number) {
     // Convert the number to a string
@@ -108,80 +105,78 @@ function loadDBages() {
       }))}
 
       return theAges2.value
-
-})
-.then(ages => {
-  myChart = new Chart(chartCanvas.value, {
-    type: 'scatter',
-    data: ages,
-    options: {
-      scales: {
-        x: {
-          min: Math.log10(1950 - new Date().getFullYear() + 20000),
-          ticks: {
-            callback: function(value,index,values) {
-                var newLab = Math.pow(10,value) - 20000;
-                if (newLab < 0) {
-                var sizer = String(Math.round(newLab)).length - 1
+  })
+  .then(ages => {
+    myChart = new Chart(chartCanvas.value, {
+      type: 'scatter',
+      data: ages,
+      options: {
+        scales: {
+          x: {
+            min: Math.log10(1950 - new Date().getFullYear() + 20000),
+            ticks: {
+              callback: function(value,index,values) {
+                  var newLab = Math.pow(10,value) - 20000;
+                  if (newLab < 0) {
+                  var sizer = String(Math.round(newLab)).length - 1
+                }
+                if (newLab >= 0) {
+                  var sizer = String(Math.round(newLab)).length
+                }
+                sizer = Math.pow(10,sizer)/1000
+                if (sizer < 1) {sizer = 1}
+                  newLab = addCommasToNumber(Math.round(newLab/sizer)*sizer)
+                  return  newLab + " "}
+            },
+              title: {
+                  display: true,
+                  text: 'Age (Years)',
+                  fontSize: 15
               }
-              if (newLab >= 0) {
-                var sizer = String(Math.round(newLab)).length
-              }
-              sizer = Math.pow(10,sizer)/1000
-              if (sizer < 1) {sizer = 1}
-                newLab = addCommasToNumber(Math.round(newLab/sizer)*sizer)
-                return  newLab + " "}
           },
-            title: {
-                display: true,
-                text: 'Age (Years)',
-                fontSize: 15
-            }
-        },
-        y: {
-            title: {
-                display: true,
-                text: 'Dataset Index' 
-            }
-        }
-    },
-      elements: {
-                    point:{
-                        radius: 0
-                    }
-                },
-      plugins: {
-        tooltips: {
-            enabled: false // Disable tooltips
-        },
-        legend: {
-          display: false 
+          y: {
+              title: {
+                  display: true,
+                  text: 'Dataset Index' 
+              }
+          }
       },
-     // zoom: {
-     //       pan: {
-     //         enabled: true,
-     //         mode: 'xy'
-     //       },
-     //       zoom: {
-     //           wheel: {
-     //               enabled: true,
-     //           },
-     //           pinch: {
-     //               enabled: true
-     //           },
-      //          mode: 'xy'
-      //      }
-      //  }
-    }
-  }
-
-  
-}  );
-
-chartReady.value = true
-console.log(Chart.version)
-
-});
+        elements: {
+                      point:{
+                          radius: 0
+                      }
+                  },
+        plugins: {
+          tooltips: {
+              enabled: false // Disable tooltips
+          },
+          legend: {
+            display: false 
+        },
+      // zoom: {
+      //       pan: {
+      //         enabled: true,
+      //         mode: 'xy'
+      //       },
+      //       zoom: {
+      //           wheel: {
+      //               enabled: true,
+      //           },
+      //           pinch: {
+      //               enabled: true
+      //           },
+        //          mode: 'xy'
+        //      }
+        //  }
+          }
+        }
+      });
+      chartReady.value = true
+      console.log(Chart.version)
+    })
+    .catch(err => {
+      console.log(err)
+    });
 }
 
 

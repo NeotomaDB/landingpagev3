@@ -46,6 +46,9 @@ function loadConstDB() {
       datasettypes.value = databasekeys.value.datasettypes
       loading_ab.value = false
     })
+    .catch(err => {
+      console.log(err)
+    })
 }
 
 onMounted(() => {

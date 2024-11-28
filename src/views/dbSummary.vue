@@ -132,7 +132,11 @@ const datasettypes_master = ref([
     });
     show.value = true
     console.log(databasekeys.value)
-    })}
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  }
 
  
 loadDatabases();

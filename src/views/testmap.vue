@@ -7,10 +7,7 @@
  import { useRoute } from 'vue-router';
  import DatabaseMap from '@/views/resources/databaseelements/DatabaseMap2.vue';
 
-
- import 'primevue/resources/themes/saga-blue/theme.css'; // Theme
- import 'primevue/resources/primevue.min.css'; // Core styles
- import 'primeicons/primeicons.css'; // Icons
+import 'primeicons/primeicons.css'; // Icons
  const route = useRoute()
  const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
  const selectedCountry = ref(null);
