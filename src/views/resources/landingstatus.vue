@@ -55,20 +55,20 @@ const loadStatus = new Promise(() => {
       console.log(err)})
 
   fetch('https://apps.neotomadb.org/explorer', {
-    method: 'GET'
-  }).then((response) => {
-      const result = response.text()
-      return(result)}).then((result)=> {
-        console.log(result)
-        refs.value['explorer'] = {
+    mode: 'no-cors', 
+    method: 'HEAD',
+    signal: controller.signal })
+    .then((response) => {
+      refs.value['explorer'] = {
         name: 'Neotoma Explorer',
-        status: result.search('Explorer') > 0,
-        url: 'https://apps.neotomadb.org/explorer'}
+        status: response.status === 200,
+        url: 'https://apps.neotomadb.org/explorer'
+      }
     })
     .catch((err) => {
       refs.value['explorer'] = {
         name: 'Neotoma Explorer',
-        status: true,
+        status: false,
         url: 'https://apps.neotomadb.org/explorer'
       }
       console.log(err)
@@ -128,7 +128,6 @@ onMounted(() => {
               <strong>{{ endpoint.name }}</strong>
             </a>
           </div>
-          </div>
         </div>
 
         <div class="col-4 p-3 align-self-end">
@@ -138,7 +137,7 @@ onMounted(() => {
             href="https://open.neotomadb.org/dbschema"
             class="p-button"
             target="_blank"
-            style="width: auto; display:block; text-align: center; background: #5D584B"
+            style="width: auto; display:block; text-align: center;background: #5D584B"
             rel="noopener noreferrer"
             >Database Schema</a
           >
@@ -151,10 +150,11 @@ onMounted(() => {
             href="https://open.neotomadb.org/manual"
             class="p-button"
             target="_blank"
-            style="width: auto; display:block; text-align: center; background: #5D584B"
+            style="width: auto; display:block; background: #5D584B"
             rel="noopener noreferrer"
             >Database Manual</a
           >
+        
         </div>
       </div>
     </div>
