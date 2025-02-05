@@ -26,16 +26,21 @@ const routes = [
     path: '/:datasetid',
     name: "Dataset",
     component: Dataset,
-    },
-    {
-        path: "/database/:databaseid",
-        name: "Database",
-        component: Database,
-    },
-    {
-      path: "/database",
-      name: "DatabaseSelect",
-      component: DatabaseSelect,
+  },
+  {
+      path: "/database/:databaseid",
+      name: "Database",
+      component: Database,
+  },
+  {
+    path: "/database",
+    name: "DatabaseSelect",
+    component: DatabaseSelect,
+  },
+  { 
+    path: "/#:login",
+    component: EmptyPage,
+    name: "Homepage",
   },
 ]
 

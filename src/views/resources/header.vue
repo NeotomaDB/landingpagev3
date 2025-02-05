@@ -1,5 +1,6 @@
 <script setup>
   import Card from 'primevue/card';
+  import orcid_login from './orcid_login.vue';
 </script>
 
 <template>
@@ -17,6 +18,7 @@
         </div>
       </div>
     </div>
+    <div class="display:flex;float:right"><orcid_login /></div>
   </template>
   </Card>
 </template>

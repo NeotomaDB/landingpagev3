@@ -15,16 +15,15 @@ import Nora from '@primevue/themes/nora';
 
 import Tooltip from 'primevue/tooltip';
 import BadgeDirective from 'primevue/badgedirective';
+import VueCookies from 'vue-cookies'
 
 const app = createApp(App)
-
 app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);
 
-
-
 app.use(createPinia())
 app.use(router)
+app.use(VueCookies)
 app.use(PrimeVue, {
     // Default theme configuration
     theme: {
