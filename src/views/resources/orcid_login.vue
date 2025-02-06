@@ -1,15 +1,12 @@
 <script setup>
   import Button from 'primevue/button';
   import { ref, onMounted, computed } from 'vue'
-  import { useORCIDStore } from '../../stores/stores'
-
-  const orcidStore = useORCIDStore();
-  const { logOut } = orcidStore;
+  // import { useORCIDStore } from '../../stores/stores'
 
 </script>
 
 <template>
-  <div v-if="orcidStore(  ) == null ">
+    <div>
     <a
       id="orcidAuthButton"
       href="https://orcid.org/oauth/authorize?response_type=token&redirect_uri=https://data.neotomadb.org/&client_id=APP-OKAEGWFY7MEOK4HE&scope=openid"
@@ -21,11 +18,6 @@
         Log Into ORCID
       </Button>
     </a>
-  </div>
-  <div v-else>
-    <Button variant="success" pill @click="logOut()" id="loginorcid-2" v-tooltip="'Click to logout and remove ORCiD-related cookies.'">
-      Logged Into ORCiD
-    </Button>
   </div>
 </template>
 

@@ -10,20 +10,3 @@ export const useCounterStore = defineStore('counter', () => {
 
   return { count, doubleCount, increment }
 })
-
-export const useORCIDStore = defineStore("orcid", () => {
-
-  let orcidId = ref(null)
-
-  const callOrcid = computed(() => {
-    orcidId.value = $cookies.get('orcidId');
-    return orcidId;
-  });
-
-  const logOut = computed(() =>{
-    orcidId.value = null
-    $cookies.remove("orcidId")
-    return orcidId;
-  });
-  return { callOrcid, logOut }
-});

@@ -4,6 +4,7 @@
   import Button from 'primevue/button';
   import download from 'downloadjs';
   import ChronDetails from "@/views/resources/datasetelements/chronologydetails.vue"
+  import ContactDetails from "@/views/resources/datasetelements/contact_details.vue"
   import TaxaDetails from "@/views/resources/datasetelements/taxaLoad.vue"
   import PublicationsDetails from "@/views/resources/datasetelements/publicationdetails.vue"
   import OtherDetails from "@/views/resources/datasetelements/otherdatasetdetails.vue"
@@ -23,7 +24,20 @@
     .then(data => {
       download(JSON.stringify(data.data), 'neotoma_dataset_' + datasetid + '.json', 'text/plain');
     })
-    
+  }
+  const get_orcid = (contactid) => {
+    let url = 'http://localhost:3001/v2.0/apps/orcids?contactid=' + contactid
+    fetch(url,
+      {method: 'GET',
+        headers: {'content-type': 'application/json'},
+      }
+    )
+    .then(res => {
+      return res.json()
+    })
+    .then(json => {
+      return json.data
+    })
   }
 </script>
 
@@ -63,7 +77,8 @@
         <div v-if="props.title.site.datasets[0].datasetpi">
           <div class="grid">
             <div v-for="name in props.title.site.datasets[0].datasetpi" class="col-6">
-              <div class="text-center p-3 border-round-sm surface-ground hover:surface-500 font-bold">{{ name.contactname }}</div>
+              <div class="text-center p-3 border-round-sm surface-ground hover:surface-500 font-bold">
+                <ContactDetails :contactid="name.contactid" style="float:left" /> {{ name.contactname }}</div> 
             </div>
           </div>
         </div>
