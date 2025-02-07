@@ -97,7 +97,7 @@
     name: 'DatasetDetails',
     data () {
       return {
-        msg: 'Mapbox element has rendered.'
+        msg: 'Dataset elements have rendered.'
       }
     }
   }

@@ -1,23 +1,47 @@
 <script setup>
+  import { ref, onMounted } from 'vue';
   import Button from 'primevue/button';
-  import { ref, onMounted, computed } from 'vue'
-  // import { useORCIDStore } from '../../stores/stores'
+  import { useRouter } from 'vue-router';
+  
+  const baseUrl = import.meta.env.VITE_APP_ORCID_LOGIN;
+
+  let buttontype = ref(null)
+  let orcid_state = ref(null)
+
+  onMounted(() => {
+    if(localStorage.hasOwnProperty("neotoma_orcid")){
+      orcid_state = localStorage.getItem("neotoma_orcid")
+      buttontype = "Logout"
+    } else {
+      buttontype = "Login"
+    }
+  })
+  
+  function logout() {
+    localStorage.removeItem("neotoma_orcid");
+    orcid_state = null;
+  }
 
 </script>
 
 <template>
-    <div>
-    <a
-      id="orcidAuthButton"
-      href="https://orcid.org/oauth/authorize?response_type=token&redirect_uri=https://data.neotomadb.org/&client_id=APP-OKAEGWFY7MEOK4HE&scope=openid"
-    >
+    <div v-if='buttontype=="Login"'>
       <Button id="loginorcid-1"
-              variant="warning"
-              pill
+              as="a"
+              :href="baseUrl"
+              rounded
               v-tooltip="'Use ORCiD to manage your authentication on the Neotoma Landing pages.'">
         Log Into ORCID
       </Button>
-    </a>
+  </div>
+  <div v-else-if='buttontype=="Logout"'>
+    <Button id="loginorcid-1"
+              variant="outlined"
+              rounded
+              v-tooltip="'Use ORCiD to manage your authentication on the Neotoma Landing pages.'"
+              @click="logout">
+        Log Out of ORCID
+      </Button>
   </div>
 </template>
 
