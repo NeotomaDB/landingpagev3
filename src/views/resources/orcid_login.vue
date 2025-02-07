@@ -10,16 +10,16 @@
 
   onMounted(() => {
     if(localStorage.hasOwnProperty("neotoma_orcid")){
-      orcid_state = localStorage.getItem("neotoma_orcid")
-      buttontype = "Logout"
+      orcid_state.value = localStorage.getItem("neotoma_orcid")
+      buttontype.value = "Logout"
     } else {
-      buttontype = "Login"
+      buttontype.value = "Login"
     }
   })
   
   function logout() {
     localStorage.removeItem("neotoma_orcid");
-    orcid_state = null;
+    orcid_state.value = null;
   }
 
 </script>
