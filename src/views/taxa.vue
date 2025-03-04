@@ -1,7 +1,13 @@
+<script setup>
+import TaxaMap from '@/views/resources/taxaelements/taxamap.vue'
+</script>
+
 <template>
     <h1>Taxon Landing Page for {{ taxoninfo.taxonname }}</h1>
     Total number of sites: {{ sitecount }}
-
+    <TaxaMap/>
+    {{taxondata}}
+    {{sitenum}}
 </template>
 
 <script>

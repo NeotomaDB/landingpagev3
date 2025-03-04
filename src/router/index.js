@@ -36,7 +36,7 @@ const routes = [
       path: "/database",
       name: "DatabaseSelect",
       component: DatabaseSelect,
-  },
+  }, 
 ]
 
 const router = createRouter({
