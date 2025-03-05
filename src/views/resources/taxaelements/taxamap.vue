@@ -20,6 +20,7 @@ import Stroke from 'ol/style/Stroke';
 import Circle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Text from 'ol/style/Text';
+import Panel from 'primevue/panel';
 const route = useRoute()
 const datasets = ref([]);
 const dataindexer = ref([]);
@@ -32,10 +33,12 @@ var uniqueids = ref([]);
 var siteids = ref([]);
 var idxlist = ref([]);
 var link = ref([]);
+const name = ref(null);
 const datatypes = ref([]);
 const myMap = ref(null);
 const loading2 = ref(true)
 const threshold = 70;
+const numresults = ref(null);
 
 const vectorSource = new VectorSource();
 
@@ -44,13 +47,15 @@ const taxonreturn = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
         
 function loadtaxon() {
-  return  fetch(neotomaapi + "/v2.0/data/taxa/" + route.params.taxonid + "/occurrences?limit=100000",
+  return  fetch(neotomaapi + "/v2.0/data/taxa/" + route.params.taxonid + "/occurrences?limit=90000",
       { method: "GET", headers: {'content-type': 'application/json'}})
     .then(res1 => {
       return res1.json()}
     )
     .then(json1 => {
       taxonreturn.value = json1.data
+      numresults.value = taxonreturn.value.length
+      name.value = taxonreturn.value[0].sample.taxonname
       return taxonreturn.value})
   .then(values => {
     let ids = [];
@@ -63,27 +68,19 @@ function loadtaxon() {
                   var geom = site.coordinates;
                   let geometry;
                   if (Array.isArray(geom[0][0])) {
-                   // console.log((geom[0][0]))
-                    //geometry = new Polygon([geom.map(coord => fromLonLat(coord))]);
                     let transformedCoordinates = geom.map(ring => 
                         ring.map(coord => fromLonLat(coord))
                          );
 
                     geometry = new Polygon([transformedCoordinates]);
-                    //console.log(geometry)
                     const flatco = geometry.getFlatCoordinates();
-                    //console.log(flatco);
-                    //console.log(flatco[0][0]);
                     const centroid = [
                         (flatco[0][0] + flatco[1][0]) / 2,  // X centroid
                         (flatco[0][1] + flatco[2][1]) / 2   // Y centroid
                     ];
-                   // console.log(centroid);
                     geometry = new Point(centroid);
-                   // console.log(geometry);
                   } else {
                     geometry = new Point(fromLonLat(geom));
-                   // console.log(geometry);
                   }
                   var feature = new Feature({
                       geometry: geometry,
@@ -164,18 +161,6 @@ function loadtaxon() {
           zoom: 2,}),
     })
 
-   // myMap.value.on('moveend', function() {
-   //     var zoom = myMap.value.getView().getZoom()
-        //console.log(zoom)
-  //      const newStyle = new Style({
-  //    image: new Circle({
-  //      radius: (5/4*zoom+1),
-  //      fill: new Fill({
-  //        color: 'rgba(251,205,188,1)',  }),
-  //      stroke: new Stroke({
-  //        color: 'rgba(92,84,80,1)',
-  //        width: (3/3*zoom),}), }),});
-  //      });
 
     myMap.value.on('click', (e) => {
       vl.getFeatures(e.pixel)
@@ -241,7 +226,6 @@ function areAllIdentical(array) {
 onMounted(async () => {
     await loadtaxon();
     var extent2 = vectorSource.getExtent()
-    //console.log(((extent2[2]-extent2[0])+(extent2[3]-extent2[1]))/2)
     var padding = ((extent2[2]-extent2[0])+(extent2[3]-extent2[1]))/20
     var paddedExtent = [extent2[0] - padding, extent2[1] - padding,
   extent2[2] + padding, extent2[3] + padding];
@@ -315,10 +299,6 @@ var displayFeatureInfo = function(pixel, coordinate) {
     // Push the index into the array corresponding to the name
                       dataindexer.value[name].push(index);
                 });
-
-                //console.log('dt indexer: ' + dataindexer.value)
-                //console.log(siteids.value)
-                //console.log(all)
                 fullsets.forEach(entry => {
                     datatypes.value.push(entry.datasettype)
                     datasets.value.push(entry.datasetid)
@@ -362,11 +342,19 @@ loading2.value =false
 </style>
 
 <template>
+    <Panel>
+        <template #header>
+            <h2>{{name}} Sites</h2>
+        </template>
 <div>
     <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
-      <div v-if="loading2" class="flex flex-wrap justify-content-center align-items-center">
+        <div v-if="numresults ==0">
+            <p>There are currently no sites in Neotoma with this taxon present.</p>
+        </div>
+      <div v-else-if="loading2" class="flex flex-wrap justify-content-center align-items-center">
          <ProgressSpinner class="flex-grow-1 w-max" />
        </div>
+ 
       <div id='map2' class="map"> </div>
     </div>
     <div v-if="uniquenames.length == 1">
@@ -413,5 +401,5 @@ loading2.value =false
         </Dialog>
     </div>
 </div>
-
+</Panel>
 </template>
