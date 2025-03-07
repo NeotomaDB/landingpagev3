@@ -1,12 +1,15 @@
 <script setup>
-import TaxaMap from '@/views/resources/taxaelements/taxamap.vue'
-import AboutTaxa from '@/views/resources/taxaelements/abouttaxa.vue'
+import TaxaMap from '@/views/resources/taxaelements/taxamap.vue';
+import AboutTaxa from '@/views/resources/taxaelements/abouttaxa.vue';
+import TaxaTree from '@/views/resources/taxaelements/taxatree.vue';
+
 </script>
 
 <template>
     <h1>Taxon Landing Page for {{ taxoninfo.taxonname }}</h1>
     Total number of sites: {{ sitecount }}
     <AboutTaxa />
+    <TaxaTree />
     <TaxaMap/>
     {{taxondata}}
     {{sitenum}}
