@@ -380,9 +380,10 @@ filteredDBs.value = computed(() => {
     return databasekeys.value.filter(car => {
       const matchString = Object.values(car.database).some(value => {
         // Check if the value is not null before converting to string
-        if (value !== null) {
+        if (value == car.database.databasename) {
           let a = value.toString().toLowerCase().includes(globalFilter.value.toLowerCase());
          // let b = value.toString().toLowerCase().includes(Object.values(datafilter.value))
+
           return a
         }
         return false; // Skip null values
@@ -403,7 +404,7 @@ if (car.datasettypes != null) {
 
 var matchReg = false;
 if (car.location == null) {
-  return true
+  matchReg = true;
 } else if (car.location!= null) {
     matchReg = Object.values(regionfilter.value).every(filter => {
   return car.location.some(loc => {
@@ -416,7 +417,7 @@ if (car.location == null) {
 
 var matchTime = false;
 if (car.time == null) {
-  return true
+  matchTime = true;
 } else if (car.time!= null) {
     matchTime = Object.values(timefilter.value).every(filter => {
   return car.time.some(tim => {
@@ -426,9 +427,6 @@ if (car.time == null) {
 } else {
     return false;
 }
-
-
-
       return matchString && matchData && matchReg && matchTime
     });
   } else {
@@ -438,41 +436,6 @@ if (car.time == null) {
 
 
 console.log(filteredDBs.value)
-
-function addCommasToNumber(number) {
-    // Convert the number to a string
-    let str = number.toString();
-    
-    // Insert commas every three characters from the end of the string
-    let result = '';
-    let count = 0;
-    if (str[0] == "-") {
-    for (let i = str.length - 1; i >= 0; i--) {
-        result = str[i] + result;
-        count++;
-        if (count % 3 === 0 && i !== 0 && i !== 1) {
-            result = ',' + result;
-        }
-    }
-  }
-    else {
-    for (let i = str.length - 1; i >= 0; i--) {
-        result = str[i] + result;
-        count++;
-        if (count % 3 === 0 && i !== 0) {
-            result = ',' + result;
-        }
-    }}
-    
-    return result;
-}
-
-const currentYear = 1950 - new Date().getFullYear();
-function gotodb(el) {
-  let id = el.database.databaseid
-  const url = `https://data.neotomadb.org/database/${id}`
-  window.open(url,'_blank');
-}
 
 
 
