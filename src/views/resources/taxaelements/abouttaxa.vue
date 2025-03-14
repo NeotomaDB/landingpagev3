@@ -75,18 +75,24 @@ onMounted(async () => {
 
 </script>
 
+<style>
+h3 {
+  padding-left: 10px;
+}
+</style>
 
 <template>
 
-<Panel>
+<Panel toggleable>
   <template #header>
       <h2>About {{ name}}</h2>
     </template>
     <div v-if="loading_ab">
     <h3>Taxon Summary</h3>
     <ul>
-      <li>Author : {{author}}: {{pub}}</li>
-      <li>Higher Taxon : <a :href='link'>{{ highname }} </a></li>
+      <li>Authority: {{author}}</li>
+      <li>Publication: {{pub}}</li>
+      <li>Higher Taxon: <a :href='link'>{{ highname }} </a></li>
       <li>Status: {{status}}</li>
       <li> Ecological Group: {{ecolgroupname}}</li>
     </ul>

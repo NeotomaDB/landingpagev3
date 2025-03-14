@@ -9,11 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@observablehq/plot": "^0.6.17",
     "@primevue/themes": "^4.0.4",
+    "@ssthouse/vue3-tree-chart": "^0.2.6",
     "chart.js": "^3.9.1",
     "chartjs-plugin-zoom": "^2.0.1",
-    "d3": "^7.9.0",
     "downloadjs": "^1.4.7",
     "ol": "^10.0.0",
     "ol-contextmenu": "^5.5.0",
@@ -25,11 +24,11 @@
     "vue": "^3.3.4",
     "vue-chart-3": "^3.1.8",
     "vue-router": "^4.2.4",
-    "vue3-openlayers": "^4.0.1",
-    "vued3tree": "^5.1.0"
+    "vue3-openlayers": "^4.0.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
+    "less": "^4.2.2",
     "vite": "^5.3.4"
   }
 }

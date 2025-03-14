@@ -2,7 +2,7 @@
 import TaxaMap from '@/views/resources/taxaelements/taxamap.vue';
 import AboutTaxa from '@/views/resources/taxaelements/abouttaxa.vue';
 import TaxaTree from '@/views/resources/taxaelements/taxatree.vue';
-
+import TaxaTree2 from '@/views/resources/taxaelements/taxatree2.vue';
 </script>
 
 <template>

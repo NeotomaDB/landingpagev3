@@ -342,7 +342,7 @@ loading2.value =false
 </style>
 
 <template>
-    <Panel>
+    <Panel toggleable>
         <template #header>
             <h2>{{name}} Sites</h2>
         </template>
