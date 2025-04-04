@@ -3,8 +3,7 @@
 
 [![NSF-1948926](https://img.shields.io/badge/NSF-1948926-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1948926)
 
-[![lifecycle](https://img.shields.io/badge/lifecycle-active-orange.svg)](https://www.tidyverse.org/lifecycle/#active)
-
+[![lifecycle](https://img.shields.io/badge/lifecycle-active-orange.svg)]
 
 <!-- badges: end -->
 
