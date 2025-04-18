@@ -2,17 +2,20 @@
 import TaxaMap from '@/views/resources/taxaelements/taxamap.vue';
 import AboutTaxa from '@/views/resources/taxaelements/abouttaxa.vue';
 import TaxaTree from '@/views/resources/taxaelements/taxatree.vue';
-import TaxaTree2 from '@/views/resources/taxaelements/taxatree2.vue';
 </script>
 
 <template>
-    <h1>Taxon Landing Page for {{ taxoninfo.taxonname }}</h1>
-    Total number of sites: {{ sitecount }}
+  <div v-if='1==1'>
+  <!--  <h1>Taxon Landing Page for {{ taxoninfo.taxonname }}</h1>
+    Total number of sites: {{ sitecount }} -->
     <AboutTaxa />
     <TaxaTree />
     <TaxaMap/>
     {{taxondata}}
     {{sitenum}}
+  </div>
+  <div v-else>
+  </div>
 </template>
 
 <script>

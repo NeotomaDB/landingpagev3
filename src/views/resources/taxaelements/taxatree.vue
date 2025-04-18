@@ -4,7 +4,6 @@ import {useRoute} from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner';
 import Dialog from 'primevue/dialog';
 import Panel from 'primevue/panel';
-import Tree from 'primevue/tree';
 import VueTree from "@ssthouse/vue3-tree-chart";
 import "@ssthouse/vue3-tree-chart/dist/vue3-tree-chart.css";
 const route = useRoute()

@@ -47,6 +47,8 @@ const taxonreturn = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
         
 function loadtaxon() {
+  //https://api.neotomadb.org/v2.0/data/sites?taxa=Betulaceae 
+  //v2.0/data/taxa/12... gives relationship between taxonid and taxonname
   return  fetch(neotomaapi + "/v2.0/data/taxa/" + route.params.taxonid + "/occurrences?limit=90000",
       { method: "GET", headers: {'content-type': 'application/json'}})
     .then(res1 => {
