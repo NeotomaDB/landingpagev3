@@ -828,7 +828,7 @@ function addCommasToNumber(number) {
   <Panel toggleable collapsed>
     <template #header>
       <h2>Dataset Type Filter</h2>
-      <i class="pi pi-question-circle" style="font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on dataset type. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on dataset type. Databases with a light gray background do not currently curate any data, but they may in the future.'),
            pt: {
             arrow:
             {
@@ -854,7 +854,7 @@ function addCommasToNumber(number) {
   <Panel toggleable collapsed>
     <template #header>
       <h2>Time Filter</h2>
-      <i class="pi pi-question-circle" style="font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on temporal range. Databases with a dark gray background curate data from the selected period on the margins. That means the given database will accept data from the selected period only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on temporal range. Databases with a dark gray background curate data from the selected period on the margins. That means the given database will accept data from the selected period only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
            pt: {
             arrow:
             {
@@ -884,7 +884,7 @@ function addCommasToNumber(number) {
   <Panel toggleable collapsed>
     <template #header>
       <h2>Region Filter</h2>
-      <i class="pi pi-question-circle" style="font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on region. Databases with a dark gray background curate data from the selected region on the margins. That means the given database will accept data from the selected region only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on region. Databases with a dark gray background curate data from the selected region on the margins. That means the given database will accept data from the selected region only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
            pt: {
             arrow:
             {
