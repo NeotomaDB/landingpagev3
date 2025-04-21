@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import EmptyPage from "@/views/emptypage.vue"
 import PageNotFound from "@/views/pagenotfound.vue"
 import Taxa from "@/views/taxa.vue"
+import TaxaWelcome from "@/views/taxawelcome.vue"
 import Dataset from "@/views/dataset.vue"
 import Database from "@/views/database.vue"
 import DatabaseSelect from "@/views/dbSummary.vue"
@@ -16,6 +17,11 @@ const routes = [
     path: '/taxa/:taxonid',
     name: "Taxa",
     component: Taxa,
+  },
+  {
+    path: '/taxa',
+    name: "TaxaWelcome",
+    component: TaxaWelcome,
   },
   {
     path: '/datasets/:datasetid',

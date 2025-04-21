@@ -24,6 +24,7 @@ import Panel from 'primevue/panel';
 const route = useRoute()
 const datasets = ref([]);
 const dataindexer = ref([]);
+const firstreturn = ref(null);
 var names = ref([]);
 var ids = ref([]);
 var coords = ref([]);
@@ -49,22 +50,32 @@ const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotoma
 function loadtaxon() {
   //https://api.neotomadb.org/v2.0/data/sites?taxa=Betulaceae 
   //v2.0/data/taxa/12... gives relationship between taxonid and taxonname
-  return  fetch(neotomaapi + "/v2.0/data/taxa/" + route.params.taxonid + "/occurrences?limit=90000",
-      { method: "GET", headers: {'content-type': 'application/json'}})
+  return  fetch(neotomaapi + "/v2.0/data/taxa/" + route.params.taxonid,
+    {method: "GET", headers: {'content-type': 'application/json'}})
+    .then(res0 => {
+      return res0.json()
+    })
+    .then(json0 => {
+      firstreturn.value = json0.data;
+      return name.value = firstreturn.value[0].taxonname
+    })
+    .then(name => {
+ return fetch(neotomaapi + "/v2.0/data/sites?taxa=" + name + "&limit=999999",
+      { method: "GET", headers: {'content-type': 'application/json'}})})
     .then(res1 => {
       return res1.json()}
     )
     .then(json1 => {
       taxonreturn.value = json1.data
+      console.log(taxonreturn.value);
       numresults.value = taxonreturn.value.length
-      name.value = taxonreturn.value[0].sample.taxonname
       return taxonreturn.value})
   .then(values => {
     let ids = [];
         values.forEach((pointfull => {
-            let site = JSON.parse(pointfull.site.location);
-            let siteid = pointfull.site.siteid;
-            let sitename = pointfull.site.sitename;
+            let site = JSON.parse(pointfull.geography);
+            let siteid = pointfull.siteid;
+            let sitename = pointfull.sitename;
           if (site.coordinates !== null) { 
             if (!ids.includes(siteid)) {
                   var geom = site.coordinates;
