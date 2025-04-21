@@ -747,9 +747,9 @@ function addCommasToNumber(number) {
 <style>
 
 .p-panel-header {
-  display: grid;
-  justify-content:space-evenly;
-  grid-template-columns: 2fr 3fr 1fr;
+  display: grid !important;
+  justify-content:space-evenly !important;
+  grid-template-columns: 2fr 3fr 1fr !important;
 }
 .placer {
   justify-items:center;
