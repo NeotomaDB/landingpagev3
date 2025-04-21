@@ -27,6 +27,8 @@ const name = ref(null);
 const globalFilter = ref('')
 const typesString = ref(null);
 const datafilter = ref([]);
+const regionfilter = ref([]);
+const timefilter = ref([]);
 const filteredDBs = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const datasettypes_master = ref([
@@ -74,46 +76,6 @@ const datasettypes_master = ref([
   
 ]);
 
-<<<<<<< Updated upstream
-//function loadDatabases() {
-//    return  fetch(neotomaapi + "/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0",
-//      { method: "GET", headers: {'content-type': 'application/json'}})
-//    .then(res1 => {
-//      return res1.json()})
-//    .then(json1 => {
-//      databasekeys.value = json1.data  
-//      return databasekeys.value
-//    })
-//    .then(val => {
-//      return  fetch(neotomaapi + "/v2.0/apps/constdb/",
-//      { method: "GET", headers: {'content-type': 'application/json'}})
-//    })
-//    .then(res1 => {
-//      return res1.json()})
-//    .then(json1 => {
-//      dbsums.value = json1.data  
-//      return dbsums.value
-//    })
-//    .then(db => {
-//      databasekeys.value = databasekeys.value.map(item1 => {
-//        const matchingItem = db.find(item2 => item1['databasename'] === item2['databasename']);
-//        return matchingItem ? { ...item1, ...matchingItem } : item1;
-//    }).concat(db.filter(item2 => !databasekeys.value.some(item1 => item1['databasename'] === item2['databasename'])))
-//    databasekeys.value.string = databasekeys.value.map(el => {
-//      el.datasettypes.join('/n')
- //   })
-    
- //   databasekeys.value = databasekeys.value.map(obj => ({
- //     ...obj,
- //     string: obj['datasettypes'].join('\n')
- //   }));
- //   show.value = true
- //   })
-
-   // }
-
-
-=======
 const regions_master = ref([
   { value: "Russia", clicked: false, cont: "Asia" },
   { value: "Central Asia", clicked: false, cont: "Asia" },
@@ -581,7 +543,6 @@ const geo_code = [
 ]
 
 
->>>>>>> Stashed changes
     function loadDatabases() {
       return  fetch(neotomaapi + "/v2.0/apps/constdb/",
       { method: "GET", headers: {'content-type': 'application/json'}})
@@ -593,23 +554,15 @@ const geo_code = [
     })
     .then(db => {
     databasekeys.value = db.map(obj => {
-<<<<<<< Updated upstream
-=======
       const geoEntry = geo_code.find(geo => 
       geo.DB === obj.database.databasename);
       const timeEntry = temp_code.find(time => 
       time.DB === obj.database.databasename);
-
-      
->>>>>>> Stashed changes
       return {
       ...obj,
       string: obj.datasettypes
       .map(type => type.datasettype)
       .filter(Boolean)
-<<<<<<< Updated upstream
-      .join("\n")
-=======
       .join("\n"),
       location: geoEntry ? geoEntry.places : null,
       location_marg: geoEntry ? geoEntry.marg_pl : null,
@@ -626,7 +579,6 @@ const geo_code = [
       marginal_value: false,
       marginal_valuet: false
 
->>>>>>> Stashed changes
     };
       
     });
@@ -649,8 +601,7 @@ function buttonfilter(dtype) {
     datafilter.value.splice(index, 1)}
 }
 
-<<<<<<< Updated upstream
-=======
+
 function buttonfilterreg(reg) {
   const index = regionfilter.value.indexOf(reg.value);
   reg.clicked = !reg.clicked;
@@ -672,130 +623,85 @@ function buttonfiltertime(time) {
 function gotodb(el) {
   window.open("https://data.neotomadb.org/database/" + el.database.databaseid)
 }
->>>>>>> Stashed changes
-
 
 filteredDBs.value = computed(() => {
-  if (databasekeys.value) {
+  if (!databasekeys.value) return [];
 
-<<<<<<< Updated upstream
-    return databasekeys.value.filter(car => {
-      console.log(Object.values(car))
-=======
-    const filtered = databasekeys.value.filter(car => {
->>>>>>> Stashed changes
-      const matchString = Object.values(car.database).some(value => {
-        // Check if the value is not null before converting to string
-        if (value !== null) {
-          let a = value.toString().toLowerCase().includes(globalFilter.value.toLowerCase());
-         // let b = value.toString().toLowerCase().includes(Object.values(datafilter.value))
-          return a
-        }
-        return false; // Skip null values
-      });
-
-      var matchData = false;
-if (car.datasettypes != null) {
-    matchData = Object.values(datafilter.value).every(filter => {
-  return car.datasettypes.some(dataset => {
-    return dataset.datasettype !== null && dataset.datasettype.toString() === filter;
-  });  
-  
-  });
-} else {
-    return false;
-}
-
-<<<<<<< Updated upstream
-
-      var timeMatch = false
-      if (car.younger != null && car.older != null) {
-      if ((car.younger <= slide.value[1] && car.younger >= slide.value[0]) || 
-      (car.older >= slide.value[0] && car.older <= slide.value[1]) || (car.younger <= slide.value[0] && car.older >= slide.value[1]) ) {
-        timeMatch = true;
-      }}
-
-      if (car.younger == null && car.older == null) {
-        timeMatch = true;
+  const filtered = databasekeys.value.filter(car => {
+    // Global string match
+    const matchString = Object.values(car.database ?? {}).some(value => {
+      if (value !== null) {
+        return value.toString().toLowerCase().includes(globalFilter.value.toLowerCase());
       }
-   //   console.log("matchstring: " + matchString)
-   //   console.log("matchData: " + matchData)
-      console.log("matchtime: " + timeMatch)
-      return matchString && matchData && timeMatch
-=======
-var matchReg = false;
-
-// Check if regionfilter's values are all in car.location
-if (car.location != null) {
-  matchReg = Object.values(regionfilter.value).every(filter => {
-    return car.location.some(loc => loc !== null && loc === filter);
-  });
-
-  if (matchReg) {
-    car.marginal_value = false;
-  }
-}
-
-// If not matched in location, check location_marg
-if (!matchReg && car.location_marg != null) {
-  matchReg = Object.values(regionfilter.value).every(filter => {
-    return car.location_marg.some(loc => loc !== null && loc === filter);
-  });
-
-  if (matchReg) {
-    car.marginal_value = true;
-    console.log("Matched marginal region" + car.database.databasename);
-  }
-}
-
-if (!matchReg) {
-  return false;
-}
-
-var matchTime = false;
-
-if (car.time != null) {
-  matchTime = Object.values(timefilter.value).every(filter => {
-    return car.time.some(tim => tim !== null && tim === filter);
-  });
-
-  if (matchTime) {
-    car.marginal_valuet = false;
-  }
-}
-
-if (!matchTime && car.time_marg != null) {
-  matchTime = Object.values(timefilter.value).every(filter => {
-    return car.time_marg.some(tim => tim !== null && tim === filter);
-  });
-
-  if (matchTime) {
-    car.marginal_valuet = true;
-    console.log("Matched marginal time");
-  }
-}
-
-if (!matchTime) {
-  return false;
-}
-      return matchString && matchData && matchReg && matchTime
->>>>>>> Stashed changes
+      return false;
     });
 
-    return filtered.slice().sort((a, b) => {
-      const priority = (el) => {
-        if (el.string !== '' && (el.marginal_value === false && el.marginal_valuet === false)) return 0;
-        if (el.string !== '' && (el.marginal_value === true || el.marginal_valuet === true )) return 1;
-        return 2;
-      };
-      return priority(a) - priority(b);
-    });
+    // Dataset type match
+    let matchData = false;
+    if (car.datasettypes != null) {
+      matchData = Object.values(datafilter.value).every(filter =>
+        car.datasettypes.some(dataset =>
+          dataset.datasettype !== null && dataset.datasettype.toString() === filter
+        )
+      );
+    } else {
+      return false;
+    }
 
-  } else {
-    return [];
-  }
+    // Region match
+    let matchReg = false;
+    if (car.location != null) {
+      matchReg = Object.values(regionfilter.value).every(filter =>
+        car.location.some(loc => loc !== null && loc === filter)
+      );
+      if (matchReg) car.marginal_value = false;
+    }
+
+    if (!matchReg && car.location_marg != null) {
+      matchReg = Object.values(regionfilter.value).every(filter =>
+        car.location_marg.some(loc => loc !== null && loc === filter)
+      );
+      if (matchReg) {
+        car.marginal_value = true;
+        console.log("Matched marginal region: " + car.database.databasename);
+      }
+    }
+
+    if (!matchReg) return false;
+
+    // Time match
+    let matchTime = false;
+    if (car.time != null) {
+      matchTime = Object.values(timefilter.value).every(filter =>
+        car.time.some(tim => tim !== null && tim === filter)
+      );
+      if (matchTime) car.marginal_valuet = false;
+    }
+
+    if (!matchTime && car.time_marg != null) {
+      matchTime = Object.values(timefilter.value).every(filter =>
+        car.time_marg.some(tim => tim !== null && tim === filter)
+      );
+      if (matchTime) {
+        car.marginal_valuet = true;
+        console.log("Matched marginal time");
+      }
+    }
+
+    if (!matchTime) return false;
+
+    return matchString && matchData && matchReg && matchTime;
+  });
+
+  return filtered.slice().sort((a, b) => {
+    const priority = (el) => {
+      if (el.string !== '' && !el.marginal_value && !el.marginal_valuet) return 0;
+      if (el.string !== '' && (el.marginal_value || el.marginal_valuet)) return 1;
+      return 2;
+    };
+    return priority(a) - priority(b);
+  });
 });
-
 
 console.log(filteredDBs.value)
 
@@ -827,77 +733,69 @@ function addCommasToNumber(number) {
     return result;
 }
 
-const currentYear = 1950 - new Date().getFullYear();
-function gotodb(el) {
-  let id = el.database.databaseid
-  const url = `https://data.neotomadb.org/database/${id}`
-  window.open(url,'_blank');
-}
+//const currentYear = 1950 - new Date().getFullYear();
+//function gotodb(el) {
+//  let id = el.database.databaseid
+//  const url = `https://data.neotomadb.org/database/${id}`
+//  window.open(url,'_blank');
+//}
 
 
 
 </script>
 
 <style>
+
+.p-panel-header {
+  display: grid;
+  justify-content:space-evenly;
+  grid-template-columns: 2fr 3fr 1fr;
+}
+.placer {
+  justify-items:center;
+  justify-content:center;
+  justify-self:center;
+}
+
+
+.bigplace {
+ 
+  justify-items:center;
+  justify-content:center;
+  justify-self:center;
+
+
+}
+
 :root {
   --vw: 10px;
 }
 .not {
-  background-color:#837c6c;
-  cursor: pointer;
-  border: 3px solid #eabf93;
-  line-height: 1.5;
-  border-collapse:collapse;
+  background-color:#837c6c  !important;
+  cursor: pointer  !important;
+  border: 3px solid #eabf93  !important;
+  line-height: 1.5  !important;
+  border-collapse:collapse  !important;
 }
 
 .clicked {
-  background-color:rgb(158, 126, 150);
-  cursor: pointer;
-  border: 2px solid pink;
-  line-height:1.5
+  background-color:rgb(158, 126, 150) !important;
+  cursor: pointer  !important;
+  border: 2px solid pink  !important;
+  line-height:1.5  !important;
  /* font-weight:bold; */
 }
 
 .clicked:hover {
-  background-color:rgb(170,110,192);
+  background-color:rgb(170,110,192) !important;
 }
 
 .not:hover {
-  background-color:#e4c3a2;
+  background-color:#e4c3a2 !important;
 }
 
 
-.p-slider {
-  background: rgb(258, 201, 152);
-  height: 10px;
-  align-self:center;
-  justify-self:center;
-  justify-content:center;
-  justify-items:center;
-  text-align:center;
-  margin-left:auto;
-  margin-right:auto;
-}
 
-.p-slider .p-slider-range {
-  background: rgb(198, 161, 132);
-}
-
-.p-slider .p-slider-handle {
- border: 2px solid rgb(198, 161, 132);
- top: 0px;
- height: 20px;
- width: 20px;
-}
-
-.p-slider:not(.p-disabled) .p-slider-handle:hover {
-  background: rgb(198,161,132);
-  border-color: #eabf93
-}
-
-.p-slider .p-slider-handle:focus {
- box-shadow: 0 0 0 0.2rem #eabf93
-}
 </style>
 
 
@@ -926,29 +824,102 @@ function gotodb(el) {
       To explore any database in more detail, simply click its button below.
     </p>
   </Panel>
-  <!-- <Panel toggleable>
-    <template #header>
-      <h2>Time Filter</h2>
-    </template>
-    <p>Neotoma's datasets use a variety of age types (calendar years AD/BC, calibrated and uncalibrated radiocarbon years...)
-      but most datasets are in radiocarbon years, so this time filter uses radiocarbon years too. The year 0 corresponds to 1950 AD.
-    </p>
-    <Slider v-model="slide" range class="w-100rem" :min='currentYear' :max='50000000' />
-    <br>
-    <div style="max-width:580px;margin-left:auto;margin-right:auto;">
-<span>Younger Age: <InputText v-model.number="slide[0]" style="max-width:100px;"/> ({{ addCommasToNumber(slide[0])  }}). 
-   Older Age: <InputText  style="max-width:120px;" 
-   v-model.number="slide[1]" />({{ addCommasToNumber(slide[1]) }})</span>
-</div>
-  </Panel> -->
+
   <Panel toggleable collapsed>
     <template #header>
       <h2>Dataset Type Filter</h2>
+      <i class="pi pi-question-circle" style="font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on dataset type. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+           pt: {
+            arrow:
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}"></i>
     </template>
     <div style="display:flex;flex-wrap:wrap;">
   <div v-for="el in datasettypes_master" >
   <Badge :class="{ 'clicked': el.clicked, 'not': !el.clicked }" @click="buttonfilter(el)" :value='el.value'></Badge>
 </div>
+</div>
+  </Panel>
+  <Panel toggleable collapsed>
+    <template #header>
+      <h2>Time Filter</h2>
+      <i class="pi pi-question-circle" style="font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on temporal range. Databases with a dark gray background curate data from the selected period on the margins. That means the given database will accept data from the selected period only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+           pt: {
+            arrow:
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}"></i>
+    </template>
+    <div style="display:flex;flex-wrap:wrap;">
+  <div v-for="el in time_master" >
+  <Badge :class="{ 'clicked': el.clicked, 'not': !el.clicked }" @click="buttonfiltertime(el)" :value='el.value'></Badge>
+</div>
+</div>
+  </Panel>
+
+
+
+
+  <Panel toggleable collapsed>
+    <template #header>
+      <h2>Region Filter</h2>
+      <i class="pi pi-question-circle" style="font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on region. Databases with a dark gray background curate data from the selected region on the margins. That means the given database will accept data from the selected region only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+           pt: {
+            arrow:
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}"></i>
+    </template>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;">
+  <div v-for="el in sortedGroupedRegions " >
+    <div  class="bigplace" v-if="el.continent != 'Np'">
+      <h3>{{el.continent}}</h3>
+        <div class="placer" v-for="pla in el.regions">
+          <Badge
+            :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }"
+            @click="buttonfilterreg(pla)" :value='pla.value'></Badge>
+        </div>
+    </div>
+    <div class="bigplace" v-else>
+      <h3>Other Continents</h3>
+      <div class="placer" v-for="pla in el.regions">
+          <Badge
+            :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }"
+            @click="buttonfilterreg(pla)" :value='pla.value'></Badge>
+        </div>
+    </div>
+  </div>
 </div>
   </Panel>
     <Panel>
@@ -961,12 +932,6 @@ function gotodb(el) {
      
 
     <div v-for="(el,index) in filteredDBs.value" class="col-4">
-<<<<<<< Updated upstream
-      <div v-if="el.string != ''" style="height:100%;">
-            <Button 
-            style="width:100%;height:100%;justify-content:center;background-color:rgb(232,229,222);border-color:rgb(221,205,188);" class="col" 
-            v-tooltip="{ value: ('Datasets: \n' + el.string),
-=======
       <div v-if="el.string != '' && el.marginal_value == false && el.marginal_valuet == false" style="height:100%;">
         <Button style="width:100%;height:100%;justify-content:center;background-color:rgb(232,229,222);border-color:rgb(221,205,188);" class="col" 
             v-tooltip="{ value: ('Datasets: \n' + el.string + '\n\n Time: \n' + el.timestring + '\n' + el.time_margstring + '\n\n Regions: \n' + el.locstring  + '\n' + el.loc_margstring),
@@ -1013,31 +978,7 @@ function gotodb(el) {
           <p style="font-size:20px;color:rgb(50,50,30);font-weight:bold;">{{ el.database.databasename }}</p>
         </Button>
       </div>
-      <div v-if="el.string == ''" style="height:100%;">
-        <Button style="width:100%;height:100%;justify-content:center;background-color:rgb(202,209,202);border-color:rgb(171,170,178);" class="col" 
-          v-tooltip="{ value: ('no datasets yet'),
->>>>>>> Stashed changes
-          pt: {
-            arrow: 
-            {
-             style: {
-                borderColor: 'rgb(108,91,71)'
-              }
-            },
-            text: { //'bg-yellow-900 font-medium'
-            style: {
-              backgroundColor: 'rgb(108,97,71)',
-              width:'250px',
-              textAlign: 'center'
-            }
-          },
-          }}" 
-            @click="gotodb(el)">
-  
-              <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.database.databasename }}</p>
-            </Button>
-          </div>
-          <div v-if="el.string == ''" style="height:100%;">
+         <div v-if="el.string == ''" style="height:100%;">
             <Button 
             style="width:100%;height:100%;justify-content:center;background-color:rgb(202,209,202);border-color:rgb(171,170,178);" class="col" 
             v-tooltip="{ value: ('no datasets yet'),
@@ -1061,25 +1002,6 @@ function gotodb(el) {
               <p style="font-size:20px;color:rgb(150,157,151);font-weight:bold;">{{ el.database.databasename }}</p>
             </Button>
           </div>
-         
-        <!--  <Dialog v-model:visible="visible"
-              modal
-              :header = 'name'
-              :style="{ width: '50rem' }"
-              :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-              <div id="about" v-html="htmlString">
-            </div>
-        
-            <p>Database Contact: {{ contact }}</p>
-            <p>{{name}} currently contains {{uniqueSites}} unique sites, associated with {{ uniqueDBsets }}
-          unique datasets. See below for a summary of the kinds of datasets {{ name }} contains. </p>
-
-    
-           <DataTable paginator :rows="5" :value="datasettypes" :sort-field="'value'" :sort-order="-1" tableStyle="min-width: 20rem">
-           <Column field="datasettype" header="Dataset Type"></Column>
-           <Column field="value" header="Number" sortable></Column>
-         </DataTable>
-        </Dialog>-->
      
   </div>
 
