@@ -67,9 +67,9 @@ const filteredtabledat = computed(() => {
     <InputText type="text" v-model="value" />
     <Button @click='findTaxa(value)'>Search</Button>
     <div v-if="!ready && processing">
-      <ProgressSpinner class="flex-grow-1 w-max" />
+      <ProgressSpinner style="display:grid;justify-self:center;"/>
     </div>
-    <div v-else>
+    <div v-if="ready && !processing">
         <DataTable  paginator :rows="5" :value="filteredtabledat" :sort-field="'taxonname'" :sort-order="-1" tableStyle="min-width: 50rem">
             <template #header>
         <div class="flex justify-content-end">
