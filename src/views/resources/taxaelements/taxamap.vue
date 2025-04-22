@@ -76,7 +76,7 @@ function loadtaxon() {
             let site = JSON.parse(pointfull.geography);
             let siteid = pointfull.siteid;
             let sitename = pointfull.sitename;
-          if (site.coordinates !== null) { 
+          if (site && site.coordinates !== null) { 
             if (!ids.includes(siteid)) {
                   var geom = site.coordinates;
                   let geometry;
