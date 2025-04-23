@@ -328,7 +328,7 @@ loading2.value =false
 <style>
   .map {
     width: 100%;
-    height: 400px; /* Adjust the height as needed */
+    height: 395px; /* Adjust the height as needed */
   }
 </style>
 
