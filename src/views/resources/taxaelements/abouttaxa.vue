@@ -20,6 +20,7 @@ const ecolgroups = ref(null);
 const ecolgroup = ref(null);
 const ecolgroupname = ref(null);
 const link = ref(null);
+const externals = ref(null);
 
 function loadAbout() {
     return  fetch(neotomaapi + "/v2.0/data/taxa/" + route.params.taxonid,
@@ -68,9 +69,23 @@ function loadEcol() {
 }
 
 
+function loadExternal() {
+  return fetch(neotomaapi + '/v2.0/apps/exttax?taxonid=' + route.params.taxonid,
+    {method: "GET", headers: {'content-type': 'application/json'}} )
+    .then(res4 => {
+      return res4.json()
+
+    })
+    .then(json4 => {
+      externals.value = json4.data
+    })
+}
+
+
 onMounted(async () => {
     await loadAbout();
     await loadEcol();
+    await loadExternal();
 })
 
 </script>
@@ -95,6 +110,17 @@ h3 {
       <li>Higher Taxon: <a :href='link'>{{ highname }} </a></li>
       <li>Status: {{status}}</li>
       <li> Ecological Group: {{ecolgroupname}}</li>
+      <div v-for="item in externals">
+        <div v-if="item.extdatabasename == 'GBIF Backbone Taxonomy'">
+          <li>{{item.extdatabasename}}: <a :href="'https://www.gbif.org/species/' + item.exttaxonid">{{ item.exttaxonid }}</a></li>
+        </div>
+        <div v-else-if="item.extdatabasename == 'NCBI Taxonomy Database'">
+          <li>{{item.extdatabasename}}: <a :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=' + item.exttaxonid">{{ item.exttaxonid }}</a></li>
+        </div>
+        <div v-else>
+          <li>{{item.extdatabasename}}: {{ item.exttaxonid }}</li>
+        </div>
+      </div>
     </ul>
     </div>
     <div v-else class="flex flex-wrap justify-content-center align-items-center">
