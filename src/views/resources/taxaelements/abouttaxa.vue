@@ -117,7 +117,7 @@ h3 {
         <div v-else-if="item.extdatabasename == 'NCBI Taxonomy Database'">
           <li>{{item.extdatabasename}}: <a :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=' + item.exttaxonid">{{ item.exttaxonid }}</a></li>
         </div>
-        <div v-else>
+        <div v-else-if="item.extdatabasename != null">
           <li>{{item.extdatabasename}}: {{ item.exttaxonid }}</li>
         </div>
       </div>
