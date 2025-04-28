@@ -1,31 +1,29 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import Button from 'primevue/button';
-  import { useRouter } from 'vue-router';
+  import useTokens from '@/stores/auth.store.js'
   
   const baseUrl = import.meta.env.VITE_APP_ORCID_LOGIN;
 
-  let buttontype = ref(null)
-  let orcid_state = ref(null)
+  let buttontype = ref("login")
+  const {fetchTokens, access_token, logoutTokens} = useTokens()
 
   onMounted(() => {
-    if(localStorage.hasOwnProperty("neotoma_orcid")){
-      orcid_state.value = localStorage.getItem("neotoma_orcid")
-      buttontype.value = "Logout"
-    } else {
-      buttontype.value = "Login"
+    fetchTokens()
+    if (!!access_token) {
+      buttontype.value = "logout"
     }
   })
-  
+    
   function logout() {
-    localStorage.removeItem("neotoma_orcid");
-    orcid_state.value = null;
+    logoutTokens()
+    buttontype.value = "login"
   }
 
 </script>
 
 <template>
-    <div v-if='buttontype=="Login"'>
+    <div v-if='buttontype=="login"'>
       <Button id="loginorcid-1"
               as="a"
               :href="baseUrl"
@@ -34,7 +32,7 @@
         Log Into ORCID
       </Button>
   </div>
-  <div v-else-if='buttontype=="Logout"'>
+  <div v-else-if='buttontype=="logout"'>
     <Button id="loginorcid-1"
               variant="outlined"
               rounded

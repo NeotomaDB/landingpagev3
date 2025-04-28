@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { orcid_store } from '@/stores/auth.store';
 
 import EmptyPage from "@/views/emptypage.vue"
 import Taxa from "@/views/taxa.vue"
@@ -43,7 +42,7 @@ export const router = createRouter({
       component: DatabaseSelect,
     },
     { 
-      path: "/user",
+      path: "/user/:contactid",
       component: UserPage,
       name: "User Profile",
     },
@@ -64,6 +63,7 @@ function removeORCIDHash(to) {
     hash_return[item.split('=')[0]] = item.split('=')[1] 
   }))
   // Note: I need to actually make sure we're getting an ORCID thing.
-  localStorage.setItem('neotoma_orcid', JSON.stringify(hash_return))
+  let hash_object = JSON.stringify(hash_return)
+  localStorage.setItem('neotoma_orcid', hash_object)
   return { path: '/user', query: to.query, hash: '' }
 }

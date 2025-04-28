@@ -1,20 +1,26 @@
-import { defineStore } from 'pinia';
-import {ref} from 'vue';
+'use-strict';
+
+import { reactive, toRefs } from "vue";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
 
-export const orcid_store = defineStore('orcid-user', () => {
-    const name = ref(null);
-    const access_token = ref(null);
-    const token_type = ref(null);
-    const expires_in = ref(null);
-    const tokenVersion = ref(null);
-    const persistent = ref(null);
-    const id_token = ref(null);
-    function validate() {
-        fetch('POST', )
-    };
-    function logout() {
+const state = reactive({
+    access_token: null
+});
 
+export default function useTokens() {
+    const fetchTokens = async () => {
+        state.access_token = localStorage.getItem("neotoma_orcid") || {}
     }
-})
+
+    const logoutTokens = async () => {
+        state.access_token = null;
+        localStorage.removeItem('neotoma_orcid')
+    } 
+
+    return {
+        ...toRefs(state), // convert to refs when returning
+        fetchTokens,
+        logoutTokens
+    }
+}

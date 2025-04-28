@@ -17,11 +17,13 @@ import Tooltip from 'primevue/tooltip';
 import BadgeDirective from 'primevue/badgedirective';
 import VueCookies from 'vue-cookies'
 
+const pinia = createPinia()
+
 const app = createApp(App)
+app.use(pinia)
 app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);
 
-app.use(createPinia())
 app.use(router)
 app.use(VueCookies)
 app.use(PrimeVue, {
