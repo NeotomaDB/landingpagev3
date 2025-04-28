@@ -12,7 +12,7 @@ const props = defineProps(['title'])
     </template>
 
     <div v-if="props.title.site">
-      <div class="grid">
+      <div class="grid" style="padding:1rem">
         <div class="col-8">
           <strong>Site Name:</strong> {{ props.title.site.sitename }}<br />
           <strong>Description: </strong>
@@ -28,7 +28,7 @@ const props = defineProps(['title'])
           <span v-else> None</span>
         </div>
         <div class="col" style="max-height:200px">
-          <SiteMap :location="props.title.site.geography" />
+          <SiteMap :location="props.title.site.geography" style="border:1px solid black"/>
         </div>
       </div>
       <br>
