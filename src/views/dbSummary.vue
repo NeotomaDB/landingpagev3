@@ -744,21 +744,27 @@ function addCommasToNumber(number) {
 
 </script>
 
-<style>
+<style scoped>
 
-.p-panel-header {
+::v-deep(.p-panel-header) {
   display: grid !important;
   justify-content:space-evenly !important;
   grid-template-columns: 2fr 3fr 1fr !important;
 }
-.placer {
+
+::v-deep(.different_one) {
+  display: grid !important;
+  justify-content:space-between !important;
+  grid-template-columns: 2fr 3fr 1fr !important;
+}
+::v-deep(.placer) {
   justify-items:center;
   justify-content:center;
   justify-self:center;
 }
 
 
-.bigplace {
+::v-deep(.bigplace) {
  
   justify-items:center;
   justify-content:center;
@@ -767,10 +773,10 @@ function addCommasToNumber(number) {
 
 }
 
-:root {
+::v-deep(:root) {
   --vw: 10px;
 }
-.not {
+::v-deep(.not) {
   background-color:#837c6c  !important;
   cursor: pointer  !important;
   border: 3px solid #eabf93  !important;
@@ -778,7 +784,7 @@ function addCommasToNumber(number) {
   border-collapse:collapse  !important;
 }
 
-.clicked {
+::v-deep(.clicked) {
   background-color:rgb(158, 126, 150) !important;
   cursor: pointer  !important;
   border: 2px solid pink  !important;
@@ -786,11 +792,11 @@ function addCommasToNumber(number) {
  /* font-weight:bold; */
 }
 
-.clicked:hover {
+::v-deep(.clicked:hover) {
   background-color:rgb(170,110,192) !important;
 }
 
-.not:hover {
+::v-deep(.not:hover) {
   background-color:#e4c3a2 !important;
 }
 
@@ -800,7 +806,7 @@ function addCommasToNumber(number) {
 
 
 <template> 
-    <Panel toggleable>
+    <Panel toggleable >
       <template #header>
         <h1 style="text-align:center;">Constituent Databases</h1>
       </template>
