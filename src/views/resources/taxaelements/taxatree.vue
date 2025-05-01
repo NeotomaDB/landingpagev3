@@ -117,30 +117,30 @@ onMounted(async () => {
 
 </script>
 
-<style>
-.tree-container .link {
+<style scoped>
+::v-deep(.tree-container .link) {
   stroke: #8a8578 !important;
 }
 
-a {
+::v-deep(a) {
   color: #1D5183;
 }
 
-#tree_id a {
+::v-deep(#tree_id a) {
   background-color: rgba(226, 225, 221, 0.8);
   width:100%;
   text-align:center;
   border-radius:1000px;
 }
 
-.p-panel-content {
+::v-deep(.p-panel-content) {
   padding: 0px;
 }
 
-.p-panel .p-panel-content {
+::v-deep(.p-panel .p-panel-content) {
   padding: 0px;
 }
-#tree_id {
+::v-deep(#tree_id) {
   padding: 0px;
 }
 </style>
