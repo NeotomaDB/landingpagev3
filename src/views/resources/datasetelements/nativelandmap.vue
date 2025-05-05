@@ -70,12 +70,12 @@ function getColor(source) {
 
 async function nativeland() {
   if(Array.isArray(location.coordinates.flat()[0])) {
-  const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position=" + newlat.value + ',' + newlong.value)
+  const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position=" + newlat.value + ',' + newlong.value + "&key=***REMOVED***")
   natland.value = await waiting.json();
 }
 else {
   const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position="
-   + location.coordinates.flat()[1] + ',' + location.coordinates.flat()[0] );
+   + location.coordinates.flat()[1] + ',' + location.coordinates.flat()[0] + "&key=***REMOVED***");
    natland.value = await waiting.json();
 }
 
