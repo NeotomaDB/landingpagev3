@@ -41,6 +41,7 @@ var link = ref([]);
 var visible = ref(false);
 const vectorSource2 = ref(null);
 const loadingnat = ref(true);
+const apiKey = import.meta.env.VITE_API_NATIVELAND_KEY;
 
 function centerMap(location) {
   if (Array.isArray(location.coordinates.flat()[0])) {
@@ -66,16 +67,15 @@ function getColor(source) {
  return color;
 }
 
-
-
 async function nativeland() {
   if(Array.isArray(location.coordinates.flat()[0])) {
-  const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position=" + newlat.value + ',' + newlong.value + "&key=***REMOVED***")
+  
+  const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position=" + newlat.value + ',' + newlong.value + "&key=" + apiKey)
   natland.value = await waiting.json();
 }
 else {
   const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position="
-   + location.coordinates.flat()[1] + ',' + location.coordinates.flat()[0] + "&key=***REMOVED***");
+   + location.coordinates.flat()[1] + ',' + location.coordinates.flat()[0] + "&key=" + apiKey);
    natland.value = await waiting.json();
 }
 
