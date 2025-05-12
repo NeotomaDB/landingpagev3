@@ -613,15 +613,6 @@ function buttonfilterreg(reg) {
     regionfilter.value.splice(index, 1)}
 }
 
-function buttonfilterreg(reg) {
-  const index = regionfilter.value.indexOf(reg.value);
-  reg.clicked = !reg.clicked;
-  if (index === -1) {
-    regionfilter.value.push(reg.value)
-  } else {
-    regionfilter.value.splice(index, 1)}
-}
-
 function buttonfiltertime(time) {
   const index = timefilter.value.indexOf(time.value);
   time.clicked = !time.clicked;
