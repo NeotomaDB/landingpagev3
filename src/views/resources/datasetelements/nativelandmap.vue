@@ -20,7 +20,7 @@ import Circle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Text from 'ol/style/Text';
 import Overlay from 'ol/Overlay';
-
+import { transformExtent } from 'ol/proj';
 
 
 let props = defineProps(['location'])
@@ -41,6 +41,7 @@ var link = ref([]);
 var visible = ref(false);
 const vectorSource2 = ref(null);
 const loadingnat = ref(true);
+const apiKey = import.meta.env.VITE_API_NATIVELAND_KEY;
 
 function centerMap(location) {
   if (Array.isArray(location.coordinates.flat()[0])) {
@@ -66,16 +67,15 @@ function getColor(source) {
  return color;
 }
 
-
-
 async function nativeland() {
   if(Array.isArray(location.coordinates.flat()[0])) {
-  const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position=" + newlat.value + ',' + newlong.value)
+  
+  const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position=" + newlat.value + ',' + newlong.value + "&key=" + apiKey)
   natland.value = await waiting.json();
 }
 else {
   const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position="
-   + location.coordinates.flat()[1] + ',' + location.coordinates.flat()[0] );
+   + location.coordinates.flat()[1] + ',' + location.coordinates.flat()[0] + "&key=" + apiKey);
    natland.value = await waiting.json();
 }
 
@@ -195,10 +195,17 @@ const vectorStyle = new Style({
     center: centerMap(location),
     zoom: 10,}),});
 
-  if (hasFeatures.value) {
-  const extent = vectorSource2.value.getExtent();
-  myMap2.getView().fit(extent)
+    if (hasFeatures.value) {
 
+  myMap2.once('postrender', () => {
+  const extent = vectorSource2.value.getExtent();
+  console.log(extent);
+  myMap2.getView().fit(extent, {
+    size: myMap2.getSize(),
+    padding: [20, 20, 20, 20],
+    maxZoom: 4 // limit how far it zooms in
+  });
+});
 }
  // myMap2.getView().setZoom(5)       
 
@@ -319,7 +326,7 @@ loadingnat.value=false
           </div>
         </template>
         <div id="griddiv_nlm" style="display:grid;grid-template-columns:1fr 1fr;">
-        <div style="height:400px;width:450px;margin-left:0%;margin-right:auto;border:3px solid rgb(92,84,80);">
+        <div style="height:400px;width:98%;margin-left:0%;margin-right:auto;border:3px solid rgb(92,84,80);">
           <div id="map2" class="map" ref="map">
         </div>
  
@@ -329,7 +336,7 @@ loadingnat.value=false
             </p>
           </div>
 
-      <div v-if="hasFeatures" style="font-size:13px;">
+      <div v-if="hasFeatures" style="font-size:13px; ">
         <br>
         <span>This site intersects Indigenous lands. It is part of the territory of the </span>
       <span v-for="(feat, index) in vectorSource2.getFeatures()">

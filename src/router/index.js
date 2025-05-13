@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import EmptyPage from "@/views/emptypage.vue"
 import Taxa from "@/views/taxa.vue"
+import TaxaWelcome from "@/views/taxawelcome.vue"
 import Dataset from "@/views/dataset.vue"
 import Database from "@/views/database.vue"
 import DatabaseSelect from "@/views/dbSummary.vue"
@@ -30,31 +31,36 @@ export const router = createRouter({
       path: '/:datasetid',
       name: "Dataset",
       component: Dataset,
-    },
-    {
-        path: "/database/:databaseid",
-        name: "Database",
-        component: Database,
-    },
-    {
-      path: "/database",
-      name: "DatabaseSelect",
-      component: DatabaseSelect,
-    },
-    { 
-      path: "/user/:contactid",
-      component: UserPage,
-      name: "User Profile",
-    },
-    { 
-      path: "/login",
-      component: EmptyPage,
-      name: "Login redirect from Orcid.",
-      beforeEnter: [removeORCIDHash],
-    },
-    
+  },
+  {
+    path: '/taxa',
+    name: "TaxaWelcome",
+    component: TaxaWelcome,
+  },
+  {
+      path: "/database/:databaseid",
+      name: "Database",
+      component: Database,
+  },
+  {
+    path: "/database",
+    name: "DatabaseSelect",
+    component: DatabaseSelect,
+  },
+  { 
+    path: "/user/:contactid",
+    component: UserPage,
+    name: "User Profile",
+  },
+  { 
+    path: "/login",
+    component: EmptyPage,
+    name: "Login redirect from Orcid.",
+    beforeEnter: [removeORCIDHash],
+  },
   ]
-})
+  }, 
+)
 
 function removeORCIDHash(to) {
   let hash = to.hash.replace(/#/g, '').split('&')
