@@ -39,3 +39,5 @@ src/views/testmap.vue
 
 package-lock.json
 passwords.txt
+
+.yarnclean
