@@ -50,6 +50,7 @@ const datasettypes_master = ref([
   { value: "geochronologic", clicked: false },
   { value: "insect", clicked: false },
   { value: "insect modern", clicked: false },
+  { value: "Lead 210", clicked: false},
   { value: "loss-on-ignition", clicked: false },
   { value: "macrocharcoal", clicked: false },
   { value: "macroinvertebrate", clicked: false },
@@ -73,7 +74,8 @@ const datasettypes_master = ref([
   { value: "vertebrate fauna", clicked: false },
   { value: "water chemistry", clicked: false },
   { value: "X-ray diffraction (XRD)", clicked: false },
-  { value: "X-ray fluorescence (XRF)", clicked: false }
+  { value: "X-ray fluorescence (XRF)", clicked: false },
+  
 ]);
 
 const regions_master = ref([
@@ -129,178 +131,418 @@ const time_master = ref([
 const temp_code = [
   {
     "DB": "African Pollen Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
   },
   {
     "DB": "Canadian Pollen Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": []
   },
   {
     "DB": "Marine Dinoflagellates Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary"]
+    "times": ["Quaternary"],
+    "marginals": ["Modern (post 1850 AD)"]
   },
   {
     "DB": "French Institute of Pondicherry Palynology and Paleoecology Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": []
   },
   {
     "DB": "European Pollen Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
   },
   {
     "DB": "PaleoVertebrates of Latin America",
-    "times": ["Quaternary"]
+    "times": ["Quaternary"],
+    "marginals": []
   },
   {
     "DB": "Neotoma Testate Amoebae Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": []
   },
   {
     "DB": "St. Croix Watershed Research Station of the Science Museum of Minnesota",
-    "times": ["Modern (post 1850 AD)", "Quaternary"]
+    "times": ["Modern (post 1850 AD)"],
+    "marginals": []
   },
   {
     "DB": "Indo-Pacific Pollen Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": ["pre-Quaternary"]
   },
   {
     "DB": "Latin American Pollen Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "times": ["Quaternary"],
+    "marginals": ["Modern (post 1850 AD)", "pre-Quaternary"]
   },
   {
-    "DB": "Academy of Natural Sciences of Drexel University",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "DB": "Academy of Natural Sciences at Drexel University",
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": ["pre-Quaternary"]
   },
   {
-    "DB": "Diatom Paleolimnology Data Cooperative (DPDC)",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "DB": "Diatom Paleolimnology Data Cooperative",
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": ["pre-Quaternary"]
   },
   {
     "DB": "North American Non-Marine Ostracode Database Project (NANODe)",
-    "times": ["Modern (post 1850 AD)"]
+    "times": ["Modern (post 1850 AD)"],
+    "marginals": []
   },
   {
     "DB": "Neotoma Ostracode Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
   },
   {
     "DB": "Canadian Museum of Nature-Delorme Ostracoda-Surface Samples",
-    "times": ["Modern (post 1850 AD)"]
+    "times": ["Modern (post 1850 AD)"],
+    "marginals": []
   },
   {
     "DB": "Tropical South American Diatom Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary"]
+    "times": ["Modern (post 1850 AD)"],
+    "marginals": ["Quaternary"]
   },
   {
     "DB": "Alaskan Archaeofaunas",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": ["pre-Quaternary"]
   },
   {
     "DB": "East Asian Nonmarine Ostracod Database",
-    "times": ["Modern (post 1850 AD)"]
+    "times": ["Modern (post 1850 AD)"],
+    "marginals": []
   },
   {
     "DB": "Alpine Palynological Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": []
   },
   {
-    "DB": "North American Pollen Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "DB": "North American Pollen Database (NAPD)",
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": ["pre-Quaternary"]
   },
   {
     "DB": "North American Plant Macrofossil Database",
-    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": ["pre-Quaternary"]
+  },
+  {
+    "DB": "FAUNMAP",
+    "times": ["Quaternary"],
+    "marginals": ["Modern (post 1850 AD)", "pre-Quaternary"]
+  },
+  {
+    "DB": "Pollen Database of Siberia and the Russian Far East",
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": ["pre-Quaternary"]
+  },
+  {
+    "DB": "Neotoma",
+    "times": [],
+    "marginals": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"]
+  },
+  {
+    "DB": "NDSU Insect Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Japanese Pollen Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": ["pre-Quaternary"]
+  },
+  {
+    "DB": "Neotoma Midden Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Chinese Pollen Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Holocene Perspective on Peatland Biogeochemistry",
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Deep-Time Palynology Database",
+    "times": ["pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Neotoma Biomarker Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Faunal Isotope Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Neotoma Charcoal Data",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Pollen Monitoring Programme",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Nonmarine Ostracod Distribution in Europe Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Sedimentary aDNA Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "ANTIGUA",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Cooperative Holocene Mapping Project",
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "SISAL",
+    "times": ["Modern (post 1850 AD)", "Quaternary", "pre-Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "Strategic Environmental Archaeology Database",
+    "times": ["Modern (post 1850 AD)", "Quaternary"],
+    "marginals": []
+  },
+  {
+    "DB": "MioMap",
+    "times": ["pre-Quaternary"],
+    "marginals": []
   }
 ]
 
 const geo_code = [
   {
     "DB": "African Pollen Database",
-    "places": ["Middle East", "North Africa", "Sub Saharan Africa", "Atlantic Ocean", "Indian Ocean"]
+    "places": ["North Africa", "Sub Saharan Africa"],
+    "marg_pl": ["Middle East", "Atlantic Ocean", "Indian Ocean"]
   },
   {
     "DB": "Canadian Pollen Database",
-    "places": ["North America"]
+    "places": ["North America"],
+    "marg_pl": []
   },
   {
     "DB": "Marine Dinoflagellates Database",
-    "places": ["Atlantic Ocean", "Pacific Ocean", "Southern Ocean", "Arctic Ocean"]
+    "places": ["Atlantic Ocean", "Arctic Ocean"],
+    "marg_pl": ["Pacific Ocean", "Southern Ocean"]
   },
   {
     "DB": "French Institute of Pondicherry Palynology and Paleoecology Database",
-    "places": ["Southeast Asia", "Indian subcontinent", "Indian Ocean"]
+    "places": ["Southeast Asia", "Indian subcontinent"],
+    "marg_pl": ["Indian Ocean"]
   },
   {
     "DB": "European Pollen Database",
-    "places": ["Russia", "Central Asia", "Eastern Asia", "Middle East", "North Africa", "Europe", "Atlantic Ocean", "Arctic Ocean"]
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Middle East", "Europe"],
+    "marg_pl": ["North Africa", "Atlantic Ocean", "Arctic Ocean"]
   },
   {
     "DB": "PaleoVertebrates of Latin America",
-    "places": ["North America", "Central America", "South America"]
+    "places": ["North America", "Central America", "South America"],
+    "marg_pl": []
   },
   {
     "DB": "Neotoma Testate Amoebae Database",
-    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania"]
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania"],
+    "marg_pl": []
   },
   {
     "DB": "St. Croix Watershed Research Station of the Science Museum of Minnesota",
-    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"]
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
   },
   {
     "DB": "Indo-Pacific Pollen Database",
-    "places": ["Southeast Asia", "Oceania", "Pacific Ocean", "Indian Ocean", "Southern Ocean"]
+    "places": ["Southeast Asia", "Oceania", "Pacific Ocean", "Indian Ocean"],
+    "marg_pl": ["Southern Ocean"]
   },
   {
     "DB": "Latin American Pollen Database",
-    "places": ["North America", "Central America", "South America"]
+    "places": ["North America", "Central America", "South America"],
+    "marg_pl": []
   },
   {
-    "DB": "Academy of Natural Sciences of Drexel University",
-    "places": ["Russia", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Atlantic Ocean", "Pacific Ocean"]
+    "DB": "Academy of Natural Sciences at Drexel University",
+    "places": ["Russia", "North America", "South America", "Europe"],
+    "marg_pl": ["North Africa", "Sub Saharan Africa", "Central America", "Atlantic Ocean", "Pacific Ocean"]
   },
   {
-    "DB": "Diatom Paleolimnology Data Cooperative (DPDC)",
-    "places": ["North America"]
+    "DB": "Diatom Paleolimnology Data Cooperative",
+    "places": ["North America"],
+    "marg_pl": []
   },
   {
     "DB": "North American Non-Marine Ostracode Database Project (NANODe)",
-    "places": ["North America"]
+    "places": ["North America"],
+    "marg_pl": []
   },
   {
     "DB": "Neotoma Ostracode Database",
-    "places": ["North America"]
+    "places": ["North America"],
+    "marg_pl": []
   },
   {
     "DB": "Canadian Museum of Nature-Delorme Ostracoda-Surface Samples",
-    "places": ["North America"]
+    "places": ["North America"],
+    "marg_pl": []
   },
   {
     "DB": "Tropical South American Diatom Database",
-    "places": ["Central America", "South America"]
+    "places": ["South America"],
+    "marg_pl": ["Central America"]
   },
   {
     "DB": "Alaskan Archaeofaunas",
-    "places": ["North America", "Pacific Ocean", "Arctic Ocean"]
+    "places": ["North America", "Pacific Ocean"],
+    "marg_pl": ["Arctic Ocean"]
   },
   {
     "DB": "East Asian Nonmarine Ostracod Database",
-    "places": ["Eastern Asia"]
+    "places": ["Eastern Asia"],
+    "marg_pl": []
   },
   {
     "DB": "Alpine Palynological Database",
-    "places": ["Russia", "Central Asia", "Middle East", "North Africa", "North America", "Central America", "South America", "Europe"]
+    "places": ["Europe"],
+    "marg_pl": ["Russia", "Central Asia", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "South America"]
   },
   {
-    "DB": "North American Pollen Database",
-    "places": ["North America", "Atlantic Ocean", "Pacific Ocean"]
+    "DB": "North American Pollen Database (NAPD)",
+    "places": ["North America"],
+    "marg_pl": ["Atlantic Ocean", "Pacific Ocean"]
   },
   {
     "DB": "North American Plant Macrofossil Database",
-    "places": ["North America", "Central America"]
+    "places": ["North America"],
+    "marg_pl": ["Central America"]
+  },
+  {
+    "DB": "FAUNMAP",
+    "places": ["North America"],
+    "marg_pl": ["Central America", "Europe"]
+  },
+  {
+    "DB": "Pollen Database of Siberia and the Russian Far East",
+    "places": ["Russia", "Central Asia"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Neotoma",
+    "places": [],
+    "marg_pl": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"]
+  },
+  {
+    "DB": "NDSU Insect Database",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Japanese Pollen Database",
+    "places": ["Eastern Asia"],
+    "marg_pl": ["Pacific Ocean"]
+  },
+  {
+    "DB": "Neotoma Midden Database",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Chinese Pollen Database",
+    "places": ["Central Asia", "Eastern Asia"],
+    "marg_pl": ["Southeast Asia", "Pacific Ocean", "Indian Ocean"]
+  },
+  {
+    "DB": "Holocene Perspective on Peatland Biogeochemistry",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Deep-Time Palynology Database",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Neotoma Biomarker Database",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Faunal Isotope Database",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Neotoma Charcoal Data",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Pollen Monitoring Programme",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Nonmarine Ostracod Distribution in Europe Database",
+    "places": ["Europe"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Sedimentary aDNA Database",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "ANTIGUA",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Cooperative Holocene Mapping Project",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "SISAL",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "Strategic Environmental Archaeology Database",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
+  },
+  {
+    "DB": "MioMap",
+    "places": ["Russia", "Central Asia", "Eastern Asia", "Southeast Asia", "Indian subcontinent", "Middle East", "North Africa", "Sub Saharan Africa", "North America", "Central America", "South America", "Europe", "Oceania", "Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean", "Arctic Ocean"],
+    "marg_pl": []
   }
 ]
-
-
 
 
     function loadDatabases() {
@@ -318,8 +560,6 @@ const geo_code = [
       geo.DB === obj.database.databasename);
       const timeEntry = temp_code.find(time => 
       time.DB === obj.database.databasename);
-
-
       return {
       ...obj,
       string: obj.datasettypes
@@ -327,9 +567,19 @@ const geo_code = [
       .filter(Boolean)
       .join("\n"),
       location: geoEntry ? geoEntry.places : null,
+      location_marg: geoEntry ? geoEntry.marg_pl : null,
       time: timeEntry ? timeEntry.times : null,
+      time_marg: timeEntry ? timeEntry.marginals : null,
       locstring: geoEntry ? geoEntry.places.join("\n") : null,
       timestring: timeEntry ? timeEntry.times.join("\n") : null,
+      time_margstring: timeEntry && timeEntry.marginals.length ? 
+      [...timeEntry.marginals.slice(0,-1), timeEntry.marginals.at(-1) + " (marginal)"].join(" (marginal) \n") 
+      : '',
+      loc_margstring:  geoEntry && geoEntry.marg_pl.length
+  ? [...geoEntry.marg_pl.slice(0, -1), geoEntry.marg_pl.at(-1) + " (marginal)"].join(" (marginal) \n")
+  : '',
+      marginal_value: false,
+      marginal_valuet: false
 
     };
       
@@ -372,72 +622,98 @@ function buttonfiltertime(time) {
     timefilter.value.splice(index, 1)}
 }
 
-
+function gotodb(el) {
+  window.open("https://data.neotomadb.org/database/" + el.database.databaseid)
+}
 
 filteredDBs.value = computed(() => {
-  if (databasekeys.value) {
+  if (!databasekeys.value) return [];
 
-    return databasekeys.value.filter(car => {
-      const matchString = Object.values(car.database).some(value => {
-        // Check if the value is not null before converting to string
-        if (value == car.database.databasename) {
-          let a = value.toString().toLowerCase().includes(globalFilter.value.toLowerCase());
-         // let b = value.toString().toLowerCase().includes(Object.values(datafilter.value))
-
-          return a
-        }
-        return false; // Skip null values
-      });
-
-      var matchData = false;
-if (car.datasettypes != null) {
-    matchData = Object.values(datafilter.value).every(filter => {
-  return car.datasettypes.some(dataset => {
-    return dataset.datasettype !== null && dataset.datasettype.toString() === filter;
-  });  
- 
-  
-  });
-} else {
-    return false;
-}
-
-var matchReg = false;
-if (car.location == null) {
-  matchReg = true;
-} else if (car.location!= null) {
-    matchReg = Object.values(regionfilter.value).every(filter => {
-  return car.location.some(loc => {
-    return loc !== null && loc === filter;
-  });  
-});  
-} else {
-    return false;
-}
-
-var matchTime = false;
-if (car.time == null) {
-  matchTime = true;
-} else if (car.time!= null) {
-    matchTime = Object.values(timefilter.value).every(filter => {
-  return car.time.some(tim => {
-    return tim !== null && tim === filter;
-  });  
-});  
-} else {
-    return false;
-}
-      return matchString && matchData && matchReg && matchTime
+  const filtered = databasekeys.value.filter(car => {
+    // Global string match
+    const matchString = Object.values(car.database ?? {}).some(value => {
+      if (value !== null) {
+        return value.toString().toLowerCase().includes(globalFilter.value.toLowerCase());
+      }
+      return false;
     });
-  } else {
-    return [];
-  }
-});
 
+    // Dataset type match
+    let matchData = false;
+    if (car.datasettypes != null) {
+      matchData = Object.values(datafilter.value).every(filter =>
+        car.datasettypes.some(dataset =>
+          dataset.datasettype !== null && dataset.datasettype.toString() === filter
+        )
+      );
+    } else {
+      return false;
+    }
+
+    // Region match
+    let matchReg = false;
+    if (car.location != null) {
+      matchReg = Object.values(regionfilter.value).every(filter =>
+        car.location.some(loc => loc !== null && loc === filter)
+      );
+      if (matchReg) car.marginal_value = false;
+    }
+
+    if (!matchReg && car.location_marg != null) {
+      matchReg = Object.values(regionfilter.value).every(filter =>
+        car.location_marg.some(loc => loc !== null && loc === filter)
+      );
+      if (matchReg) {
+        car.marginal_value = true;
+        console.log("Matched marginal region: " + car.database.databasename);
+      }
+    }
+
+    if (!matchReg) return false;
+
+    // Time match
+    let matchTime = false;
+    if (car.time != null) {
+      matchTime = Object.values(timefilter.value).every(filter =>
+        car.time.some(tim => tim !== null && tim === filter)
+      );
+      if (matchTime) car.marginal_valuet = false;
+    }
+
+    if (!matchTime && car.time_marg != null) {
+      matchTime = Object.values(timefilter.value).every(filter =>
+        car.time_marg.some(tim => tim !== null && tim === filter)
+      );
+      if (matchTime) {
+        car.marginal_valuet = true;
+        console.log("Matched marginal time");
+      }
+    }
+
+    if (!matchTime) return false;
+
+    return matchString && matchData && matchReg && matchTime;
+  });
+
+  return filtered.slice().sort((a, b) => {
+    const priority = (el) => {
+      if (el.string !== '' && !el.marginal_value && !el.marginal_valuet) return 0;
+      if (el.string !== '' && (el.marginal_value || el.marginal_valuet)) return 1;
+      return 2;
+    };
+    return priority(a) - priority(b);
+  });
+});
 
 console.log(filteredDBs.value)
 
 
+//const currentYear = 1950 - new Date().getFullYear();
+//function gotodb(el) {
+//  let id = el.database.databaseid
+//  const url = `https://data.neotomadb.org/database/${id}`
+//  window.open(url,'_blank');
+//}
 
 </script>
 
@@ -449,77 +725,69 @@ console.log(filteredDBs.value)
   justify-self:center;
 }
 
-.bigplace {
-  
+<style scoped>
+
+::v-deep(.p-panel-header) {
+  display: grid !important;
+  justify-content:space-evenly !important;
+  grid-template-columns: 2fr 3fr 1fr !important;
+}
+
+::v-deep(.different_one) {
+  display: grid !important;
+  justify-content:space-between !important;
+  grid-template-columns: 2fr 3fr 1fr !important;
+}
+::v-deep(.placer) {
+  justify-items:center;
+  justify-content:center;
+  justify-self:center;
+}
+
+
+::v-deep(.bigplace) {
+ 
   justify-items:center;
   justify-content:center;
   justify-self:center;
 
-}
-:root {
-  --vw: 10px;
-}
-.not {
-  background-color:#837c6c !important;
-  cursor: pointer !important;
-  border: 3px solid #eabf93 !important;
-  line-height: 1.5 !important;
-  border-collapse:collapse !important;
+
 }
 
-.clicked {
+::v-deep(:root) {
+  --vw: 10px;
+}
+::v-deep(.not) {
+  background-color:#837c6c  !important;
+  cursor: pointer  !important;
+  border: 3px solid #eabf93  !important;
+  line-height: 1.5  !important;
+  border-collapse:collapse  !important;
+}
+
+::v-deep(.clicked) {
   background-color:rgb(158, 126, 150) !important;
-  cursor: pointer !important;
-  border: 2px solid pink !important;
-  line-height:1.5 !important;
+  cursor: pointer  !important;
+  border: 2px solid pink  !important;
+  line-height:1.5  !important;
  /* font-weight:bold; */
 }
 
-.clicked:hover {
+::v-deep(.clicked:hover) {
   background-color:rgb(170,110,192) !important;
 }
 
-.not:hover {
+::v-deep(.not:hover) {
   background-color:#e4c3a2 !important;
 }
 
 
-.p-slider {
-  background: rgb(258, 201, 152);
-  height: 10px;
-  align-self:center;
-  justify-self:center;
-  justify-content:center;
-  justify-items:center;
-  text-align:center;
-  margin-left:auto;
-  margin-right:auto;
-}
 
-.p-slider .p-slider-range {
-  background: rgb(198, 161, 132);
-}
-
-.p-slider .p-slider-handle {
- border: 2px solid rgb(198, 161, 132);
- top: 0px;
- height: 20px;
- width: 20px;
-}
-
-.p-slider:not(.p-disabled) .p-slider-handle:hover {
-  background: rgb(198,161,132);
-  border-color: #eabf93
-}
-
-.p-slider .p-slider-handle:focus {
- box-shadow: 0 0 0 0.2rem #eabf93
-}
 </style>
 
 
 <template> 
-    <Panel toggleable>
+    <Panel toggleable >
       <template #header>
         <h1 style="text-align:center;">Constituent Databases</h1>
       </template>
@@ -543,9 +811,26 @@ console.log(filteredDBs.value)
       To explore any database in more detail, simply click its button below.
     </p>
   </Panel>
+
   <Panel toggleable collapsed>
     <template #header>
       <h2>Dataset Type Filter</h2>
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on dataset type. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+           pt: {
+            arrow:
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}"></i>
     </template>
     <div style="display:flex;flex-wrap:wrap;">
   <div v-for="el in datasettypes_master" >
@@ -553,10 +838,25 @@ console.log(filteredDBs.value)
 </div>
 </div>
   </Panel>
-
   <Panel toggleable collapsed>
     <template #header>
       <h2>Time Filter</h2>
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on temporal range. Databases with a dark gray background curate data from the selected period on the margins. That means the given database will accept data from the selected period only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+           pt: {
+            arrow:
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}"></i>
     </template>
     <div style="display:flex;flex-wrap:wrap;">
   <div v-for="el in time_master" >
@@ -566,25 +866,43 @@ console.log(filteredDBs.value)
   </Panel>
 
 
+
+
   <Panel toggleable collapsed>
     <template #header>
       <h2>Region Filter</h2>
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on region. Databases with a dark gray background curate data from the selected region on the margins. That means the given database will accept data from the selected region only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+           pt: {
+            arrow:
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}"></i>
     </template>
     <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;">
   <div v-for="el in sortedGroupedRegions " >
     <div  class="bigplace" v-if="el.continent != 'Np'">
       <h3>{{el.continent}}</h3>
         <div class="placer" v-for="pla in el.regions">
-          <Badge 
-            :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }" 
+          <Badge
+            :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }"
             @click="buttonfilterreg(pla)" :value='pla.value'></Badge>
         </div>
     </div>
     <div class="bigplace" v-else>
       <h3>Other Continents</h3>
       <div class="placer" v-for="pla in el.regions">
-          <Badge 
-            :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }" 
+          <Badge
+            :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }"
             @click="buttonfilterreg(pla)" :value='pla.value'></Badge>
         </div>
     </div>
@@ -602,9 +920,9 @@ console.log(filteredDBs.value)
     </div>
       <div class="flex flex-wrap">
     <div v-for="(el,index) in filteredDBs.value" class="col-4">
-      <div v-if="el.string != ''" style="height:100%;">
+      <div v-if="el.string != '' && el.marginal_value == false && el.marginal_valuet == false" style="height:100%;">
         <Button style="width:100%;height:100%;justify-content:center;background-color:rgb(232,229,222);border-color:rgb(221,205,188);" class="col" 
-            v-tooltip="{ value: ('Datasets: \n' + el.string + '\n\n Time: \n' + el.timestring + '\n\n Regions: \n' + el.locstring),
+            v-tooltip="{ value: ('Datasets: \n' + el.string + '\n\n Time: \n' + el.timestring + '\n' + el.time_margstring + '\n\n Regions: \n' + el.locstring  + '\n' + el.loc_margstring),
            pt: {
             arrow: 
             {
@@ -625,10 +943,10 @@ console.log(filteredDBs.value)
           <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.database.databasename }}</p>
         </Button>
       </div>
-      <div v-if="el.string == ''" style="height:100%;">
-        <Button style="width:100%;height:100%;justify-content:center;background-color:rgb(202,209,202);border-color:rgb(171,170,178);" class="col" 
-          v-tooltip="{ value: ('no datasets yet'),
-          pt: {
+      <div v-if="el.string != '' && (el.marginal_value == true || el.marginal_valuet == true)" style="height:100%;">
+        <Button style="width:100%;height:100%;justify-content:center;background-color:rgb(150,150,150);border-color:rgb(221,205,188);" class="col" 
+            v-tooltip="{ value: ('Datasets: \n' + el.string + '\n\n Time: \n' + el.timestring +   '\n' + el.time_margstring + '\n\n Regions: \n' + el.locstring + '\n' + el.loc_margstring),
+           pt: {
             arrow: 
             {
              style: {
@@ -644,11 +962,36 @@ console.log(filteredDBs.value)
           },
           }}" 
           @click="gotodb(el)">
-          <p style="font-size:20px;color:rgb(150,157,151);font-weight:bold;">{{ el.database.databasename }}</p>
+  
+          <p style="font-size:20px;color:rgb(50,50,30);font-weight:bold;">{{ el.database.databasename }}</p>
         </Button>
       </div>
-    </div>
-
+         <div v-if="el.string == ''" style="height:100%;">
+            <Button 
+            style="width:100%;height:100%;justify-content:center;background-color:rgb(202,209,202);border-color:rgb(171,170,178);" class="col" 
+            v-tooltip="{ value: ('no datasets yet'),
+          pt: {
+            arrow: 
+            {
+             style: {
+                borderColor: 'rgb(108,91,71)'
+              }
+            },
+            text: { //'bg-yellow-900 font-medium'
+            style: {
+              backgroundColor: 'rgb(108,97,71)',
+              width:'250px',
+              textAlign: 'center'
+            }
+          },
+          }}" 
+            @click="gotodb(el)">
+  
+              <p style="font-size:20px;color:rgb(150,157,151);font-weight:bold;">{{ el.database.databasename }}</p>
+            </Button>
+          </div>
+     
+  </div>
 
 </div> 
 </Panel>
