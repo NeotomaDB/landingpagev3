@@ -63,13 +63,45 @@ export const router = createRouter({
 )
 
 function removeORCIDHash(to) {
-  let hash = to.hash.replace(/#/g, '').split('&')
-  let hash_return = {}
-  hash.forEach((item => {
-    hash_return[item.split('=')[0]] = item.split('=')[1] 
-  }))
-  // Note: I need to actually make sure we're getting an ORCID thing.
-  let hash_object = JSON.stringify(hash_return)
-  localStorage.setItem('neotoma_orcid', hash_object)
-  return { path: '/user', query: to.query, hash: '' }
+    try {
+        console.log('🔑 Router guard processing hash:', to.hash);
+        
+        if (!to.hash || !to.hash.includes('access_token')) {
+            console.warn('⚠️ No ORCID token found in hash');
+            return { path: '/user', query: to.query, hash: '' };
+        }
+
+        let hash = to.hash.replace(/#/g, '').split('&');
+        let hash_return = {};
+        
+        hash.forEach((item) => {
+            const [key, value] = item.split('=');
+            if (key && value) {
+                hash_return[key] = decodeURIComponent(value);
+            }
+        });
+        
+        if (!hash_return.access_token) {
+            console.error('💥 No access_token found in ORCID response');
+            return { path: '/user', query: to.query, hash: '' };
+        }
+        
+        // Add expiration timestamp
+        if (hash_return.expires_in) {
+            hash_return.expires_at = Date.now() + (parseInt(hash_return.expires_in) * 1000);
+        }
+        
+        // Store the token object
+        let hash_object = JSON.stringify(hash_return);
+        localStorage.setItem('neotoma_orcid', hash_object);
+        
+        console.log('✅ ORCID tokens stored successfully');
+        console.log('📦 Stored data:', hash_object);
+        
+        return { path: '/user', query: to.query, hash: '' };
+        
+    } catch (error) {
+        console.error('💥 Error processing ORCID hash:', error);
+        return { path: '/user', query: to.query, hash: '' };
+    }
 }
