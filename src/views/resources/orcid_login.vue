@@ -44,6 +44,7 @@ async function validateUser() {
         }
 
         const userData = await response.json();
+        userData['expires'] = access_token.value.expires_at;
         localStorage.setItem('orcid_user', JSON.stringify(userData));
         user.value = userData;
         console.log('User validated successfully');
