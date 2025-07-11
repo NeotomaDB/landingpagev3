@@ -22,6 +22,7 @@ const buttonType = computed(() => {
 
 // Validate user with backend
 async function validateUser() {
+
     if (!hasValidTokens.value) return;
     
     isValidating.value = true;
@@ -44,13 +45,11 @@ async function validateUser() {
         }
 
         const userData = await response.json();
-        userData['expires'] = access_token.value.expires_at;
+        userData['data']['user']['expires_at'] = access_token.value.expires_at;
         localStorage.setItem('orcid_user', JSON.stringify(userData));
         user.value = userData;
-        console.log('User validated successfully');
         
     } catch (error) {
-        console.error('Validation error:', error);
         logoutTokens();
     } finally {
         isValidating.value = false;
@@ -60,27 +59,25 @@ async function validateUser() {
 
 // Watch for route changes (like when redirected from OAuth)
 watch(() => route.fullPath, (newPath) => {
-    console.log('🔄 Route changed to:', newPath);
-    
     // Refetch tokens when route changes
-    fetchTokens();
-    
-    if (hasValidTokens.value) {
-        validateUser();
-    }
+    fetchTokens()
+      .then(() => {
+        console.log(hasValidTokens.value)
+        if (hasValidTokens.value) {
+          console.log('validating')      
+          validateUser();
+        }
+      });
 }, { immediate: true });
 
 
 // Initialize on mount
 onMounted(async () => {
-    console.log('OrcidLogin component mounted');
-
     // Load tokens from localStorage
-    fetchTokens();
+    await fetchTokens();
     
     // If we have tokens, validate them
     if (hasValidTokens.value) {
-        console.log('Valid tokens found, validating user');
         await validateUser();
     } else {
         console.log('No valid tokens found');
@@ -88,12 +85,10 @@ onMounted(async () => {
 });
 
 function handleLogin() {
-    console.log('Redirecting to ORCID OAuth');
     window.location.href = baseUrl;
 }
 
 function handleLogout() {
-    console.log('Logging out user');
     logoutTokens();
     user.value = null;
 }

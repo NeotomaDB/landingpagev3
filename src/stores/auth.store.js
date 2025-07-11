@@ -26,10 +26,10 @@ const state = reactive({
 
 export default function useTokens() {
     
-    const fetchTokens = () => {
+    const fetchTokens = async () => {
         try {
             const storedTokens = localStorage.getItem("neotoma_orcid");
-            const userValidation = localStorage.getItem("neotoma_user");
+            const userValidation = localStorage.getItem("orcid_user");
             
             if (storedTokens) {
                 state.access_token = JSON.parse(storedTokens);
@@ -39,11 +39,11 @@ export default function useTokens() {
                 state.access_token = null;
             }
             if (userValidation) {
-                state.user = JSON.parse(userValidatoin);
+                state.user = JSON.parse(userValidation);
                 console.log('User loaded from localStorage');
             } else {
                 console.log('No ORCID user info')
-                state.orcid_user = null;
+                state.user = null;
             }
         } catch (error) {
             console.error('Error parsing stored tokens:', error);
@@ -63,17 +63,25 @@ export default function useTokens() {
     };
 
     const hasValidTokens = computed(() => {
-        if (!(state.access_token | state.user)) return false;
+        console.log(state)
+        if (state.access_token == null && state.user == null) {
+            console.log('we are in here.')
+            return false;
+        }
         
         // Check if token has required properties
         // if (!state.access_token.access_token) return false;
         
         // Check if token is expired
-        if (state.user.expires_at) {
-            const isExpired = Date.now() >= state.access_token.expires_at;
-            if (isExpired) {
-                console.log('Token has expired');
-                return false;
+        if (state.user) {
+            if (state.user.expires_at){
+                console.log('testing time.')
+                const isExpired = Date.now() >= state.access_token.expires_at;
+                if (isExpired) {
+                    console.log('Token has expired');
+                    logoutTokens()
+                    return false;
+                }
             }
         }
         
