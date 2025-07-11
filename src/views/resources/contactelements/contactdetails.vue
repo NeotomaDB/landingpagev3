@@ -5,13 +5,12 @@
   import ProgressSpinner from 'primevue/progressspinner';
 
   const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
-  const props = defineProps(['title'])
+  const props = async () => { defineProps(['title']) }
   const contactinfo = ref({})
   const loading = ref(true)
   const error = ref(null)
-
-  function get_contact(contactid) {
-    return fetch(neotomaapi + "/v2.0/data/contacts/" + contactid, 
+  function get_contact(contactid) {  
+    return fetch(neotomaapi + "/v2.0/data/contacts/" + contactid,
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {
@@ -32,8 +31,9 @@
           }
         })
   }
-  onMounted(() => {
-  get_contact(props.title)
+  onMounted(async () => {
+    console.log(props.title)
+    get_contact(props.title)
   })
 </script>
 

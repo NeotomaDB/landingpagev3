@@ -33,7 +33,7 @@
         })
   }
   onMounted(() => {
-  get_contactpubs(props.title)
+    get_contactpubs(props.title)
   })
 </script>
 
