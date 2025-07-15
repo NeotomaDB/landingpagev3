@@ -1,6 +1,5 @@
 <script setup>
   import Card from 'primevue/card';
-<<<<<<< HEAD
   import Menubar from 'primevue/menubar';
 
   const menuitems = [{label: 'Home', url: './', icon:'pi pi-home'},
@@ -8,9 +7,7 @@
                      {label: 'Taxa', url: './taxa', icon: 'pi pi-sitemap'},
                      {label: 'Users', url: './users', icon: 'pi pi-user'},
                      {label: 'Constituent Databases', url: './databases', icon: 'pi pi-database'}]
-=======
   import orcid_login from './orcid_login.vue';
->>>>>>> feature/ORCID_login
 </script>
 
 <template>
