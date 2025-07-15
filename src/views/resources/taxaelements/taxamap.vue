@@ -13,15 +13,18 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import {fromLonLat} from 'ol/proj';
 import Point from 'ol/geom/Point';
+import Polygon from 'ol/geom/Polygon';
 import Feature from "ol/Feature";
 import {Style} from 'ol/style';
 import Stroke from 'ol/style/Stroke';
 import Circle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Text from 'ol/style/Text';
+import Panel from 'primevue/panel';
 const route = useRoute()
 const datasets = ref([]);
 const dataindexer = ref([]);
+const firstreturn = ref(null);
 var names = ref([]);
 var ids = ref([]);
 var coords = ref([]);
@@ -31,48 +34,84 @@ var uniqueids = ref([]);
 var siteids = ref([]);
 var idxlist = ref([]);
 var link = ref([]);
+const name = ref(null);
 const datatypes = ref([]);
 const myMap = ref(null);
 const loading2 = ref(true)
 const threshold = 70;
+const numresults = ref(null);
 
 const vectorSource = new VectorSource();
 
 const visible = ref(false);
-const constDBinfo = ref(null);
+const taxonreturn = ref(null);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
         
-function loadconstDB() {
-  return  fetch(neotomaapi + "/v2.0/apps/constdb/datasets?dbid=" + route.params.databaseid,
-      { method: "GET", headers: {'content-type': 'application/json'}})
+function loadtaxon() {
+  //https://api.neotomadb.org/v2.0/data/sites?taxa=Betulaceae 
+  //v2.0/data/taxa/12... gives relationship between taxonid and taxonname
+  return  fetch(neotomaapi + "/v2.0/data/taxa/" + route.params.taxonid,
+    {method: "GET", headers: {'content-type': 'application/json'}})
+    .then(res0 => {
+      return res0.json()
+    })
+    .then(json0 => {
+      firstreturn.value = json0.data;
+      return name.value = firstreturn.value[0].taxonname
+    })
+    .then(name => {
+ return fetch(neotomaapi + "/v2.0/data/sites?taxa=" + name + "&limit=999999",
+      { method: "GET", headers: {'content-type': 'application/json'}})})
     .then(res1 => {
-      return res1.json()})
+      return res1.json()}
+    )
     .then(json1 => {
-      constDBinfo.value = json1.data
-      return constDBinfo.value})
+      taxonreturn.value = json1.data
+      console.log(taxonreturn.value);
+      numresults.value = taxonreturn.value.length
+      return taxonreturn.value})
   .then(values => {
     let ids = [];
-        values.forEach((pointfull) => {
-          if (pointfull.coords !== null) { 
-            if (!ids.includes(pointfull.siteid)) {
-                  var point = pointfull.coords
-                  const lonLat = fromLonLat(point);
+        values.forEach((pointfull => {
+            let site = JSON.parse(pointfull.geography);
+            let siteid = pointfull.siteid;
+            let sitename = pointfull.sitename;
+          if (site && site.coordinates !== null) { 
+            if (!ids.includes(siteid)) {
+                  var geom = site.coordinates;
+                  let geometry;
+                  if (Array.isArray(geom[0][0])) {
+                    let transformedCoordinates = geom.map(ring => 
+                        ring.map(coord => fromLonLat(coord))
+                         );
+
+                    geometry = new Polygon([transformedCoordinates]);
+                    const flatco = geometry.getFlatCoordinates();
+                    const centroid = [
+                        (flatco[0][0] + flatco[1][0]) / 2,  // X centroid
+                        (flatco[0][1] + flatco[2][1]) / 2   // Y centroid
+                    ];
+                    geometry = new Point(centroid);
+                  } else {
+                    geometry = new Point(fromLonLat(geom));
+                  }
                   var feature = new Feature({
-                      geometry: new Point(lonLat),
-                      name: pointfull.sitename,
-                      id: pointfull.siteid,
+                      geometry: geometry,
+                      name: sitename,
+                      id: siteid,
               })
-                ids.push(pointfull.siteid)
+                ids.push(siteid)
                 vectorSource.addFeature(feature);
             }
           }
-        })
-
+        }))
+        console.log(vectorSource.getFeatures())
+        console.log(ids)
     return vectorSource;})
   .then(source => {
     const clusterSource = new Cluster({
-      distance: 18,
-      minDistance: 18,
+      distance: 15,
+      minDistance: 15,
       source:source});
 
     const styleCache = {};
@@ -86,7 +125,7 @@ function loadconstDB() {
           if (size == 1) {
             style = new Style({
               image: new Circle({
-                radius: (5/4*4+1),
+                radius: (5),
                 fill: new Fill({
                   color: 'rgba(251,205,188,1)',  }),
                 stroke: new Stroke({
@@ -97,7 +136,7 @@ function loadconstDB() {
             } else {
               style = new Style({
                 image: new Circle({
-                  radius: size**(1/3)+5,
+                  radius: 8,
                   stroke: new Stroke({
                     color: 'rgb(60,50,40)',
                   }),
@@ -135,18 +174,6 @@ function loadconstDB() {
           zoom: 2,}),
     })
 
-    myMap.value.on('moveend', function() {
-        var zoom = myMap.value.getView().getZoom()
-        console.log(zoom)
-        const newStyle = new Style({
-      image: new Circle({
-        radius: (5/4*zoom+1),
-        fill: new Fill({
-          color: 'rgba(251,205,188,1)',  }),
-        stroke: new Stroke({
-          color: 'rgba(92,84,80,1)',
-          width: (2/3*zoom),}), }),});
-        });
 
     myMap.value.on('click', (e) => {
       vl.getFeatures(e.pixel)
@@ -210,9 +237,8 @@ function areAllIdentical(array) {
 
 
 onMounted(async () => {
-    await loadconstDB();
+    await loadtaxon();
     var extent2 = vectorSource.getExtent()
-    //console.log(((extent2[2]-extent2[0])+(extent2[3]-extent2[1]))/2)
     var padding = ((extent2[2]-extent2[0])+(extent2[3]-extent2[1]))/20
     var paddedExtent = [extent2[0] - padding, extent2[1] - padding,
   extent2[2] + padding, extent2[3] + padding];
@@ -253,7 +279,7 @@ var displayFeatureInfo = function(pixel, coordinate) {
           var sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' +stringIDs + '/datasets?limit=2000')
             .then(res =>{
                 var inter = res.json()
-                console.log(inter)
+                //console.log(inter)
             return inter
 
             })
@@ -286,10 +312,6 @@ var displayFeatureInfo = function(pixel, coordinate) {
     // Push the index into the array corresponding to the name
                       dataindexer.value[name].push(index);
                 });
-
-                console.log('dt indexer: ' + dataindexer.value)
-                console.log(siteids)
-                console.log(all)
                 fullsets.forEach(entry => {
                     datatypes.value.push(entry.datasettype)
                     datasets.value.push(entry.datasetid)
@@ -333,11 +355,19 @@ loading2.value =false
 </style>
 
 <template>
+    <Panel toggleable>
+        <template #header>
+            <h2>{{name}} Sites</h2>
+        </template>
 <div>
     <div style="width:750px;margin-left:auto;margin-right:auto;border:3px solid rgb(92,84,80);">
-      <div v-if="loading2" class="flex flex-wrap justify-content-center align-items-center">
+        <div v-if="numresults ==0">
+            <p>There are currently no sites in Neotoma with this taxon present.</p>
+        </div>
+      <div v-else-if="loading2" class="flex flex-wrap justify-content-center align-items-center">
          <ProgressSpinner class="flex-grow-1 w-max" />
        </div>
+ 
       <div id='map2' class="map"> </div>
     </div>
     <div v-if="uniquenames.length == 1">
@@ -384,5 +414,5 @@ loading2.value =false
         </Dialog>
     </div>
 </div>
-
+</Panel>
 </template>

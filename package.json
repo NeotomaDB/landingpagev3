@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@primevue/themes": "^4.0.4",
+    "@ssthouse/vue3-tree-chart": "^0.2.6",
     "chart.js": "^3.9.1",
     "chartjs-plugin-zoom": "^2.0.1",
     "downloadjs": "^1.4.7",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
+    "less": "^4.2.2",
     "vite": "^5.3.4"
   }
 }
