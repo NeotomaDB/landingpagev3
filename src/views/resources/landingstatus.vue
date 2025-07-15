@@ -150,7 +150,7 @@ onMounted(() => {
             href="https://open.neotomadb.org/manual"
             class="p-button"
             target="_blank"
-            style="width: auto; display:block; background: #5D584B"
+            style="width: auto; display:block; text-align: center; background: #5D584B"
             rel="noopener noreferrer"
             >Database Manual</a
           >
