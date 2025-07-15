@@ -3,14 +3,18 @@
   import Panel from 'primevue/panel'
   import Badge  from 'primevue/badge'
   import ProgressSpinner from 'primevue/progressspinner';
+  import { useRoute, useRouter } from 'vue-router'
+
+  const router = useRouter();
 
   const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
-  const props = async () => { defineProps(['title']) }
+  const props = defineProps(['title'])
   const contactinfo = ref({})
   const loading = ref(true)
   const error = ref(null)
-  function get_contact(contactid) {  
-    return fetch(neotomaapi + "/v2.0/data/contacts/" + contactid,
+  
+  async function get_contact(contactid) {
+    await fetch(neotomaapi + "/v2.0/data/contacts/" + contactid,
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {
@@ -32,8 +36,8 @@
         })
   }
   onMounted(async () => {
-    console.log(props.title)
-    get_contact(props.title)
+    await router.isReady()
+    const contactinfo = await get_contact(props.title)
   })
 </script>
 

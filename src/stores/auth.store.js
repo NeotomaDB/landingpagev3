@@ -33,16 +33,12 @@ export default function useTokens() {
             
             if (storedTokens) {
                 state.access_token = JSON.parse(storedTokens);
-                console.log('Token loaded from localStorage');
             } else {
-                console.log('No ORCID access token.');
                 state.access_token = null;
             }
             if (userValidation) {
                 state.user = JSON.parse(userValidation);
-                console.log('User loaded from localStorage');
             } else {
-                console.log('No ORCID user info')
                 state.user = null;
             }
         } catch (error) {
@@ -59,13 +55,11 @@ export default function useTokens() {
         state.error = null;
         localStorage.removeItem('neotoma_orcid');
         localStorage.removeItem('orcid_user');
-        console.log('Tokens cleared');
     };
 
     const hasValidTokens = computed(() => {
         console.log(state)
         if (state.access_token == null && state.user == null) {
-            console.log('we are in here.')
             return false;
         }
         

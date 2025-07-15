@@ -50,6 +50,11 @@ export const router = createRouter({
   { 
     path: "/user/:contactid",
     component: UserPage,
+    name: "Specific User Profile",
+  },
+  {
+    path: "/user",
+    component: UserPage,
     name: "User Profile",
   },
   { 

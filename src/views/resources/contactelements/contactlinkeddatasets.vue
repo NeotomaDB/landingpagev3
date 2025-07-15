@@ -2,6 +2,8 @@
   import { onMounted, ref } from 'vue'
   import Panel from 'primevue/panel'
   import Badge  from 'primevue/badge'
+  import Button from 'primevue/button'
+  import Card from 'primevue/card'
   import ProgressSpinner from 'primevue/progressspinner';
   import { useRoute, useRouter } from 'vue-router'
 
@@ -9,13 +11,28 @@
 
   const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
   const props = defineProps(['title'])
-  const publications = ref({})
+  const datasets = ref({})
+  const countsums = ref([])
   const loading = ref(true)
   const error = ref(null)
 
-  async function get_contactpubs(contactid) {
-    console.log(neotomaapi + `/v2.0/data/contacts/` + contactid + `/publications`)
-    await fetch(neotomaapi + `/v2.0/data/contacts/` + contactid + `/publications`, 
+  async function groupRoles(datasets) {
+    var counts = datasets.reduce((p, c) => {
+    var roles = c.roles;
+    roles.forEach((role, index) => {
+        if (!p.hasOwnProperty(role)) {
+            p[role] = 0;
+        }
+        p[role]++;
+    })
+        return p;
+    }, {});
+    loading.value = false;
+    return counts
+  }
+
+  async function get_contactdatasets(contactid) {
+    await fetch(neotomaapi + `/v2.0/apps/contacts/` + contactid + `/datasets`, 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {
@@ -26,8 +43,7 @@
           return res.json()
         })
         .then(json => {
-          publications.value = json.data[0]
-          loading.value = false;
+          datasets.value = json.data
         })
         .catch(err => {
           error.value = err
@@ -38,7 +54,8 @@
   }
   onMounted(async () => {
     await router.isReady()
-    publications.value = await get_contactpubs(await props.title)
+    await get_contactdatasets(await props.title)
+    countsums.value = await groupRoles(datasets.value)
   })
 </script>
 
@@ -47,19 +64,23 @@
         <ProgressSpinner class="flex-grow-1 w-max" />
     </div>
     <div v-else>
-        {{ publications }}
-        <div v-for="item in publications">
-            {{ item.citation }}
-        </div>
+        <Panel>
+            <template #header>
+                <h4>User Submission Summary</h4>
+            </template>
+                <div v-for="(role, index) in countsums">
+                    <Button :badge="role" :label="index" /> 
+                </div>
+        </Panel>
     </div>
 </template>
 
 <script>
 export default {
-  name: 'ContactPublications',
+  name: 'ContactDatasets',
   data() {
     return {
-      msg: 'We have rendered the publications for the author.'
+      msg: 'We have rendered the datasets for the author.'
     }
   }
 }

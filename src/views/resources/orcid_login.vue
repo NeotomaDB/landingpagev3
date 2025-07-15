@@ -63,8 +63,7 @@ watch(() => route.fullPath, (newPath) => {
     fetchTokens()
       .then(() => {
         console.log(hasValidTokens.value)
-        if (hasValidTokens.value) {
-          console.log('validating')      
+        if (hasValidTokens.value) {  
           validateUser();
         }
       });
