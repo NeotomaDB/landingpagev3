@@ -1,7 +1,7 @@
 <script setup>
   import { onMounted, ref } from 'vue'
   import Panel from 'primevue/panel'
-  import Badge  from 'primevue/badge'
+  import Card  from 'primevue/card'
   import { useRoute, useRouter } from 'vue-router'
   import ProgressSpinner from 'primevue/progressspinner';
   import ContactDetails from '@/views/resources/contactelements/contactdetails.vue'
@@ -53,13 +53,24 @@
 
 <template>
   <div v-if="contactinfo">
-   <ContactDetails :title="contactinfo" />
-   <ContactDatasets :title="contactinfo" />
+    <ContactDetails :title="contactinfo" />
+    <ContactDatasets :title="contactinfo" />
     <ContactPublications :title="contactinfo" />
   </div>
   <div else>
-    <Panel header="Neotoma Contacts">
-      This page is intended as a landing page for Neotoma contacts. This includes authors, stewards, data contributors, analysts and others.
+    <Panel>
+      <template #header><h1>Neotoma Contacts</h1></template>
+      <p>This page is intended as a landing page for Neotoma contacts. This includes authors, stewards, data contributors, analysts and others.</p>
+
+      <p>Neotoma is the product of thousands of contributors working as sample analysts, sample collectors, authors, data modellers and stewards, among other activities.</p>
+
+      <p>Individual contributions are difficult to encapsulate into simple statistics, but we hope that these summaries can help showcase the work individuals have put into the database.</p>
+      <Card>
+        <template #content>
+          User Search coming soon.
+        </template>
+      </Card>
+
     </Panel>
   </div>
 </template>

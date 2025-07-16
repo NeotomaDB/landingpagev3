@@ -38,22 +38,22 @@ export const router = createRouter({
     component: TaxaWelcome,
   },
   {
-      path: "/database/:databaseid",
+      path: "/databases/:databaseid",
       name: "Database",
       component: Database,
   },
   {
-    path: "/database",
+    path: "/databases",
     name: "DatabaseSelect",
     component: DatabaseSelect,
   },
   { 
-    path: "/user/:contactid",
+    path: "/users/:contactid",
     component: UserPage,
     name: "Specific User Profile",
   },
   {
-    path: "/user",
+    path: "/users",
     component: UserPage,
     name: "User Profile",
   },
@@ -73,7 +73,7 @@ function removeORCIDHash(to) {
         
         if (!to.hash || !to.hash.includes('access_token')) {
             console.warn('⚠️ No ORCID token found in hash');
-            return { path: '/user', query: to.query, hash: '' };
+            return { path: '/users', query: to.query, hash: '' };
         }
 
         let hash = to.hash.replace(/#/g, '').split('&');
@@ -88,7 +88,7 @@ function removeORCIDHash(to) {
         
         if (!hash_return.access_token) {
             console.error('💥 No access_token found in ORCID response');
-            return { path: '/user', query: to.query, hash: '' };
+            return { path: '/users', query: to.query, hash: '' };
         }
         
         // Add expiration timestamp
@@ -103,10 +103,10 @@ function removeORCIDHash(to) {
         console.log('✅ ORCID tokens stored successfully');
         console.log('📦 Stored data:', hash_object);
         
-        return { path: '/user', query: to.query, hash: '' };
+        return { path: '/users', query: to.query, hash: '' };
         
     } catch (error) {
         console.error('💥 Error processing ORCID hash:', error);
-        return { path: '/user', query: to.query, hash: '' };
+        return { path: '/users', query: to.query, hash: '' };
     }
 }

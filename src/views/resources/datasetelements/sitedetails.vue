@@ -8,7 +8,9 @@ const props = defineProps(['title'])
 <template>
   <Panel>
     <template #header>
-      <h2>Site Details</h2>
+      <div style="width:100%;">
+      <h2 style="display:inline;">Site Details for {{ props.title.site.sitename }}</h2><div style="text-align:right;float:right;">{{ props.title.site.datasets[0].database }}</div>
+      </div>
     </template>
 
     <div v-if="props.title.site">

@@ -1,6 +1,6 @@
 <script setup>
   import Panel from 'primevue/panel';
-  import Card from 'primevue/card';
+  import SelectButton from 'primevue/selectbutton';
   import Button from 'primevue/button';
   import download from 'downloadjs';
   import ChronDetails from "@/views/resources/datasetelements/chronologydetails.vue"
@@ -8,6 +8,12 @@
   import TaxaDetails from "@/views/resources/datasetelements/taxaLoad.vue"
   import PublicationsDetails from "@/views/resources/datasetelements/publicationdetails.vue"
   import OtherDetails from "@/views/resources/datasetelements/otherdatasetdetails.vue"
+  import { ref, onMounted, watch } from 'vue';
+
+  const citation = ref(null)
+  const styles = ref(['apa', 'bibtex', 'ieee', 'vancouver'])
+  const style = defineModel()
+
   const props = defineProps(['title'])
   let dstype = props.title.site.datasets[0].datasettype[0].toUpperCase() +
     props.title.site.datasets[0].datasettype.slice(1)
@@ -39,6 +45,29 @@
       return json.data
     })
   }
+  async function getdatacitecitation(doi, style) {
+    const sty = style.value;
+    if (!sty) {
+      sty = 'apa'
+    }
+    const citation_format = await fetch(`https://citation.doi.org/format?doi=${doi}&style=${sty}&lang=en-US`, {
+      method: 'GET'});
+    if (citation_format.ok) {
+      citation.value = await citation_format.text()
+    } else {
+      citation.value = 'Just junk';
+    }
+  };
+
+watch(style, async() => {
+  getdatacitecitation(props.title.site.datasets[0].doi[0], style)
+});
+
+onMounted(async() => {
+  style.value = 'apa'
+  getdatacitecitation(props.title.site.datasets[0].doi[0], style)
+})
+
 </script>
 
 <template>
@@ -46,6 +75,10 @@
       <template #header>
         <h2>{{ dstype }} dataset details</h2>
       </template>
+        <h3>Dataset Citation</h3>
+        <SelectButton default-value='apa' v-model="style" :options="styles"></SelectButton>
+        <p>{{ citation }}</p>
+      <hr/>
       <div class="grid">
         <div class="col">
         <Button @click="calljson()" label="Download Raw JSON Data" style="margin:10px;width:100%" rounded />

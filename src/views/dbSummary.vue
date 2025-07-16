@@ -623,7 +623,7 @@ function buttonfiltertime(time) {
 }
 
 function gotodb(el) {
-  window.open("https://data.neotomadb.org/database/" + el.database.databaseid)
+  window.open("https://data.neotomadb.org/databases/" + el.database.databaseid)
 }
 
 filteredDBs.value = computed(() => {
@@ -711,7 +711,7 @@ console.log(filteredDBs.value)
 //const currentYear = 1950 - new Date().getFullYear();
 //function gotodb(el) {
 //  let id = el.database.databaseid
-//  const url = `https://data.neotomadb.org/database/${id}`
+//  const url = `https://data.neotomadb.org/databases/${id}`
 //  window.open(url,'_blank');
 //}
 

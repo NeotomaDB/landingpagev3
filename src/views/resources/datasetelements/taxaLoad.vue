@@ -3,7 +3,6 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Panel from 'primevue/panel'
 import Chip from 'primevue/chip'
-import Dialog from 'primevue/dialog'
 import ProgressSpinner from 'primevue/progressspinner'
 
 const route = useRoute()
@@ -62,15 +61,6 @@ onMounted(() => {
       <div v-for="element in datasetinfo" :key="element.taxonname">
         <Chip :label="element.taxonname" @click="visible = true" class="m-1" style="cursor:pointer">
         </Chip>
-        <!--<Dialog
-          v-model:visible="visible"
-          modal
-          :header="element.taxonname"
-          :style="{ width: '50rem' }"
-          :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-        >
-        <pre>{{ JSON.stringify(element, null, 2) }}</pre>
-        </Dialog> -->
       </div>
   </div>
   </Panel>
