@@ -8,7 +8,7 @@ const route = useRoute();
 
 const apiLocation = import.meta.env.VITE_APP_API_URL || 'https://api.neotomadb.org';
 const baseUrl = import.meta.env.VITE_APP_ORCID_LOGIN || "https://orcid.org/oauth/authorize?response_type=token&redirect_uri=https://data.neotomadb.org/login&client_id=APP-OKAEGWFY7MEOK4HE&scope=openid";
-const userValidation = import.meta.env.VITE_APP_API_URL + '/v2.0/apps/orcids/validate';
+const userValidation = apiLocation + '/v2.0/apps/orcids/validate';
 
 const user = ref(null);
 const isValidating = ref(false);
