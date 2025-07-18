@@ -1,298 +1,317 @@
 <script setup>
-import { ref, onMounted, computed, watchEffect } from 'vue'
-import OSM from 'ol/source/OSM.js';
-import Panel from 'primevue/panel';
-import Avatar from 'primevue/avatar';
-import Dialog from 'primevue/dialog';
-import ProgressSpinner from 'primevue/progressspinner'
-import { Map, View } from 'ol';
-import XYZ from 'ol/source/XYZ';
-import Tile from 'ol/layer/Tile.js';
-import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'ol/layer/Vector';
-import {fromLonLat} from 'ol/proj';
-import Point from 'ol/geom/Point';
-import Feature from "ol/Feature";
-import Polygon from "ol/geom/Polygon";
-import {Style} from 'ol/style';
-import Stroke from 'ol/style/Stroke';
-import Circle from 'ol/style/Circle';
-import Fill from 'ol/style/Fill';
-import Text from 'ol/style/Text';
-import Overlay from 'ol/Overlay';
-import { transformExtent } from 'ol/proj';
+  import { ref, onMounted, computed, watchEffect } from 'vue'
+  import OSM from 'ol/source/OSM.js';
+  import Panel from 'primevue/panel';
+  import Dialog from 'primevue/dialog';
+  import ProgressSpinner from 'primevue/progressspinner'
+  import { Map, View } from 'ol';
+  import XYZ from 'ol/source/XYZ';
+  import Tile from 'ol/layer/Tile.js';
+  import VectorSource from 'ol/source/Vector';
+  import VectorLayer from 'ol/layer/Vector';
+  import {fromLonLat} from 'ol/proj';
+  import Point from 'ol/geom/Point';
+  import Feature from "ol/Feature";
+  import Polygon from "ol/geom/Polygon";
+  import {Style} from 'ol/style';
+  import Stroke from 'ol/style/Stroke';
+  import Circle from 'ol/style/Circle';
+  import Fill from 'ol/style/Fill';
+  import Text from 'ol/style/Text';
+  import Overlay from 'ol/Overlay';
+  import { transformExtent } from 'ol/proj';
+
+  let props = defineProps(['location'])
+  var location = JSON.parse(props.location)
+  delete location.crs
+  const projection = ref('EPSG:4326')
+  const zoom = ref(9)
+  const rotation = ref(0)
+  const newlong = ref(0)
+  const newlat = ref(0)
+  const natland = ref(null)
+  const map = ref(null);
+  const hasFeatures = ref(null);
+  var ids = ref([]);
+  var features = ref([]);
+  var info = ref([]);
+  var link = ref([]);
+  var visible = ref(false);
+  const vectorSource2 = ref(null);
+  const loadingnat = ref(true);
+
+  const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+
+  const centerMap = async function (location) {
+    // Intention is to center the map around the data point for the site.
+    if (Array.isArray(location.coordinates.flat()[0])) {
+      return location.coordinates.flat()[0]
+    } else {
+      return location.coordinates
+    }
+  };
+
+  const displayFeatureInfo = function(pixel, coordinate) {
+      features.value = [];
+      info.value = [];
+      ids.value = [];
+      link.value = [];
+      myMap2.forEachFeatureAtPixel(pixel, function(feature, layer) {
+        if (layer === vectorLayer2) {
+          features.value.push(feature); 
+        }
+      });
+      if (features.value.length > 0) {
+        for (var i = 0, ii = features.value.length; i < ii; ++i) {
+          info.value.push(features.value[i].get('name'));
+          ids.value.push(features.value[i].get('slug'));
+          //link.value.push(("https://native-land.ca/maps/territories/" + features.value[i].get('slug')));
+        }
+      }
+  };
 
 
-let props = defineProps(['location'])
-var location = JSON.parse(props.location)
-delete location.crs
-const projection = ref('EPSG:4326')
-const zoom = ref(9)
-const rotation = ref(0)
-const newlong = ref(0)
-const newlat = ref(0)
-const natland = ref(null)
-const map = ref(null);
-const hasFeatures = ref(null);
-var ids = ref([]);
-var features = ref([]);
-var info = ref([]);
-var link = ref([]);
-var visible = ref(false);
-const vectorSource2 = ref(null);
-const loadingnat = ref(true);
-const apiKey = import.meta.env.VITE_API_NATIVELAND_KEY;
-
-function centerMap(location) {
-  if (Array.isArray(location.coordinates.flat()[0])) {
-    return location.coordinates.flat()[0]
-  } else {
-    return location.coordinates
+  if(Array.isArray(location.coordinates.flat()[0])) {
+    newlat.value = (location.coordinates.flat()[0][1] + location.coordinates.flat()[2][1])/2
+    newlong.value = (location.coordinates.flat()[1][0] + location.coordinates.flat()[0][0])/2
   }
-}
+    
+  function getColor(source) {
+    var length = source.length
+    var color = null;
+    var colorList = ['#D94120','#92bb20','#20BB82', '#484D5C']
+    for (var i = 0; i < length; i++) {
+      color = colorList[i];
+    }
+    return color;
+  }
 
+  async function nativeland(mapOverlay) {
+    // This is the main function to render the map.      
+    const vectorSource = new VectorSource();
+    const vectorStyle = new Style({
+      image: new Circle({
+        radius: 12,
+        fill: new Fill({
+          color: 'rgba(251,205,188,1)',  }),
+        stroke: new Stroke({
+          color: 'rgba(92,84,80,1)',
+          width: 6,}), }),});
 
-if(Array.isArray(location.coordinates.flat()[0])) {
-  newlat.value = (location.coordinates.flat()[0][1] + location.coordinates.flat()[2][1])/2
-  newlong.value = (location.coordinates.flat()[1][0] + location.coordinates.flat()[0][0])/2
-}
-  
-function getColor(source) {
-  var length = source.length
-  var color = null;
-  var colorList = ['#D94120','#92bb20','#20BB82', '#484D5C']
- for (var i = 0; i < length; i++) {
-  color = colorList[i];
- }
- return color;
-}
+      const vectorLayer = new VectorLayer({
+        source: vectorSource,
+        style: vectorStyle});
 
-async function nativeland() {
-  if(Array.isArray(location.coordinates.flat()[0])) {
-  
-  const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position=" + newlat.value + ',' + newlong.value + "&key=" + apiKey)
-  natland.value = await waiting.json();
-}
-else {
-  const waiting = await fetch("https://native-land.ca/api/index.php?maps=territories&position="
-   + location.coordinates.flat()[1] + ',' + location.coordinates.flat()[0] + "&key=" + apiKey);
-   natland.value = await waiting.json();
-}
-
-  
-const vectorSource = new VectorSource();
-const vectorStyle = new Style({
-  image: new Circle({
-    radius: 12,
-    fill: new Fill({
-      color: 'rgba(251,205,188,1)',  }),
-    stroke: new Stroke({
-      color: 'rgba(92,84,80,1)',
-      width: 6,}), }),});
-
-  const vectorLayer = new VectorLayer({
-    source: vectorSource,
-    style: vectorStyle});
-
-  if(Array.isArray(location.coordinates.flat()[0])) {
-    console.log("true poly")
+      if(Array.isArray(location.coordinates.flat()[0])) {
+        // console.log("true poly")
         const lonLat = fromLonLat([newlong.value,newlat.value]);
         var feature = new Feature({
-          geometry: new Point(lonLat) })
-        vectorSource.addFeature(feature); }
-
-  else {
+          geometry: new Point(lonLat)
+        });
+        vectorSource.addFeature(feature);
+      } else {
         const lonLat = fromLonLat(location.coordinates.flat());
         var feature = new Feature({
           geometry: new Point(lonLat) })
-        vectorSource.addFeature(feature); }
+        vectorSource.addFeature(feature);
+      }
 
-  const polygonStyle = new Style({
-  fill: new Fill({
-    color: 'rgba(232,229, 222, 0.5)' // Specify the fill color for the polygon
-  }),
-  stroke: new Stroke({
-    color: 'rgba(92, 84, 80, 1)', // Specify the border color for the polygon
-    width: 1 // Specify the border width for the polygon
-  })
-});
-
-
-
-  vectorSource2.value = new VectorSource();
-  const vectorLayer2 = new VectorLayer({
-    source: vectorSource2.value,
-    style: function(feature) {
-      return new Style({
-        fill: new Fill({
-          color: feature.getProperties().fillColor}),
-        stroke: new Stroke({
-          color: 'rgba(92, 84, 80, 0)',
-          width: 0 }),
-        text: new Text({
-          text: feature.get('name'),
-          font: '20px Calibri,sans-serif',
-          fill: new Fill({
-            color: '#000'
-          }),
-          stroke: new Stroke({
-            color: 'rgba(92, 84, 80, 1)',
-            width: 1
-          }),
-          //offsetX: 0,
-          //offsetY: -10,
-          overflow: true,
-          textAlign: 'center',
-          textBaseline: 'middle',
-         // placement: 'point',
-         placement: 'line',
-          maxAngle: Math.PI /4
-
-        })
+      const polygonStyle = new Style({
+      fill: new Fill({
+        color: 'rgba(232,229, 222, 0.5)' // Specify the fill color for the polygon
+      }),
+      stroke: new Stroke({
+        color: 'rgba(92, 84, 80, 1)', // Specify the border color for the polygon
+        width: 1 // Specify the border width for the polygon
       })
-    }});
-  natland.value.forEach((elem,index) => {
-    if (elem.geometry.coordinates.flat().length != 1) {
-      var polygonGeometry = new Polygon([elem.geometry.coordinates.flat().map(coord => fromLonLat(coord))]);
-      var choices = ['rgba(227, 181, 0, 0.7)', 'rgba(90, 253, 101, 0.7)','rgba(134, 192, 253, 0.7)', 'rgba(255, 0, 185, 0.5)','rgba(0, 0, 10, 0.5)']
-      //, , , , , 
-      var fillColor = choices[(index % 5)] 
-      const polygonFeature = new Feature({
-        fillColor: fillColor,
-        geometry: polygonGeometry,
-        name: elem.properties.Name,
-        slug: elem.properties.Slug,
-        url: 'https://native-land.ca/maps/territories/' + elem.properties.Slug});
-      vectorSource2.value.addFeature(polygonFeature);}
-    else {
-      elem.geometry.coordinates.flat().forEach((pol) => {
-        var polygonGeometry = new Polygon([pol.map(coord => fromLonLat(coord))]);
+    });
+
+    vectorSource2.value = new VectorSource();
+    const vectorLayer2 = new VectorLayer({
+      source: vectorSource2.value,
+      style: function(feature) {
+        return new Style({
+          fill: new Fill({
+            color: feature.getProperties().fillColor}),
+          stroke: new Stroke({
+            color: 'rgba(92, 84, 80, 0)',
+            width: 0 }),
+          text: new Text({
+            text: feature.get('name'),
+            font: '20px Calibri,sans-serif',
+            fill: new Fill({
+              color: '#000'
+            }),
+            stroke: new Stroke({
+              color: 'rgba(92, 84, 80, 1)',
+              width: 1
+            }),
+            //offsetX: 0,
+            //offsetY: -10,
+            overflow: true,
+            textAlign: 'center',
+            textBaseline: 'middle',
+          // placement: 'point',
+          placement: 'line',
+            maxAngle: Math.PI /4
+
+          })
+        })
+      }});
+
+    mapOverlay.forEach((elem,index) => {
+      if (elem.geometry.coordinates.flat().length != 1) {
+        var polygonGeometry = new Polygon([elem.geometry.coordinates.flat().map(coord => fromLonLat(coord))]);
+        var choices = ['rgba(227, 181, 0, 0.7)',
+                      'rgba(90, 253, 101, 0.7)',
+                      'rgba(134, 192, 253, 0.7)',
+                      'rgba(255, 0, 185, 0.5)',
+                      'rgba(0, 0, 10, 0.5)']
+        var fillColor = choices[(index % 5)] 
         const polygonFeature = new Feature({
+          fillColor: fillColor,
           geometry: polygonGeometry,
           name: elem.properties.Name,
           slug: elem.properties.Slug,
-          url: 'https://native-land.ca/maps/territories/' + elem.properties.Slug});
-        vectorSource2.value.addFeature(polygonFeature);})}
-      });
-  console.log("features: " + vectorSource2.value.getFeatures().length)
-  if (vectorSource2.value.getFeatures().length > 0) {
-    hasFeatures.value = true
-  }
-  else {
-    hasFeatures.value = false
-  }
-  console.log("has features: " + hasFeatures.value)
-  var myMap2 = new Map({
-    layers: [
-      new Tile({
-        source: new XYZ({
-            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-        }),}),
-      vectorLayer2, vectorLayer],
-    target: 'map2',
-    style: undefined,
-    view: new View({
-    center: centerMap(location),
-    zoom: 10,}),});
+          url: 'https://native-land.ca/maps/territories/' + elem.properties.Slug
+        });
+        vectorSource2.value.addFeature(polygonFeature);
+      }
+      else {
+        elem.geometry.coordinates.flat().forEach((pol) => {
+          var polygonGeometry = new Polygon([pol.map(coord => fromLonLat(coord))]);
+          const polygonFeature = new Feature({
+            geometry: polygonGeometry,
+            name: elem.properties.Name,
+            slug: elem.properties.Slug,
+            url: 'https://native-land.ca/maps/territories/' + elem.properties.Slug});
+          vectorSource2.value.addFeature(polygonFeature);
+        })
+      }
+    });
+
+    // console.log("features: " + vectorSource2.value.getFeatures().length)
+    
+    if (vectorSource2.value.getFeatures().length > 0) {
+      hasFeatures.value = true
+    }
+    else {
+      hasFeatures.value = false
+    }
+    // console.log("has features: " + hasFeatures.value)
+    var myMap2 = new Map({
+      layers: [
+        new Tile({
+          source: new XYZ(
+            {
+              url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+            }),
+          }),
+          vectorLayer2,
+          vectorLayer
+        ],
+      target: 'map2',
+      style: undefined,
+      view: new View({
+        center: await centerMap(location),
+        zoom: 10,
+      }),
+    });
 
     if (hasFeatures.value) {
+      myMap2.once('postrender', () => {
+        const extent = vectorSource2.value.getExtent();
+        // console.log(extent);
+        myMap2.getView().fit(extent, {
+          size: myMap2.getSize(),
+          padding: [20, 20, 20, 20],
+          maxZoom: 4 // limit how far it zooms in
+        });
+      });
+    }
 
-  myMap2.once('postrender', () => {
-  const extent = vectorSource2.value.getExtent();
-  console.log(extent);
-  myMap2.getView().fit(extent, {
-    size: myMap2.getSize(),
-    padding: [20, 20, 20, 20],
-    maxZoom: 4 // limit how far it zooms in
-  });
-});
-}
- // myMap2.getView().setZoom(5)       
+  // console.log("check: " + hasFeatures.value)
+  
+    if (!hasFeatures.value) {
+      // console.log('there is none')
+      const extent = vectorSource.getExtent();
+      myMap2.getView().fit(extent)
+      myMap2.getView().setZoom(5)
+    } 
 
- console.log("check: " + hasFeatures.value)
- if (!hasFeatures.value) {
-  console.log('there is none')
-  const extent = vectorSource.getExtent();
-  myMap2.getView().fit(extent)
-  myMap2.getView().setZoom(5)
-
-
- } 
-
-  var displayFeatureInfo = function(pixel, coordinate) {
-    features.value = [];
-    info.value = [];
-    ids.value = [];
-    link.value = [];
-    myMap2.forEachFeatureAtPixel(pixel, function(feature, layer) {
-      if (layer === vectorLayer2) {
-        features.value.push(feature); }});
-        if (features.value.length > 0) {
-          for (var i = 0, ii = features.value.length; i < ii; ++i) {
-            info.value.push(features.value[i].get('name'));
-            ids.value.push(features.value[i].get('slug'));
-            link.value.push(("https://native-land.ca/maps/territories/" + features.value[i].get('slug')));
-          }} };
-
-  myMap2.on('click', function(evt) {
-    visible.value = true;
-    var coordinate = evt.coordinate;
-    displayFeatureInfo(evt.pixel, coordinate);});
-
-
-
+    myMap2.on('click', function(evt) {
+      visible.value = true;
+      var coordinate = evt.coordinate;
+      displayFeatureInfo(evt.pixel, coordinate);
+    });
+  
     const popupContainer = document.createElement('div');
-popupContainer.className = 'popup';
-document.body.appendChild(popupContainer);
+    popupContainer.className = 'popup';
+    document.body.appendChild(popupContainer);
 
-// Create an overlay with the popup container
-const popupOverlay = new Overlay({
-    element: popupContainer,
-    positioning: 'bottom-center',
-    stopEvent: false,
-    offset: [0, -15] // Offset to position the popup above the pointer
-});
-myMap2.addOverlay(popupOverlay);
-    // Add a pointermove event listener to the map
-myMap2.on('pointermove', function(event) {
-    // Get the pixel coordinates of the pointer from the event
-    const pixel = myMap2.getEventPixel(event.originalEvent);
-    const featureInfo = [];
+    // Create an overlay with the popup container
+    const popupOverlay = new Overlay({
+        element: popupContainer,
+        positioning: 'bottom-center',
+        stopEvent: false,
+        offset: [0, -15] // Offset to position the popup above the pointer
+    });
+    
+    myMap2.addOverlay(popupOverlay);
+        // Add a pointermove event listener to the map
+    
+    myMap2.on('pointermove', function(event) {
+      // Get the pixel coordinates of the pointer from the event
+      const pixel = myMap2.getEventPixel(event.originalEvent);
+      const featureInfo = [];
 
-    // Perform an action when hovering over a feature
-    myMap2.forEachFeatureAtPixel(pixel, function(feature, layer) {
+      // Perform an action when hovering over a feature
+      myMap2.forEachFeatureAtPixel(pixel, function(feature, layer) {
         // Check if the feature exists
         if (feature) {
             // Do something when hovering over the feature
             const featureProperties = feature.getProperties();
             const text = featureProperties.name || 'Feature';
             if (layer == vectorLayer2) {
-            featureInfo.push(text)}
-
+              featureInfo.push(text)
+            }
         }
-    });
-    if (featureInfo.length > 0) {
-        popupContainer.innerHTML = featureInfo.join('<br>'); // Separate feature information with line breaks
-        const coordinate = myMap2.getEventCoordinate(event.originalEvent);
-        popupOverlay.setPosition(coordinate);
-        popupOverlay.setMap(myMap2);
-    } else {
-        // If no feature is found, hide the popup overlay
-        popupOverlay.setMap(null);
-    }
+      });
 
-});
-   
+      if (featureInfo.length > 0) {
+          popupContainer.innerHTML = featureInfo.join('<br>'); // Separate feature information with line breaks
+          const coordinate = myMap2.getEventCoordinate(event.originalEvent);
+          popupOverlay.setPosition(coordinate);
+          popupOverlay.setMap(myMap2);
+      } else {
+          // If no feature is found, hide the popup overlay
+          popupOverlay.setMap(null);
+      }
+
+    });
+  }
+
+const mapContent = async function() {
+    let params = {}
+    if(Array.isArray(location.coordinates.flat()[0])) {
+      params = new URLSearchParams({ lat: newlat.value, long: newlong.value })
+    }
+    else {
+      params = new URLSearchParams({ lat: location.coordinates.flat()[1], long: location.coordinates.flat()[0] })
+    }
+    // console.log(neotomaapi + `/v2.0/apps/nativelands?${params}`)
+    const waiting = await fetch(neotomaapi + `/v2.0/apps/nativelands?${params}`)
+    const output = await waiting.json();
+    loadingnat.value=false
+    return output
 }
 
-onMounted(() => {
-  nativeland();
-
+onMounted(async   () => {
+  const mapOverlayPass = await mapContent()
+  const mapData = mapOverlayPass['data']
+  nativeland(await mapData);
 })
 
-
-
-loadingnat.value=false
 </script>
 
 
