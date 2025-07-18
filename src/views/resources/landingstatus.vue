@@ -11,7 +11,7 @@ const timeoutId = setTimeout(() => controller.abort(), 5000)
 
 const apidev = import.meta.env.VITE_APP_APIDEV_ENDPOINT ?? 'https://api-dev.neotomadb.org'
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
-const tiliaapi = import.meta.env.VITE_APP_TILIA_ENDPOINT ?? 'http://tilia.neotomadb.org'
+const tiliaapi = import.meta.env.VITE_APP_TILIA_ENDPOINT ?? 'https://tilia.neotomadb.org'
 
 const loadStatus = new Promise(() => {
   fetch(apidev + '/api-docs/', {
