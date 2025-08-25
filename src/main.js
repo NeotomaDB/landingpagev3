@@ -25,7 +25,7 @@ app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);
 
 app.use(router)
-app.use(VueCookies)
+app.use(VueCookies, { expires: '7d'})
 app.use(PrimeVue, {
     // Default theme configuration
     theme: {

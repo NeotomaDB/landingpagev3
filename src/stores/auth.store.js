@@ -17,27 +17,73 @@
   */
 
 import { reactive, toRefs, computed } from "vue";
+import VueCookies from 'vue-cookies'
 
 const state = reactive({
     access_token: null,
     user: null,
-    error: null
+    error: null,
+    consent: null
 });
+
+// Validate user with backend
+async function validateUser() {
+
+    if (!hasValidTokens.value) {
+        return;
+    }
+    
+    isValidating.value = true;
+    
+    try {
+        const response = await fetch(userValidation, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ 
+                token: access_token.value.access_token 
+            })
+        });
+
+        if (response.status !== 200) {
+            console.log('Token validation failed, logging out');
+            logoutTokens();
+            return;
+        }
+
+        const userData = await response.json();
+        userData['data']['user']['expires_at'] = access_token.value.expires_at;
+        VueCookies.set('orcid_user', userData);
+        VueCookies.remove('orcid_token');
+        user.value = userData;
+        
+    } catch (error) {
+        logoutTokens();
+    } finally {
+        isValidating.value = false;
+    }
+}
 
 export default function useTokens() {
     
     const fetchTokens = async () => {
         try {
-            const storedTokens = localStorage.getItem("neotoma_orcid");
-            const userValidation = localStorage.getItem("orcid_user");
+            // Passed from ORCID
+            const storedTokens = VueCookies.get("orcid_token");
+            // Passed from Neotoma
+            const userValidation = VueCookies.get("orcid_user");
             
             if (storedTokens) {
-                state.access_token = JSON.parse(storedTokens);
+                state.access_token = storedTokens;
+                let nothing = await validateUser()
             } else {
                 state.access_token = null;
             }
+
             if (userValidation) {
-                state.user = JSON.parse(userValidation);
+                state.user = userValidation;
+                state.user = state.user['data']
             } else {
                 state.user = null;
             }
@@ -45,7 +91,7 @@ export default function useTokens() {
             console.error('Error parsing stored tokens:', error);
             state.access_token = null;
             state.user = null;
-            localStorage.removeItem('neotoma_orcid');
+            VueCookies.remove('neotoma_orcid');
         }
     };
 
@@ -53,8 +99,8 @@ export default function useTokens() {
         state.access_token = null;
         state.user = null;
         state.error = null;
-        localStorage.removeItem('neotoma_orcid');
-        localStorage.removeItem('orcid_user');
+        VueCookies.remove('orcid_token');
+        VueCookies.remove('orcid_user');
     };
 
     const hasValidTokens = computed(() => {
@@ -68,6 +114,7 @@ export default function useTokens() {
         
         // Check if token is expired
         if (state.user) {
+            // This should post back to the API to check.
             if (state.user.expires_at){
                 console.log('testing time.')
                 const isExpired = Date.now() >= state.access_token.expires_at;

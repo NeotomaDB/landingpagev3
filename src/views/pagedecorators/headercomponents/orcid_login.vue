@@ -3,6 +3,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import Button from 'primevue/button';
 import useTokens from '@/stores/auth.store.js';
 import { useRoute } from 'vue-router';
+import VueCookies from 'vue-cookies'
 
 const route = useRoute();
 
@@ -21,45 +22,6 @@ const buttonType = computed(() => {
     return hasValidTokens.value ? 'logout' : 'login';
 });
 
-// Validate user with backend
-async function validateUser() {
-
-    if (!hasValidTokens.value) {
-        return;
-    }
-    
-    isValidating.value = true;
-    
-    try {
-        const response = await fetch(userValidation, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ 
-                token: access_token.value.access_token 
-            })
-        });
-
-        if (response.status !== 200) {
-            console.log('Token validation failed, logging out');
-            logoutTokens();
-            return;
-        }
-
-        const userData = await response.json();
-        userData['data']['user']['expires_at'] = access_token.value.expires_at;
-        localStorage.setItem('orcid_user', JSON.stringify(userData));
-        localStorage.removeItem('neotoma_orcid');
-        user.value = userData;
-        
-    } catch (error) {
-        logoutTokens();
-    } finally {
-        isValidating.value = false;
-    }
-}
-
 
 // Watch for route changes (like when redirected from OAuth)
 watch(() => route.fullPath, (newPath) => {
@@ -68,8 +30,7 @@ watch(() => route.fullPath, (newPath) => {
       .then(() => {
         console.log(hasValidTokens.value)
         if (hasValidTokens.value) {  
-          validateUser();
-
+          user.value = VueCookies.get('orcid_user')
         }
       });
 }, { immediate: true });
@@ -79,13 +40,6 @@ watch(() => route.fullPath, (newPath) => {
 onMounted(async () => {
     // Load tokens from localStorage
     await fetchTokens();
-    
-    // If we have tokens, validate them
-    if (hasValidTokens.value) {
-        await validateUser();
-    } else {
-        console.log('No valid tokens found');
-    }
 });
 
 function handleLogin() {

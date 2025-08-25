@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import VueCookies from 'vue-cookies'
 
 import EmptyPage from "@/views/emptypage.vue"
 import Taxa from "@/views/pages/taxa.vue"
@@ -17,6 +18,7 @@ export const router = createRouter({
       path: "/",
       name: "EmptyPage",
       component: EmptyPage,
+      beforeEnter: [removeORCIDHash],
     },
     {
       path: '/taxa/:taxonid',
@@ -79,6 +81,8 @@ function removeORCIDHash(to) {
         
         if (!to.hash || !to.hash.includes('access_token')) {
             console.warn('⚠️ No ORCID token found in hash');
+            VueCookies.remove("orcid_token", hash_object)
+
             return { path: '/users', query: to.query, hash: '' };
         }
 
@@ -94,17 +98,14 @@ function removeORCIDHash(to) {
         
         if (!hash_return.access_token) {
             console.error('💥 No access_token found in ORCID response');
+            VueCookies.remove("orcid_token", hash_object)
             return { path: '/users', query: to.query, hash: '' };
-        }
-        
-        // Add expiration timestamp
-        if (hash_return.expires_in) {
-            hash_return.expires_at = Date.now() + (parseInt(hash_return.expires_in) * 1000);
         }
         
         // Store the token object
         let hash_object = JSON.stringify(hash_return);
-        localStorage.setItem('neotoma_orcid', hash_object);
+        VueCookies.set("orcid_token", hash_object)
+        localStorage.setItem('orcid_bearer_token', hash_object);
         
         console.log('✅ ORCID tokens stored successfully');
         console.log('📦 Stored data:', hash_object);
@@ -113,6 +114,7 @@ function removeORCIDHash(to) {
         
     } catch (error) {
         console.error('💥 Error processing ORCID hash:', error);
+        VueCookies.remove("orcid_token", hash_object)
         return { path: '/users', query: to.query, hash: '' };
     }
 }
