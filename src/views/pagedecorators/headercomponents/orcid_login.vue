@@ -7,16 +7,16 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const apiLocation = import.meta.env.VITE_APP_API_URL || 'https://api.neotomadb.org';
-const baseUrl = import.meta.env.VITE_APP_ORCID_LOGIN || "https://orcid.org/oauth/authorize?response_type=token&redirect_uri=https://data.neotomadb.org/login&client_id=APP-OKAEGWFY7MEOK4HE&scope=openid";
+const baseUrl = import.meta.env.VITE_APP_ORCID_LOGIN || 'https://orcid.org/oauth/authorize?response_type=token&redirect_uri=https://data.neotomadb.org/login&client_id=APP-OKAEGWFY7MEOK4HE&scope=openid';
 const userValidation = apiLocation + '/v2.0/apps/orcids/validate';
 
 const user = ref(null);
 const isValidating = ref(false);
 
-// Get the store functions and state
+// Get the store functions and state:
 const { access_token, fetchTokens, logoutTokens, hasValidTokens } = useTokens();
 
-// Computed property for button state
+// Computed property for button state:
 const buttonType = computed(() => {
     return hasValidTokens.value ? 'logout' : 'login';
 });
@@ -24,7 +24,9 @@ const buttonType = computed(() => {
 // Validate user with backend
 async function validateUser() {
 
-    if (!hasValidTokens.value) return;
+    if (!hasValidTokens.value) {
+        return;
+    }
     
     isValidating.value = true;
     
@@ -48,6 +50,7 @@ async function validateUser() {
         const userData = await response.json();
         userData['data']['user']['expires_at'] = access_token.value.expires_at;
         localStorage.setItem('orcid_user', JSON.stringify(userData));
+        localStorage.removeItem('neotoma_orcid');
         user.value = userData;
         
     } catch (error) {
@@ -66,6 +69,7 @@ watch(() => route.fullPath, (newPath) => {
         console.log(hasValidTokens.value)
         if (hasValidTokens.value) {  
           validateUser();
+
         }
       });
 }, { immediate: true });

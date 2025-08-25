@@ -1,6 +1,5 @@
 <script setup>
 import Card from 'primevue/card';
-import Avatar from 'primevue/avatar';
 </script>
 <template>
   <Card>

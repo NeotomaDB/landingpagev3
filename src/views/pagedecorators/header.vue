@@ -6,8 +6,9 @@
                      {label: 'Datasets', url: '/datasets', icon: 'pi pi-image'},
                      {label: 'Taxa', url: '/taxa', icon: 'pi pi-sitemap'},
                      {label: 'Users', url: '/users', icon: 'pi pi-user'},
-                     {label: 'Constituent Databases', url: '/databases', icon: 'pi pi-database'}]
-  import orcid_login from './orcid_login.vue';
+                     {label: 'Constituent Databases', url: '/databases', icon: 'pi pi-database'},
+                     {label: 'Resource Status', url: '/status', icon: 'pi pi-server'}]
+  import orcid_login from './headercomponents/orcid_login.vue';
 </script>
 
 <template>
