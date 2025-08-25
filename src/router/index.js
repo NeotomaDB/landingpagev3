@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import EmptyPage from "@/views/emptypage.vue"
-import Taxa from "@/views/taxa.vue"
+import Taxa from "@/views/pages/taxa.vue"
 import TaxaWelcome from "@/views/taxawelcome.vue"
-import Dataset from "@/views/dataset.vue"
+import Dataset from "@/views/pages/dataset.vue"
 import Database from "@/views/database.vue"
 import DatabaseSelect from "@/views/dbSummary.vue"
 import UserPage from "@/views/userpage.vue"
+import landingStatus from "@/views/pages/landingstatus.vue"
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,6 +64,11 @@ export const router = createRouter({
     name: "Login redirect from Orcid.",
     beforeEnter: [removeORCIDHash],
   },
+  {
+    path: "/status",
+    component: landingStatus,
+    name: "Web Services Status",
+  },  
   ]
   }, 
 )
