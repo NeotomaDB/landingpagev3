@@ -1,6 +1,7 @@
 <script setup>
 import SiteMap from '@/views/resources/mapsite.vue'
-import NativeMap from '@/views/resources/datasetelements/nativelandmap.vue'
+
+import NativeMap from '@/views/pages/datasetelements/nativelandmap.vue'
 import Panel from 'primevue/panel'
 const props = defineProps(['title'])
 </script>

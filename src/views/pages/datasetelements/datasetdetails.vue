@@ -3,11 +3,12 @@
   import SelectButton from 'primevue/selectbutton';
   import Button from 'primevue/button';
   import download from 'downloadjs';
-  import ChronDetails from "@/views/resources/datasetelements/chronologydetails.vue"
-  import ContactDetails from "@/views/resources/datasetelements/contact_details.vue"
-  import TaxaDetails from "@/views/resources/datasetelements/taxaLoad.vue"
-  import PublicationsDetails from "@/views/resources/datasetelements/publicationdetails.vue"
-  import OtherDetails from "@/views/resources/datasetelements/otherdatasetdetails.vue"
+
+  import ChronDetails from "@/views/pages/datasetelements/chronologydetails.vue"
+  import ContactDetails from "@/views/pages/datasetelements/contact_details.vue"
+  import TaxaDetails from "@/views/pages/datasetelements/taxaLoad.vue"
+  import PublicationsDetails from "@/views/pages/datasetelements/publicationdetails.vue"
+  import OtherDetails from "@/views/pages/datasetelements/otherdatasetdetails.vue"
   import { ref, onMounted, watch } from 'vue';
 
   const citation = ref(null)
@@ -46,7 +47,7 @@
     })
   }
   async function getdatacitecitation(doi, style) {
-    const sty = style.value;
+    let sty = style.value;
     if (!sty) {
       sty = 'apa'
     }
@@ -118,11 +119,10 @@ onMounted(async() => {
         <div v-else>None Reported</div>
       </div>
       <TaxaDetails />
-    </Panel>  
-    
-    <ChronDetails :datasetid="props.title.site.datasets[0].datasetid"/>
-    <PublicationsDetails :datasetid="props.title.site.datasets[0].datasetid"/>
-    <OtherDetails :siteid="props.title.site.siteid" :datasetid="props.title.site.datasets[0].datasetid"/>
+      <ChronDetails :datasetid="props.title.site.datasets[0].datasetid"/>
+      <PublicationsDetails :datasetid="props.title.site.datasets[0].datasetid"/>
+      <OtherDetails :siteid="props.title.site.siteid" :datasetid="props.title.site.datasets[0].datasetid"/>
+    </Panel>
 </template>
 
 <script>

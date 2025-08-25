@@ -3,7 +3,6 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Panel from 'primevue/panel'
 import Chip from 'primevue/chip'
-import ProgressSpinner from 'primevue/progressspinner'
 
 const route = useRoute()
 

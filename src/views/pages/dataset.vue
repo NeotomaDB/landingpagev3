@@ -4,8 +4,8 @@
   import Panel from 'primevue/panel'
   import Card from 'primevue/card'
   import ProgressSpinner from 'primevue/progressspinner';
-  import SiteDetails from "@/views/resources/datasetelements/sitedetails.vue"
-  import DatasetDetails from "@/views/resources/datasetelements/datasetdetails.vue"
+  import SiteDetails from "@/views/pages/datasetelements/sitedetails.vue"
+  import DatasetDetails from "@/views/pages/datasetelements/datasetdetails.vue"
 
   const route = useRoute()
   const router = useRouter();

@@ -43,7 +43,7 @@ onMounted(() => {
 <template>
   <Panel toggleable>
     <template #header>
-      <h2>Chronologies</h2>
+      <h3>Chronologies</h3>
     </template>
       <div v-if="!loading">
         <div class="grid">
