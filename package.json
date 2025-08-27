@@ -9,7 +9,7 @@
     "preview": "vite serve --mode=development"
   },
   "dependencies": {
-    "@primevue/themes": "^4.0.4",
+    "@primevue/themes": "^4.3.7",
     "@ssthouse/vue3-tree-chart": "^0.2.6",
     "chart.js": "^3.9.1",
     "chartjs-plugin-zoom": "^2.0.1",
