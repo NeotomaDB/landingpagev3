@@ -25,7 +25,7 @@
     "vue-chart-3": "^3.1.8",
     "vue-cookies": "^1.8.6",
     "vue-router": "^4.2.4",
-    "vue3-openlayers": "^4.0.1"
+    "vue3-openlayers": "^11.6.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
