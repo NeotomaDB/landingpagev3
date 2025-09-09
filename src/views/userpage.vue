@@ -3,7 +3,6 @@
   import Panel from 'primevue/panel'
   import Card  from 'primevue/card'
   import { useRoute, useRouter } from 'vue-router'
-  import ProgressSpinner from 'primevue/progressspinner';
   import ContactDetails from '@/views/resources/contactelements/contactdetails.vue'
   import ContactPublications from '@/views/resources/contactelements/contactlinkedpublications.vue'
   import ContactDatasets from '@/views/resources/contactelements/contactlinkeddatasets.vue'
@@ -14,23 +13,12 @@
   const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
   let loading = ref(true)
   let contactinfo = ref(null)
-  let userdatasets = ref(null)
-
-  async function findContact(orcid) {
-    const userid = await fetch(neotomaapi + '/v2.0/apps/landing/orcid', {
-      method: "GET",
-      headers: {
-                "Content-Type": "application/json",
-            },
-    })
-    
-  }
 
   // Initialize on mount
   onMounted(async () => {
     await router.isReady()
     contactinfo.value = route.params.contactid;
-    if (!contactinfo) {
+    if (!contactinfo.value) {
       const userValidation = localStorage.getItem("orcid_user");
       if (userValidation) {
         const userOrcid = URLSearchParams({orcid:userValidation['data']['user']['id']})
