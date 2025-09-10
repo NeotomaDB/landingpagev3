@@ -1,5 +1,5 @@
 <script setup>
-import TaxaSearch from '@/views/resources/taxaelements/taxasearch.vue';
+import TaxaSearch from '@/views/resources/taxaelements/TaxaSearch.vue';
 import Panel from 'primevue/panel';
 
 </script>

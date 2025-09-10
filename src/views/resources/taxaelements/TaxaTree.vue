@@ -2,7 +2,6 @@
 import { ref,onMounted} from 'vue';
 import {useRoute} from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner';
-import Dialog from 'primevue/dialog';
 import Panel from 'primevue/panel';
 import VueTree from "@ssthouse/vue3-tree-chart";
 import "@ssthouse/vue3-tree-chart/dist/vue3-tree-chart.css";
@@ -71,15 +70,6 @@ function loadTree() {
   })
 }
 
-
-const openLink = (url) => {
-  if (url) {
-    window.open(url, "_blank"); // Opens in a new tab
-  } else {
-    console.warn("No URL provided");
-  }
-};
-
 function buildTree() {
   let map = new Map();
   allbros.value.forEach(item => {
@@ -108,12 +98,10 @@ function buildTree() {
   console.log(taxon.value);
 }
 
-
 onMounted(async () => {
     await loadTree();
     await buildTree();
 })
-
 
 </script>
 
@@ -145,7 +133,6 @@ onMounted(async () => {
 }
 </style>
 
-
 <template>
   <Panel id="tree_id" toggleable>
     <template #header >
@@ -163,7 +150,7 @@ onMounted(async () => {
       :collapse-enabled=false
     >
 
-    <template v-slot:node="{ node, collapsed }">
+    <template v-slot:node="{ node }">
         <a
           class="tree-node"
           :style="{ fontWeight: node.value == taxon.taxonname ? '900' : ''}"

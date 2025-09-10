@@ -8,7 +8,8 @@
                      {label: 'Users', url: '/users', icon: 'pi pi-user'},
                      {label: 'Constituent Databases', url: '/databases', icon: 'pi pi-database'},
                      {label: 'Resource Status', url: '/status', icon: 'pi pi-server'}]
-  import orcid_login from './headercomponents/orcid_login.vue';
+                     
+  import orcid_login from './headercomponents/OrcidLogin.vue';
 </script>
 
 <template>
@@ -32,14 +33,3 @@
   <Menubar :model="menuitems" style="border-radius:5px;">
   </Menubar>
 </template>
-
-<script>
-  export default {
-    name: 'LandingPageHeader',
-    data () {
-      return {
-        msg: 'Welcome to Your Vue.js App'
-      }
-    }
-  }
-</script>

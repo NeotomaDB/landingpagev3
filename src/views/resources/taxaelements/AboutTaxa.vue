@@ -2,7 +2,6 @@
 import { ref,onMounted} from 'vue';
 import {useRoute} from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner';
-import Dialog from 'primevue/dialog';
 import Panel from 'primevue/panel';
 const route = useRoute()
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
@@ -12,7 +11,6 @@ const hightaxon = ref(null);
 const loading_ab = ref(false);
 const high1 = ref(null);
 const highname = ref(null);
-const highid = ref(null);
 const author = ref(null);
 const status = ref(null);
 const pub = ref(null);

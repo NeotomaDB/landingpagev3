@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from 'vue';
+import { ref, computed } from 'vue';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
@@ -13,8 +13,6 @@ const ready = ref(false);
 const processing = ref(false);
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org';
 const value = ref('');
-
-
 
 async function findTaxa(taxonval) {
   try {
@@ -47,7 +45,6 @@ tabledat.value = filtered.value.map(obj => ({
     return {};
   }
 }
-
 
 const filteredtabledat = computed(() => {
   if (tabledat.value) {

@@ -4,11 +4,11 @@
   import Button from 'primevue/button';
   import download from 'downloadjs';
 
-  import ChronDetails from "@/views/pages/datasetelements/chronologydetails.vue"
-  import ContactDetails from "@/views/pages/datasetelements/contact_details.vue"
-  import TaxaDetails from "@/views/pages/datasetelements/taxaLoad.vue"
-  import PublicationsDetails from "@/views/pages/datasetelements/publicationdetails.vue"
-  import OtherDetails from "@/views/pages/datasetelements/otherdatasetdetails.vue"
+  import ChronDetails from "@/views/pages/datasetelements/ChronologyDetails.vue"
+  import ContactDetails from "@/views/pages/datasetelements/ContactDetails.vue"
+  import TaxaDetails from "@/views/pages/datasetelements/TaxaLoad.vue"
+  import PublicationsDetails from "@/views/pages/datasetelements/PublicationDetails.vue"
+  import OtherDetails from "@/views/pages/datasetelements/OtherDatasetDetails.vue"
   import { ref, onMounted, watch } from 'vue';
 
   const citation = ref(null)
@@ -32,20 +32,7 @@
       download(JSON.stringify(data.data), 'neotoma_dataset_' + datasetid + '.json', 'text/plain');
     })
   }
-  const get_orcid = (contactid) => {
-    let url = 'http://localhost:3001/v2.0/apps/orcids?contactid=' + contactid
-    fetch(url,
-      {method: 'GET',
-        headers: {'content-type': 'application/json'},
-      }
-    )
-    .then(res => {
-      return res.json()
-    })
-    .then(json => {
-      return json.data
-    })
-  }
+
   async function getdatacitecitation(doi, style) {
     let sty = style.value;
     if (!sty) {
