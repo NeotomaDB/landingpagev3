@@ -1,7 +1,6 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import Panel from 'primevue/panel';
-  import Card from 'primevue/card';
   import ProgressSpinner from 'primevue/progressspinner';
   const props = defineProps(['datasetid'])
   let publication = ref(null)

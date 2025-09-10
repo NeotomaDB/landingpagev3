@@ -21,7 +21,6 @@
     if (!contactinfo.value) {
       const userValidation = localStorage.getItem("orcid_user");
       if (userValidation) {
-        const userOrcid = URLSearchParams({orcid:userValidation['data']['user']['id']})
         const response = await fetch(neotomaapi + `/v2.0/apps/landing/orcids/orcid?{userOrcid}`, {
           method: 'GET',
         }

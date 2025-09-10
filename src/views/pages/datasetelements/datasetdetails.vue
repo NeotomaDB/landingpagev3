@@ -32,20 +32,7 @@
       download(JSON.stringify(data.data), 'neotoma_dataset_' + datasetid + '.json', 'text/plain');
     })
   }
-  const get_orcid = (contactid) => {
-    let url = 'http://localhost:3001/v2.0/apps/orcids?contactid=' + contactid
-    fetch(url,
-      {method: 'GET',
-        headers: {'content-type': 'application/json'},
-      }
-    )
-    .then(res => {
-      return res.json()
-    })
-    .then(json => {
-      return json.data
-    })
-  }
+
   async function getdatacitecitation(doi, style) {
     let sty = style.value;
     if (!sty) {

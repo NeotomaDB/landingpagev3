@@ -7,7 +7,6 @@ import Badge from 'primevue/badge'
 const refs = ref({})
 
 const controller = new AbortController()
-const timeoutId = setTimeout(() => controller.abort(), 5000)
 
 const apidev = import.meta.env.VITE_APP_APIDEV_ENDPOINT ?? 'https://api-dev.neotomadb.org'
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
@@ -167,6 +166,6 @@ onMounted(() => {
 
 <script>
 export default {
-  name: 'datastatus'
+  name: 'DataStatus'
 }
 </script>

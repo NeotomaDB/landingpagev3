@@ -1,7 +1,6 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import Panel from 'primevue/panel';
-  import Card from 'primevue/card';
   const props = defineProps(['datasetid'])
   let chronology = ref(null)
   let loading = ref(true)
