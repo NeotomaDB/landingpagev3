@@ -5,7 +5,6 @@ import {useRoute} from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner';
 import Dialog from 'primevue/dialog';
 import XYZ from 'ol/source/XYZ';
-import OSM from 'ol/source/OSM';
 import {boundingExtent} from 'ol/extent.js';
 import Cluster from 'ol/source/Cluster';
 import Tile from 'ol/layer/Tile.js';
@@ -244,7 +243,7 @@ onMounted(async () => {
   extent2[2] + padding, extent2[3] + padding];
     myMap.value.getView().fit(paddedExtent);
  
-var displayFeatureInfo = function(pixel, coordinate) {
+var displayFeatureInfo = function(pixel) {
     var features2 = [];
     names.value = [];
     ids.value = [];
@@ -254,7 +253,7 @@ var displayFeatureInfo = function(pixel, coordinate) {
     link.value = [];
     datasets.value = [];
     datatypes.value = [];
-    myMap.value.forEachFeatureAtPixel(pixel, function(feature, layer) {
+    myMap.value.forEachFeatureAtPixel(pixel, function(feature) {
         console.log(feature);
         feature.values_.features.forEach(el => {
           features2.push(el); });});
@@ -276,12 +275,11 @@ var displayFeatureInfo = function(pixel, coordinate) {
           var stringIDs = uniqueids.value.join(",");
           visible.value=true
           console.log(stringIDs)
-          var sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' +stringIDs + '/datasets?limit=2000')
+          let sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' +stringIDs + '/datasets?limit=2000')
             .then(res =>{
                 var inter = res.json()
                 //console.log(inter)
-            return inter
-
+                return inter
             })
             .then(int => {
                 var all = int.data
@@ -290,8 +288,7 @@ var displayFeatureInfo = function(pixel, coordinate) {
                 idxlist.value = [];
                 var idx = 0;
                 all.forEach(function(site) {
-                  
-                  site.site.datasets.forEach(function(dataset) {
+                  site.site.datasets.forEach(function() {
                     idx = idx + 1
                     siteids.value.push({name: site.site.sitename, index: idx})
                     idxlist.value.push(idx)
@@ -333,18 +330,14 @@ var displayFeatureInfo = function(pixel, coordinate) {
 };
 
 myMap.value.on('click', async function(evt) {
-  console.log(await uniquenames.value)
+  console.log(uniquenames.value)
 
-    var coordinate = evt.coordinate;
-    displayFeatureInfo(evt.pixel, coordinate); })
+  var coordinate = evt.coordinate;
+  displayFeatureInfo(evt.pixel, coordinate); })
 
-
-
-loading2.value =false
-
-
-
+  loading2.value =false
 })
+
 </script>
 
 <style>

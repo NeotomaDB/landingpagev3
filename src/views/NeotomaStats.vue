@@ -5,7 +5,6 @@ import Card from 'primevue/card'
 import ProgressSpinner from 'primevue/progressspinner'
 const rawstats = ref(null)
 const loaderror = ref(null)
-const visible = ref(false)
 const today = new Date().toLocaleString()
 
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'

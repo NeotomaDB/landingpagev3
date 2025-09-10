@@ -2,9 +2,7 @@ name: Deploy Landing Pages to S3
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 jobs:
   deploy:
@@ -12,12 +10,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set environment based on branch
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+            echo "AWS_BUCKET_NAME=$(secrets.AWS_BUCKET_NAME)" >> $GITHUB_ENV
+          else
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+            echo "AWS_BUCKET_NAME=$(secrets.AWS_DEV_BUCKET_NAME)" >> $GITHUB_ENV
+          fi
           
-      - name: Get yarn cache directory path 🛠
+      - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
         
-      - name: Cache node_modules 📦
+      - name: Cache node_modules
         uses: actions/cache@v4
         id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
@@ -38,6 +46,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          AWS_BUCKET_NAME: $${{ github.AWS_BUCKET_NAME }}
           BUCKET_PATH: "/${{github.event.number}}"
           DIST_LOCATION_CODE: ./dist

@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted } from 'vue'
   import Panel from 'primevue/panel';
   import Card from 'primevue/card';
   import ProgressSpinner from 'primevue/progressspinner';
@@ -21,7 +21,7 @@
           return res.json()
         })
         .then(json => {
-          otherDatasets = json.data
+          otherDatasets.value = json.data
           loading.value = false;
         })
         .catch(err => {

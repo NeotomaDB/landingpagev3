@@ -1,16 +1,15 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import Panel from 'primevue/panel';
-  import Card from 'primevue/card';
-  import ProgressSpinner from 'primevue/progressspinner';
   const props = defineProps(['datasetid'])
-  let publication = ref(null)
+  let chronology = ref(null)
   let loading = ref(true)
   const error = ref(null)
-  const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
-  function loadPublication() {
-    return fetch(neotomaapi + "/v2.0/data/datasets/" + props.datasetid +'/publications', 
+const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+
+  function loadChronology() {
+    return fetch(neotomaapi + "/v2.0/data/datasets/" + props.datasetid +'/chronologies', 
       { method: "GET", headers: {'content-type': 'application/json'}})
         .then(res => {
           if (!res.ok) {
@@ -21,7 +20,7 @@
           return res.json()
         })
         .then(json => {
-          publication.value = json.data
+          chronology.value = json.data
           loading.value = false;
         })
         .catch(err => {
@@ -36,36 +35,38 @@
   }
 
 onMounted(() => {
-  loadPublication()
+  loadChronology()
 })
 </script>
 
 <template>
   <Panel toggleable>
     <template #header>
-      <h2>Publications</h2>
+      <h3>Chronologies</h3>
     </template>
       <div v-if="!loading">
         <div class="grid">
-          <div v-for="pub in publication" class="col-6">
+          <div v-for="chron in chronology" class="col-6">
             <div class="text-left p-3 border-round surface-ground hover:surface-500">
-              {{ pub.publication.citation}}<br>
-              <div v-if="pub.publication.doi">
-                <strong>DOI:</strong> <a :href="'https://doi.org/' + pub.publication.doi" target="_blank">https://doi.org/{{ pub.publication.doi}}</a>
-              </div>
+              <h3>{{ chron.chronology.chronologyName }}</h3>
+              <strong>Chronology ID:</strong> {{ chron.chronology.chronologyid }}<br>
+              <strong>Date Prepared:</strong> {{ chron.chronology.datePrepared }}<br>
+              <strong>Chronological Controls Used:</strong> {{ chron.chronology.controls.length }} <br>
+              <strong>Reliable Age Range:</strong> {{ chron.chronology.reliableagespan.younger }} - {{ chron.chronology.reliableagespan.older }} {{ chron.chronology.agetype }}<br>
+              <strong>Model Basis:</strong> {{ chron.chronology.modelType }}
             </div>
           </div>
         </div>
       </div>
       <div v-else>
-        <ProgressSpinner />
+        LOADING
       </div>
   </Panel>
 </template>
 
 <script>
   export default {
-    name: 'PublicationDetails',
+    name: 'ChronologyDetails',
     data () {
       return {
         msg: 'Mapbox element has rendered.'

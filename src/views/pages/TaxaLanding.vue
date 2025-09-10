@@ -1,7 +1,7 @@
 <script setup>
-import TaxaMap from '@/views/resources/taxaelements/taxamap.vue';
-import AboutTaxa from '@/views/resources/taxaelements/abouttaxa.vue';
-import TaxaTree from '@/views/resources/taxaelements/taxatree.vue';
+import TaxaMap from '@/views/resources/taxaelements/TaxaMap.vue';
+import AboutTaxa from '@/views/resources/taxaelements/AboutTaxa.vue';
+import TaxaTree from '@/views/resources/taxaelements/TaxaTree.vue';
 import {useRoute} from 'vue-router';
 const route = useRoute();
 </script>

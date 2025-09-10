@@ -1,7 +1,7 @@
 <script setup>
   import {ref} from "vue"
   import { geoJson } from "leaflet"
-  import SiteMap from "@/views/resources/mapsite.vue"
+  import SiteMap from "@/views/resources/MapSite.vue"
   const props = defineProps(['title'])
   let zoom = ref(5);
   let center = geoJson(JSON.parse(props.title.site.geography))
@@ -18,14 +18,3 @@
     <!--<SiteMap :location="center" />-->
     </div>
 </template>
-
-<script>
-  export default {
-    name: 'SiteDetails',
-    data () {
-      return {
-        msg: 'Mapbox element has rendered.'
-      }
-    }
-  }
-</script>

@@ -1,7 +1,7 @@
 <script setup>
-import SiteMap from '@/views/resources/mapsite.vue'
+import SiteMap from '@/views/resources/MapSite.vue'
 
-import NativeMap from '@/views/pages/datasetelements/nativelandmap.vue'
+import NativeMap from '@/views/pages/datasetelements/NativeLandMap.vue'
 import Panel from 'primevue/panel'
 const props = defineProps(['title'])
 </script>
@@ -10,7 +10,10 @@ const props = defineProps(['title'])
   <Panel>
     <template #header>
       <div style="width:100%;">
-      <h2 style="display:inline;">Site Details for {{ props.title.site.sitename }}</h2><div style="text-align:right;float:right;">{{ props.title.site.datasets[0].database }}</div>
+        <h2 style="display:inline;">Site Details for {{ props.title.site.sitename }}</h2>
+        <div style="text-align:right;float:right;">
+          {{ props.title.site.datasets[0].database }}
+        </div>
       </div>
     </template>
 
@@ -39,14 +42,3 @@ const props = defineProps(['title'])
     </div>
   </Panel>
 </template>
-
-<script>
-export default {
-  name: 'SiteDetails',
-  data() {
-    return {
-      msg: 'Mapbox element has rendered.'
-    }
-  }
-}
-</script>
