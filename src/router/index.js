@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import VueCookies from 'vue-cookies'
 
-import EmptyPage from "@/views/emptypage.vue"
+import EmptyPage from "@/views/EmptyPage.vue"
 import Taxa from "@/views/pages/taxa.vue"
-import TaxaWelcome from "@/views/taxawelcome.vue"
-import Dataset from "@/views/pages/dataset.vue"
+import TaxaWelcome from "@/views/TaxaWelcome.vue"
+import Dataset from "@/views/pages/DatasetLanding.vue"
 import Database from "@/views/database.vue"
 import DatabaseSelect from "@/views/dbSummary.vue"
-import UserPage from "@/views/userpage.vue"
-import landingStatus from "@/views/pages/landingstatus.vue"
+import UserPage from "@/views/UserPage.vue"
+import landingStatus from "@/views/pages/LandingStatus.vue"
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

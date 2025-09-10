@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, onBeforeMount } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import Panel from 'primevue/panel'
   import Card from 'primevue/card'
