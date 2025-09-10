@@ -2,13 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router'
 import VueCookies from 'vue-cookies'
 
 import EmptyPage from "@/views/EmptyPage.vue"
-import Taxa from "@/views/pages/taxa.vue"
+import Taxa from "@/views/pages/TaxaLanding.vue"
 import TaxaWelcome from "@/views/TaxaWelcome.vue"
 import Dataset from "@/views/pages/DatasetLanding.vue"
-import Database from "@/views/database.vue"
+import Database from "@/views/DatabaseLanding.vue"
 import DatabaseSelect from "@/views/dbSummary.vue"
 import UserPage from "@/views/UserPage.vue"
-import landingStatus from "@/views/pages/LandingStatus.vue"
+import LandingStatus from "@/views/pages/LandingStatus.vue"
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -67,7 +67,7 @@ export const router = createRouter({
   },
   {
     path: "/status",
-    component: landingStatus,
+    component: LandingStatus,
     name: "Web Services Status",
   },  
   ]

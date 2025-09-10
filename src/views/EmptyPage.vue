@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import Panel from 'primevue/panel'
-  import DatasetStatistics from '@/views/neotomastats.vue'
+  import DatasetStatistics from '@/views/NeotomaStats.vue'
 
   const images = ref(['centralamerica-fs8.png','australia-fs8.png',
     'easternna-fs8.png','japan-fs8.png',

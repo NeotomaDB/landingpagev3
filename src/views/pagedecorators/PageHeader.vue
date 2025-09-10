@@ -8,6 +8,7 @@
                      {label: 'Users', url: '/users', icon: 'pi pi-user'},
                      {label: 'Constituent Databases', url: '/databases', icon: 'pi pi-database'},
                      {label: 'Resource Status', url: '/status', icon: 'pi pi-server'}]
+                     
   import orcid_login from './headercomponents/OrcidLogin.vue';
 </script>
 

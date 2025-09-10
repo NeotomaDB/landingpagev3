@@ -2,7 +2,6 @@
 import { ref,onMounted} from 'vue';
 import {useRoute} from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner';
-import Dialog from 'primevue/dialog';
 import Panel from 'primevue/panel';
 const route = useRoute()
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'

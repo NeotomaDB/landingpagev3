@@ -1,19 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Map, View } from 'ol';
-import OSM from 'ol/source/OSM.js';
-import Tile from 'ol/layer/Tile.js';
-import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'ol/layer/Vector';
-import {fromLonLat} from 'ol/proj';
-import Point from 'ol/geom/Point';
-import Feature from "ol/Feature";
-import Polygon from "ol/geom/Polygon";
-import {Style} from 'ol/style';
-import Stroke from 'ol/style/Stroke';
-import Circle from 'ol/style/Circle';
-import Fill from 'ol/style/Fill';
-import Overlay from 'ol/Overlay';
+import { ref } from 'vue'
 
 let props = defineProps(['location'])
 var location = JSON.parse(props.location)
@@ -23,7 +9,6 @@ const zoom = ref(9)
 const rotation = ref(0)
 const newlong = ref(0)
 const newlat = ref(0)
-const natland = ref(null)
 
 function centerMap(location) {
   if (Array.isArray(location.coordinates.flat()[0])) {

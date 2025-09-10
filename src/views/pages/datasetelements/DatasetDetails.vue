@@ -4,11 +4,11 @@
   import Button from 'primevue/button';
   import download from 'downloadjs';
 
-  import ChronDetails from "@/views/pages/datasetelements/chronologydetails.vue"
-  import ContactDetails from "@/views/pages/datasetelements/contact_details.vue"
-  import TaxaDetails from "@/views/pages/datasetelements/taxaLoad.vue"
-  import PublicationsDetails from "@/views/pages/datasetelements/publicationdetails.vue"
-  import OtherDetails from "@/views/pages/datasetelements/otherdatasetdetails.vue"
+  import ChronDetails from "@/views/pages/datasetelements/ChronologyDetails.vue"
+  import ContactDetails from "@/views/pages/datasetelements/ContactDetails.vue"
+  import TaxaDetails from "@/views/pages/datasetelements/TaxaLoad.vue"
+  import PublicationsDetails from "@/views/pages/datasetelements/PublicationDetails.vue"
+  import OtherDetails from "@/views/pages/datasetelements/OtherDatasetDetails.vue"
   import { ref, onMounted, watch } from 'vue';
 
   const citation = ref(null)
