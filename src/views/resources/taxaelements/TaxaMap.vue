@@ -275,12 +275,11 @@ var displayFeatureInfo = function(pixel) {
           var stringIDs = uniqueids.value.join(",");
           visible.value=true
           console.log(stringIDs)
-          var sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' +stringIDs + '/datasets?limit=2000')
+          let sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' +stringIDs + '/datasets?limit=2000')
             .then(res =>{
                 var inter = res.json()
                 //console.log(inter)
-            return inter
-
+                return inter
             })
             .then(int => {
                 var all = int.data
@@ -289,7 +288,6 @@ var displayFeatureInfo = function(pixel) {
                 idxlist.value = [];
                 var idx = 0;
                 all.forEach(function(site) {
-                  
                   site.site.datasets.forEach(function() {
                     idx = idx + 1
                     siteids.value.push({name: site.site.sitename, index: idx})
