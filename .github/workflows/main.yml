@@ -16,10 +16,10 @@ jobs:
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
-            echo "AWS_BUCKET_NAME=$(secrets.AWS_BUCKET_NAME)" >> $GITHUB_OUTPUT
+            echo "AWS_BUCKET_NAME=$(${secrets.AWS_BUCKET_NAME})" >> $GITHUB_ENV
           else
             echo "ENVIRONMENT=dev" >> $GITHUB_ENV
-            echo "AWS_BUCKET_NAME=$(secrets.AWS_DEV_BUCKET_NAME)" >> $GITHUB_OUTPUT
+            echo "AWS_BUCKET_NAME=$(${secrets.AWS_DEV_BUCKET_NAME})" >> $GITHUB_ENV
           fi
           
       - name: Get yarn cache directory path

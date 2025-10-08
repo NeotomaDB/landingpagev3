@@ -1,5 +1,5 @@
 <script setup>
-import {ref, computed, watch, shallowReactive} from 'vue';
+import { ref, computed, watch, shallowReactive } from 'vue';
 import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -12,7 +12,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 
 import Badge from 'primevue/badge';
 
-const slide = ref([(1950 - new Date().getFullYear()),50000000]);
+const slide = ref([(1950 - new Date().getFullYear()), 50000000]);
 
 const databasekeys = ref(null);
 const show = ref(false);
@@ -50,7 +50,7 @@ const datasettypes_master = ref([
   { value: "geochronologic", clicked: false },
   { value: "insect", clicked: false },
   { value: "insect modern", clicked: false },
-  { value: "Lead 210", clicked: false},
+  { value: "Lead 210", clicked: false },
   { value: "loss-on-ignition", clicked: false },
   { value: "macrocharcoal", clicked: false },
   { value: "macroinvertebrate", clicked: false },
@@ -75,7 +75,7 @@ const datasettypes_master = ref([
   { value: "water chemistry", clicked: false },
   { value: "X-ray diffraction (XRD)", clicked: false },
   { value: "X-ray fluorescence (XRF)", clicked: false },
-  
+
 ]);
 
 const regions_master = ref([
@@ -87,7 +87,7 @@ const regions_master = ref([
   { value: "Middle East", clicked: false, cont: "Asia" },
   { value: "North Africa", clicked: false, cont: "Africa" },
   { value: "Sub-Saharan Africa", clicked: false, cont: "Africa" },
-  { value: "North America", clicked: false, cont: "North America"},
+  { value: "North America", clicked: false, cont: "North America" },
   { value: "Central America", clicked: false, cont: "North America" },
   { value: "South America", clicked: false, cont: "Np" },
   { value: "Europe", clicked: false, cont: "Np" },
@@ -545,55 +545,56 @@ const geo_code = [
 ]
 
 
-    function loadDatabases() {
-      return  fetch(neotomaapi + "/v2.0/apps/constdb/",
-      { method: "GET", headers: {'content-type': 'application/json'}})
+function loadDatabases() {
+  return fetch(neotomaapi + "/v2.0/apps/constdb/",
+    { method: "GET", headers: { 'content-type': 'application/json' } })
     .then(res1 => {
-      return res1.json()})
+      return res1.json()
+    })
     .then(json1 => {
-      dbsums.value = json1.data 
+      dbsums.value = json1.data
       return dbsums.value
     })
     .then(db => {
-    databasekeys.value = db.map(obj => {
-      const geoEntry = geo_code.find(geo => 
-      geo.DB === obj.database.databasename);
-      const timeEntry = temp_code.find(time => 
-      time.DB === obj.database.databasename);
-      return {
-      ...obj,
-      string: obj.datasettypes
-      .map(type => type.datasettype)
-      .filter(Boolean)
-      .join("\n"),
-      location: geoEntry ? geoEntry.places : null,
-      location_marg: geoEntry ? geoEntry.marg_pl : null,
-      time: timeEntry ? timeEntry.times : null,
-      time_marg: timeEntry ? timeEntry.marginals : null,
-      locstring: geoEntry ? geoEntry.places.join("\n") : null,
-      timestring: timeEntry ? timeEntry.times.join("\n") : null,
-      time_margstring: timeEntry && timeEntry.marginals.length ? 
-      [...timeEntry.marginals.slice(0,-1), timeEntry.marginals.at(-1) + " (marginal)"].join(" (marginal) \n") 
-      : '',
-      loc_margstring:  geoEntry && geoEntry.marg_pl.length
-  ? [...geoEntry.marg_pl.slice(0, -1), geoEntry.marg_pl.at(-1) + " (marginal)"].join(" (marginal) \n")
-  : '',
-      marginal_value: false,
-      marginal_valuet: false
+      databasekeys.value = db.map(obj => {
+        const geoEntry = geo_code.find(geo =>
+          geo.DB === obj.database.databasename);
+        const timeEntry = temp_code.find(time =>
+          time.DB === obj.database.databasename);
+        return {
+          ...obj,
+          string: obj.datasettypes
+            .map(type => type.datasettype)
+            .filter(Boolean)
+            .join("\n"),
+          location: geoEntry ? geoEntry.places : null,
+          location_marg: geoEntry ? geoEntry.marg_pl : null,
+          time: timeEntry ? timeEntry.times : null,
+          time_marg: timeEntry ? timeEntry.marginals : null,
+          locstring: geoEntry ? geoEntry.places.join("\n") : null,
+          timestring: timeEntry ? timeEntry.times.join("\n") : null,
+          time_margstring: timeEntry && timeEntry.marginals.length ?
+            [...timeEntry.marginals.slice(0, -1), timeEntry.marginals.at(-1) + " (marginal)"].join(" (marginal) \n")
+            : '',
+          loc_margstring: geoEntry && geoEntry.marg_pl.length
+            ? [...geoEntry.marg_pl.slice(0, -1), geoEntry.marg_pl.at(-1) + " (marginal)"].join(" (marginal) \n")
+            : '',
+          marginal_value: false,
+          marginal_valuet: false
 
-    };
-      
-    });
-    show.value = true;
-    loaded.value = true;
-    console.log(databasekeys.value)
+        };
+
+      });
+      show.value = true;
+      loaded.value = true;
+      console.log(databasekeys.value)
     })
     .catch(err => {
       console.log(err)
     })
-  }
+}
 
- 
+
 loadDatabases();
 function buttonfilter(dtype) {
   const index = datafilter.value.indexOf(dtype.value);
@@ -601,7 +602,8 @@ function buttonfilter(dtype) {
   if (index === -1) {
     datafilter.value.push(dtype.value)
   } else {
-    datafilter.value.splice(index, 1)}
+    datafilter.value.splice(index, 1)
+  }
 }
 
 function buttonfilterreg(reg) {
@@ -610,7 +612,8 @@ function buttonfilterreg(reg) {
   if (index === -1) {
     regionfilter.value.push(reg.value)
   } else {
-    regionfilter.value.splice(index, 1)}
+    regionfilter.value.splice(index, 1)
+  }
 }
 
 function buttonfiltertime(time) {
@@ -619,7 +622,8 @@ function buttonfiltertime(time) {
   if (index === -1) {
     timefilter.value.push(time.value)
   } else {
-    timefilter.value.splice(index, 1)}
+    timefilter.value.splice(index, 1)
+  }
 }
 
 function gotodb(el) {
@@ -717,39 +721,37 @@ console.log(filteredDBs.value)
 
 </script>
 
-<style>
-
-.placer {
-  justify-items:center;
-  justify-content:center;
-  justify-self:center;
-}
-
 <style scoped>
+.placer {
+  justify-items: center;
+  justify-content: center;
+  justify-self: center;
+}
 
 ::v-deep(.p-panel-header) {
   display: grid !important;
-  justify-content:space-evenly !important;
+  justify-content: space-evenly !important;
   grid-template-columns: 2fr 3fr 1fr !important;
 }
 
 ::v-deep(.different_one) {
   display: grid !important;
-  justify-content:space-between !important;
+  justify-content: space-between !important;
   grid-template-columns: 2fr 3fr 1fr !important;
 }
+
 ::v-deep(.placer) {
-  justify-items:center;
-  justify-content:center;
-  justify-self:center;
+  justify-items: center;
+  justify-content: center;
+  justify-self: center;
 }
 
 
 ::v-deep(.bigplace) {
- 
-  justify-items:center;
-  justify-content:center;
-  justify-self:center;
+
+  justify-items: center;
+  justify-content: center;
+  justify-self: center;
 
 
 }
@@ -757,57 +759,57 @@ console.log(filteredDBs.value)
 ::v-deep(:root) {
   --vw: 10px;
 }
+
 ::v-deep(.not) {
-  background-color:#837c6c  !important;
-  cursor: pointer  !important;
-  border: 3px solid #eabf93  !important;
-  line-height: 1.5  !important;
-  border-collapse:collapse  !important;
+  background-color: #837c6c !important;
+  cursor: pointer !important;
+  border: 3px solid #eabf93 !important;
+  line-height: 1.5 !important;
+  border-collapse: collapse !important;
 }
 
 ::v-deep(.clicked) {
-  background-color:rgb(158, 126, 150) !important;
-  cursor: pointer  !important;
-  border: 2px solid pink  !important;
-  line-height:1.5  !important;
- /* font-weight:bold; */
+  background-color: rgb(158, 126, 150) !important;
+  cursor: pointer !important;
+  border: 2px solid pink !important;
+  line-height: 1.5 !important;
+  /* font-weight:bold; */
 }
 
 ::v-deep(.clicked:hover) {
-  background-color:rgb(170,110,192) !important;
+  background-color: rgb(170, 110, 192) !important;
 }
 
 ::v-deep(.not:hover) {
-  background-color:#e4c3a2 !important;
+  background-color: #e4c3a2 !important;
 }
-
-
-
 </style>
 
 
-<template> 
-    <Panel toggleable >
-      <template #header>
-        <h1 style="text-align:center;">Constituent Databases</h1>
-      </template>
-    <p style="font-size:20px;">Neotoma is a database of databases. Each constituent database in Neotoma 
-      specializes in the curation of paleoecological data from some particular configuration of 
+<template>
+  <Panel toggleable>
+    <template #header>
+      <h1 style="text-align:center;">Constituent Databases</h1>
+    </template>
+    <p style="font-size:20px;">Neotoma is a database of databases. Each constituent database in Neotoma
+      specializes in the curation of paleoecological data from some particular configuration of
       time, space, and proxy type. For instance, the main focus of the North American Pollen Database
-      is on late Quaternary pollen records from North America (as the name suggests!). 
+      is on late Quaternary pollen records from North America (as the name suggests!).
     </p>
-     <p style="font-size:20px;"> Although Neotoma's constituent databases specialize in particular kinds of paleo data, 
-      they tend over the years to have accumulated other data which arguably fall outside their ambit. 
-      (If you explore the North American Pollen Database, you will notice it also includes 
-      records from other continents and concerning a variety of proxies.) 
-      The landing pages for Neotoma's constituent databases (linked below) are meant to 
-      facilitate data exploration by constituent database, in order to make the 
-      sometimes unexpected holdings of any given database more transparent to 
-      Neotoma's users. 
+    <p style="font-size:20px;"> Although Neotoma's constituent databases specialize in particular kinds of paleo data,
+      they tend over the years to have accumulated other data which arguably fall outside their ambit.
+      (If you explore the North American Pollen Database, you will notice it also includes
+      records from other continents and concerning a variety of proxies.)
+      The landing pages for Neotoma's constituent databases (linked below) are meant to
+      facilitate data exploration by constituent database, in order to make the
+      sometimes unexpected holdings of any given database more transparent to
+      Neotoma's users.
       These pages provide database-specific information on dataset types,
-    spatial and temporal coverage, upload history, and data contributors. 
+      spatial and temporal coverage, upload history, and data contributors.
     </p>
-    <p style="font-size:20px;"> On this page, you may filter by database name, dataset type, and temporal coverage, to find Neotoma constituent databases that may be of interest to you. 
+    <p style="font-size:20px;"> On this page, you may filter by database name, dataset type, and temporal coverage, to
+      find
+      Neotoma constituent databases that may be of interest to you.
       To explore any database in more detail, simply click its button below.
     </p>
   </Panel>
@@ -815,54 +817,60 @@ console.log(filteredDBs.value)
   <Panel toggleable collapsed>
     <template #header>
       <h2>Dataset Type Filter</h2>
-      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on dataset type. Databases with a light gray background do not currently curate any data, but they may in the future.'),
-           pt: {
-            arrow:
-            {
-             style: {
-                borderColor: 'rgb(108,91,71)'
-              }
-            },
-            text: { //'bg-yellow-900 font-medium'
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{
+        value: ('Filter Neotoma\'s databases based on dataset type. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+        pt: {
+          arrow:
+          {
+            style: {
+              borderColor: 'rgb(108,91,71)'
+            }
+          },
+          text: { //'bg-yellow-900 font-medium'
             style: {
               backgroundColor: 'rgb(108,97,71)',
-              width:'250px',
+              width: '250px',
               textAlign: 'center'
             }
           },
-          }}"></i>
+        }
+      }"></i>
     </template>
     <div style="display:flex;flex-wrap:wrap;">
-  <div v-for="el in datasettypes_master" >
-  <Badge :class="{ 'clicked': el.clicked, 'not': !el.clicked }" @click="buttonfilter(el)" :value='el.value'></Badge>
-</div>
-</div>
+      <div v-for="el in datasettypes_master">
+        <Badge :class="{ 'clicked': el.clicked, 'not': !el.clicked }" @click="buttonfilter(el)" :value='el.value'>
+        </Badge>
+      </div>
+    </div>
   </Panel>
   <Panel toggleable collapsed>
     <template #header>
       <h2>Time Filter</h2>
-      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on temporal range. Databases with a dark gray background curate data from the selected period on the margins. That means the given database will accept data from the selected period only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
-           pt: {
-            arrow:
-            {
-             style: {
-                borderColor: 'rgb(108,91,71)'
-              }
-            },
-            text: { //'bg-yellow-900 font-medium'
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{
+        value: ('Filter Neotoma\'s databases based on temporal range. Databases with a dark gray background curate data from the selected period on the margins. That means the given database will accept data from the selected period only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+        pt: {
+          arrow:
+          {
+            style: {
+              borderColor: 'rgb(108,91,71)'
+            }
+          },
+          text: { //'bg-yellow-900 font-medium'
             style: {
               backgroundColor: 'rgb(108,97,71)',
-              width:'250px',
+              width: '250px',
               textAlign: 'center'
             }
           },
-          }}"></i>
+        }
+      }"></i>
     </template>
     <div style="display:flex;flex-wrap:wrap;">
-  <div v-for="el in time_master" >
-  <Badge :class="{ 'clicked': el.clicked, 'not': !el.clicked }" @click="buttonfiltertime(el)" :value='el.value'></Badge>
-</div>
-</div>
+      <div v-for="el in time_master">
+        <Badge :class="{ 'clicked': el.clicked, 'not': !el.clicked }" @click="buttonfiltertime(el)" :value='el.value'>
+        </Badge>
+      </div>
+    </div>
   </Panel>
 
 
@@ -871,128 +879,133 @@ console.log(filteredDBs.value)
   <Panel toggleable collapsed>
     <template #header>
       <h2>Region Filter</h2>
-      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{ value: ('Filter Neotoma\'s databases based on region. Databases with a dark gray background curate data from the selected region on the margins. That means the given database will accept data from the selected region only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
-           pt: {
-            arrow:
-            {
-             style: {
-                borderColor: 'rgb(108,91,71)'
-              }
-            },
-            text: { //'bg-yellow-900 font-medium'
+      <i class="pi pi-question-circle" style="width:10px;font-size: 1rem; color: rgb(108,97,71);" v-tooltip="{
+        value: ('Filter Neotoma\'s databases based on region. Databases with a dark gray background curate data from the selected region on the margins. That means the given database will accept data from the selected region only if no other database is more suitable. Databases with a light gray background do not currently curate any data, but they may in the future.'),
+        pt: {
+          arrow:
+          {
+            style: {
+              borderColor: 'rgb(108,91,71)'
+            }
+          },
+          text: { //'bg-yellow-900 font-medium'
             style: {
               backgroundColor: 'rgb(108,97,71)',
-              width:'250px',
+              width: '250px',
               textAlign: 'center'
             }
           },
-          }}"></i>
+        }
+      }"></i>
     </template>
     <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;">
-  <div v-for="el in sortedGroupedRegions " >
-    <div  class="bigplace" v-if="el.continent != 'Np'">
-      <h3>{{el.continent}}</h3>
-        <div class="placer" v-for="pla in el.regions">
-          <Badge
-            :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }"
-            @click="buttonfilterreg(pla)" :value='pla.value'></Badge>
+      <div v-for="el in sortedGroupedRegions">
+        <div class="bigplace" v-if="el.continent != 'Np'">
+          <h3>{{ el.continent }}</h3>
+          <div class="placer" v-for="pla in el.regions">
+            <Badge :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }" @click="buttonfilterreg(pla)"
+              :value='pla.value'></Badge>
+          </div>
         </div>
-    </div>
-    <div class="bigplace" v-else>
-      <h3>Other Continents</h3>
-      <div class="placer" v-for="pla in el.regions">
-          <Badge
-            :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }"
-            @click="buttonfilterreg(pla)" :value='pla.value'></Badge>
+        <div class="bigplace" v-else>
+          <h3>Other Continents</h3>
+          <div class="placer" v-for="pla in el.regions">
+            <Badge :class="{ 'clicked': pla.clicked, 'not': !pla.clicked }" @click="buttonfilterreg(pla)"
+              :value='pla.value'></Badge>
+          </div>
         </div>
+      </div>
     </div>
-  </div>
-</div>
   </Panel>
-    <Panel>
-      <template #header>
-    <div class="flex justify-content-center">
-                <InputText v-model="globalFilter" placeholder="Search Databases" />
-        </div>
-      </template>
-      <div v-if="!loaded" style="justify-content:center;justify-self:center;justify-items:center;">
+  <Panel>
+    <template #header>
+      <div class="flex justify-content-center">
+        <InputText v-model="globalFilter" placeholder="Search Databases" />
+      </div>
+    </template>
+    <div v-if="!loaded" style="justify-content:center;justify-self:center;justify-items:center;">
       <ProgressSpinner />
     </div>
-      <div class="flex flex-wrap">
-    <div v-for="(el,index) in filteredDBs.value" class="col-4">
-      <div v-if="el.string != '' && el.marginal_value == false && el.marginal_valuet == false" style="height:100%;">
-        <Button style="width:100%;height:100%;justify-content:center;background-color:rgb(232,229,222);border-color:rgb(221,205,188);" class="col" 
-            v-tooltip="{ value: ('Datasets: \n' + el.string + '\n\n Time: \n' + el.timestring + '\n' + el.time_margstring + '\n\n Regions: \n' + el.locstring  + '\n' + el.loc_margstring),
-           pt: {
-            arrow: 
-            {
-             style: {
-                borderColor: 'rgb(108,91,71)'
+    <div class="flex flex-wrap">
+      <div v-for="(el, index) in filteredDBs.value" class="col-4">
+        <div v-if="el.string != '' && el.marginal_value == false && el.marginal_valuet == false" style="height:100%;">
+          <Button
+            style="width:100%;height:100%;justify-content:center;background-color:rgb(232,229,222);border-color:rgb(221,205,188);"
+            class="col" v-tooltip="{
+              value: ('Datasets: \n' + el.string + '\n\n Time: \n' + el.timestring + '\n' + el.time_margstring + '\n\n Regions: \n' + el.locstring + '\n' + el.loc_margstring),
+              pt: {
+                arrow:
+                {
+                  style: {
+                    borderColor: 'rgb(108,91,71)'
+                  }
+                },
+                text: { //'bg-yellow-900 font-medium'
+                  style: {
+                    backgroundColor: 'rgb(108,97,71)',
+                    width: '250px',
+                    textAlign: 'center'
+                  }
+                },
               }
-            },
-            text: { //'bg-yellow-900 font-medium'
-            style: {
-              backgroundColor: 'rgb(108,97,71)',
-              width:'250px',
-              textAlign: 'center'
-            }
-          },
-          }}" 
-          @click="gotodb(el)">
-  
-          <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.database.databasename }}</p>
-        </Button>
-      </div>
-      <div v-if="el.string != '' && (el.marginal_value == true || el.marginal_valuet == true)" style="height:100%;">
-        <Button style="width:100%;height:100%;justify-content:center;background-color:rgb(150,150,150);border-color:rgb(221,205,188);" class="col" 
-            v-tooltip="{ value: ('Datasets: \n' + el.string + '\n\n Time: \n' + el.timestring +   '\n' + el.time_margstring + '\n\n Regions: \n' + el.locstring + '\n' + el.loc_margstring),
-           pt: {
-            arrow: 
-            {
-             style: {
-                borderColor: 'rgb(108,91,71)'
-              }
-            },
-            text: { //'bg-yellow-900 font-medium'
-            style: {
-              backgroundColor: 'rgb(108,97,71)',
-              width:'250px',
-              textAlign: 'center'
-            }
-          },
-          }}" 
-          @click="gotodb(el)">
-  
-          <p style="font-size:20px;color:rgb(50,50,30);font-weight:bold;">{{ el.database.databasename }}</p>
-        </Button>
-      </div>
-         <div v-if="el.string == ''" style="height:100%;">
-            <Button 
-            style="width:100%;height:100%;justify-content:center;background-color:rgb(202,209,202);border-color:rgb(171,170,178);" class="col" 
-            v-tooltip="{ value: ('no datasets yet'),
-          pt: {
-            arrow: 
-            {
-             style: {
-                borderColor: 'rgb(108,91,71)'
-              }
-            },
-            text: { //'bg-yellow-900 font-medium'
-            style: {
-              backgroundColor: 'rgb(108,97,71)',
-              width:'250px',
-              textAlign: 'center'
-            }
-          },
-          }}" 
-            @click="gotodb(el)">
-  
-              <p style="font-size:20px;color:rgb(150,157,151);font-weight:bold;">{{ el.database.databasename }}</p>
-            </Button>
-          </div>
-     
-  </div>
+            }" @click="gotodb(el)">
 
-</div> 
-</Panel>
+            <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.database.databasename }}</p>
+          </Button>
+        </div>
+        <div v-if="el.string != '' && (el.marginal_value == true || el.marginal_valuet == true)" style="height:100%;">
+          <Button
+            style="width:100%;height:100%;justify-content:center;background-color:rgb(150,150,150);border-color:rgb(221,205,188);"
+            class="col" v-tooltip="{
+              value: ('Datasets: \n' + el.string + '\n\n Time: \n' + el.timestring + '\n' + el.time_margstring + '\n\n Regions: \n' + el.locstring + '\n' + el.loc_margstring),
+              pt: {
+                arrow:
+                {
+                  style: {
+                    borderColor: 'rgb(108,91,71)'
+                  }
+                },
+                text: { //'bg-yellow-900 font-medium'
+                  style: {
+                    backgroundColor: 'rgb(108,97,71)',
+                    width: '250px',
+                    textAlign: 'center'
+                  }
+                },
+              }
+            }" @click="gotodb(el)">
+
+            <p style="font-size:20px;color:rgb(50,50,30);font-weight:bold;">{{ el.database.databasename }}</p>
+          </Button>
+        </div>
+        <div v-if="el.string == ''" style="height:100%;">
+          <Button
+            style="width:100%;height:100%;justify-content:center;background-color:rgb(202,209,202);border-color:rgb(171,170,178);"
+            class="col" v-tooltip="{
+              value: ('no datasets yet'),
+              pt: {
+                arrow:
+                {
+                  style: {
+                    borderColor: 'rgb(108,91,71)'
+                  }
+                },
+                text: { //'bg-yellow-900 font-medium'
+                  style: {
+                    backgroundColor: 'rgb(108,97,71)',
+                    width: '250px',
+                    textAlign: 'center'
+                  }
+                },
+              }
+            }" @click="gotodb(el)">
+
+            <p style="font-size:20px;color:rgb(150,157,151);font-weight:bold;">{{ el.database.databasename }}</p>
+          </Button>
+        </div>
+
+      </div>
+
+    </div>
+  </Panel>
 </template>
