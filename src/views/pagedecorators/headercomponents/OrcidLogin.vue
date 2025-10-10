@@ -27,12 +27,12 @@ const buttonType = computed(() => {
 watch(() => route.fullPath, (newPath) => {
     // Refetch tokens when route changes
     fetchTokens()
-      .then(() => {
-        console.log(hasValidTokens.value)
-        if (hasValidTokens.value) {  
-          user.value = VueCookies.get('orcid_user')
-        }
-      });
+        .then(() => {
+            console.log(hasValidTokens.value)
+            if (hasValidTokens.value) {
+                user.value = VueCookies.get('orcid_user')
+            }
+        });
 }, { immediate: true });
 
 
@@ -56,30 +56,22 @@ function handleLogout() {
     <div class="orcid-auth">
         <!-- Login State -->
         <div v-if="buttonType === 'login'">
-            <Button 
-                id="orcid-login-btn"
-                @click="handleLogin"
-                rounded
+            <Button id="orcid-login-btn" @click="handleLogin" rounded
                 v-tooltip="'Use ORCiD to manage your authentication on the Neotoma Landing pages.'"
-            >
+                aria-label="Login to ORCID">
                 <i class="pi pi-sign-in"></i>
                 Log Into ORCID
             </Button>
         </div>
-        
+
         <!-- Logout State -->
         <div v-else-if="buttonType === 'logout'">
             <div class="user-info" v-if="user">
                 <span>Welcome, {{ user['data']['user']['name'] || 'ORCID User' }}</span>
             </div>
-            
-            <Button 
-                id="orcid-logout-btn"
-                @click="handleLogout"
-                outlined
-                rounded
-                :disabled="isValidating"
-            >
+
+            <Button id="orcid-logout-btn" @click="handleLogout" outlined rounded :disabled="isValidating"
+                aria-label="Logout from ORCID">
                 <i class="pi pi-sign-out"></i>
                 {{ isValidating ? 'Validating...' : 'Log Out of ORCID' }}
             </Button>

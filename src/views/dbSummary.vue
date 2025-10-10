@@ -948,7 +948,7 @@ console.log(filteredDBs.value)
                   }
                 },
               }
-            }" @click="gotodb(el)">
+            }" @click="gotodb(el)" :aria-label="el.database.databasename">
 
             <p style="font-size:20px;color:rgb(108,97,71);font-weight:bold;">{{ el.database.databasename }}</p>
           </Button>
@@ -973,7 +973,7 @@ console.log(filteredDBs.value)
                   }
                 },
               }
-            }" @click="gotodb(el)">
+            }" @click="gotodb(el)" :aria-label="el.database.databasename">
 
             <p style="font-size:20px;color:rgb(50,50,30);font-weight:bold;">{{ el.database.databasename }}</p>
           </Button>
@@ -998,7 +998,7 @@ console.log(filteredDBs.value)
                   }
                 },
               }
-            }" @click="gotodb(el)">
+            }" @click="gotodb(el)" :aria-label="el.database.databasename">
 
             <p style="font-size:20px;color:rgb(150,157,151);font-weight:bold;">{{ el.database.databasename }}</p>
           </Button>
