@@ -15,9 +15,11 @@ jobs:
           if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
             echo "AWS_BUCKET_NAME=${{secrets.AWS_BUCKET_NAME}}" >> "$GITHUB_ENV"
+            echo "CFDDISTRIBUTIONID=${{secrets.CFDDISTRIBUTIONID}}" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=dev" >> $GITHUB_ENV
             echo "AWS_BUCKET_NAME=${{secrets.AWS_DEV_BUCKET_NAME}}" >> $GITHUB_ENV
+            echo "CFDDISTRIBUTIONID=${{secrets.CFDDISTRIBUTIONID_DEV}}" >> "$GITHUB_ENV"
           fi
           
       - name: Get yarn cache directory path
@@ -60,7 +62,7 @@ jobs:
         name: Invalidate CloudFront Cache
         id: invalidate-cloudfront-cache
         with:
-          distribution-id: ${{ secrets.CFDistributionId }}
+          distribution-id: ${{ env.CFDDISTRIBUTIONID }}
           aws-region: 'us-east-1'
           origin-prefix: 'root'
           include-origin-prefix: true
