@@ -34,8 +34,9 @@ import Card from 'primevue/card';
         <template #content>
           <div class="grid" style="justify-content:space-between;">
             <div class="col-1">
-              <a href="https://localcontexts.org/notice/open-to-collaborate/"><img
-                  src="../../assets/Open_To_Collaborate.svg" width=50></a>
+              <a href="https://localcontexts.org/notice/open-to-collaborate/"
+                aria-label="Open to Collaborate label information."><img src="../../assets/Open_To_Collaborate.svg"
+                  width=50 alt="Open to Collaborate logo from LocalContext."></a>
             </div>
             <div class="col-11">
               <strong>Our institution is committed to the development of new modes of collaboration, engagement, and

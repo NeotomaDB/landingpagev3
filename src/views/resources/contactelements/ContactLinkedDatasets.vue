@@ -67,7 +67,7 @@ onMounted(async () => {
         <h4>User Submission Summary</h4>
       </template>
       <div v-for="(role, index) in countsums">
-        <Button :badge="role" :label="index" />
+        <Button :badge="role" :label="index" aria-lable="User Submission Counts" />
       </div>
     </Panel>
   </div>

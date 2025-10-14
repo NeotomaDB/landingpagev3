@@ -3,11 +3,9 @@ name: Deploy Landing Pages to S3
 on:
   push:
     branches: [main, dev]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -17,9 +15,11 @@ jobs:
           if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
             echo "AWS_BUCKET_NAME=${{secrets.AWS_BUCKET_NAME}}" >> "$GITHUB_ENV"
+            echo "CFDISTRIBUTIONID=${{secrets.CFDISTRIBUTIONID}}" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=dev" >> $GITHUB_ENV
             echo "AWS_BUCKET_NAME=${{secrets.AWS_DEV_BUCKET_NAME}}" >> $GITHUB_ENV
+            echo "CFDISTRIBUTIONID=${{secrets.CFDISTRIBUTIONID_DEV}}" >> "$GITHUB_ENV"
           fi
           
       - name: Get yarn cache directory path
@@ -50,3 +50,21 @@ jobs:
           AWS_BUCKET_NAME: ${{ env.AWS_BUCKET_NAME }}
           BUCKET_PATH: "/${{github.event.number}}"
           DIST_LOCATION_CODE: ./dist
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - uses: badsyntax/github-action-aws-cloudfront@master
+        name: Invalidate CloudFront Cache
+        id: invalidate-cloudfront-cache
+        with:
+          distribution-id: ${{ env.CFDISTRIBUTIONID }}
+          aws-region: 'us-east-1'
+          origin-prefix: 'root'
+          include-origin-prefix: true
+          invalidate-paths: '/*'
+          default-root-object: 'index.html'

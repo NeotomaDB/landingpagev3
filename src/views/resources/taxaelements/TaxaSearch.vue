@@ -29,16 +29,16 @@ async function findTaxa(taxonval) {
     const json1 = await res1.json();
     const taxa = json1.data ?? {};
     filtered.value = taxa.filter(obj =>
-    pattern.test(obj.taxonname)   
-);
+      pattern.test(obj.taxonname)
+    );
 
-console.log(filtered);
+    console.log(filtered);
 
-tabledat.value = filtered.value.map(obj => ({
-  ...obj,
-  link: `https://data.neotomadb.org/taxa/${obj.taxonid}`
-}));
-    ready.value =true;
+    tabledat.value = filtered.value.map(obj => ({
+      ...obj,
+      link: `https://data.neotomadb.org/taxa/${obj.taxonid}`
+    }));
+    ready.value = true;
     processing.value = false;
   } catch (err) {
     console.log(err);
@@ -61,27 +61,28 @@ const filteredtabledat = computed(() => {
 </script>
 
 <template>
-    <InputText type="text" v-model="value" />
-    <Button @click='findTaxa(value)'>Search</Button>
-    <div v-if="!ready && processing">
-      <ProgressSpinner style="display:grid;justify-self:center;"/>
-    </div>
-    <div v-if="ready && !processing">
-        <DataTable  paginator :rows="5" :value="filteredtabledat" :sort-field="'taxonname'" :sort-order="-1" tableStyle="min-width: 50rem">
-            <template #header>
+  <InputText type="text" v-model="value" />
+  <Button @click='findTaxa(value)' aria-label="Search Taxa">Search</Button>
+  <div v-if="!ready && processing">
+    <ProgressSpinner style="display:grid;justify-self:center;" />
+  </div>
+  <div v-if="ready && !processing">
+    <DataTable paginator :rows="5" :value="filteredtabledat" :sort-field="'taxonname'" :sort-order="-1"
+      tableStyle="min-width: 50rem">
+      <template #header>
         <div class="flex justify-content-end">
-                <InputText v-model="globalFilter" placeholder="Search Table" />
+          <InputText v-model="globalFilter" placeholder="Search Table" />
         </div>
       </template>
-        <Column field="taxonname" header="Taxon Name"></Column>
-        <Column header="Link">
-          <template #body="slotProps">
-              <a :href="slotProps.data.link" target="_blank">
-                  View Taxon
-              </a>
-          </template>
-        </Column>
-      </DataTable>
-    </div>
+      <Column field="taxonname" header="Taxon Name"></Column>
+      <Column header="Link">
+        <template #body="slotProps">
+          <a :href="slotProps.data.link" target="_blank">
+            View Taxon
+          </a>
+        </template>
+      </Column>
+    </DataTable>
+  </div>
 
 </template>
