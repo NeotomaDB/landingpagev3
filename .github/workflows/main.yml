@@ -16,10 +16,12 @@ jobs:
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
             echo "AWS_BUCKET_NAME=${{secrets.AWS_BUCKET_NAME}}" >> "$GITHUB_ENV"
             echo "CFDISTRIBUTIONID=${{secrets.CFDISTRIBUTIONID}}" >> "$GITHUB_ENV"
+            echo "VITE_APP_API_ENDPOINT=https://api.neotomadb.org" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=dev" >> $GITHUB_ENV
             echo "AWS_BUCKET_NAME=${{secrets.AWS_DEV_BUCKET_NAME}}" >> $GITHUB_ENV
             echo "CFDISTRIBUTIONID=${{secrets.CFDISTRIBUTIONID_DEV}}" >> "$GITHUB_ENV"
+            echo "VITE_APP_API_ENDPOINT=https://api-dev.neotomadb.org" >> "$GITHUB_ENV"
           fi
           
       - name: Get yarn cache directory path
@@ -35,10 +37,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install dependencies 👨🏻‍💻
+      - name: Install dependencies
         run: yarn --frozen-lockfile
         
-      - name: Build dependencies 🛠
+      - name: Build dependencies
         run: yarn build
 
       - name: Deploying application to Amazon S3

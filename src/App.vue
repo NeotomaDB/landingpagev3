@@ -6,6 +6,8 @@ import LandingPageFooter from "@/views/pagedecorators/PageFooter.vue"
 
 <template>
   <LandingPageHeader></LandingPageHeader>
-  <RouterView />
+  <main>
+    <RouterView />
+  </main>
   <LandingPageFooter />
 </template>

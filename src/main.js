@@ -20,6 +20,13 @@ import VueCookies from 'vue-cookies'
 const pinia = createPinia()
 
 const app = createApp(App)
+
+app.config.errorHandler = (err, instance, info) => {
+  // report error to tracking services
+}
+
+app.config.performance = true
+
 app.use(pinia)
 app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);

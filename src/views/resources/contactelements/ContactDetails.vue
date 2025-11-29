@@ -7,10 +7,11 @@ import { useRouter } from 'vue-router'
 const router = useRouter();
 
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
-const props = defineProps(['title'])
+const props = defineProps(['contactid'])
 const contactinfo = ref({})
 const loading = ref(true)
 const error = ref(null)
+const name = ref(props.contactid)
 
 async function get_contact(contactid) {
   await fetch(neotomaapi + "/v2.0/data/contacts/" + contactid,
@@ -45,8 +46,13 @@ onMounted(async () => {
     <ProgressSpinner class="flex-grow-1 w-max" />
   </div>
   <div v-else>
-    <Panel :header="contactinfo['contactname']">
-      email:{{ contactinfo['email'] }}
+    <Panel>
+      <template #header>
+        <h4>{{ name }}</h4>
+      </template>
+      <p>
+        email:{{ contactinfo['email'] }}
+      </p>
     </Panel>
   </div>
 </template>

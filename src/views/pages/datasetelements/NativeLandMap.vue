@@ -182,7 +182,7 @@ async function nativeland(mapOverlay) {
         geometry: polygonGeometry,
         name: elem.properties.Name,
         slug: elem.properties.Slug,
-        url: 'https://native-land.ca/maps/territories/' + elem.properties.Slug
+        url: 'https://native-land.ca/api/index.php?maps=territories&' + elem.properties.Slug
       });
       vectorSource2.value.addFeature(polygonFeature);
     }
@@ -193,7 +193,7 @@ async function nativeland(mapOverlay) {
           geometry: polygonGeometry,
           name: elem.properties.Name,
           slug: elem.properties.Slug,
-          url: 'https://native-land.ca/maps/territories/' + elem.properties.Slug
+          url: 'https://native-land.ca/api/index.php?maps=territories&' + elem.properties.Slug
         });
         vectorSource2.value.addFeature(polygonFeature);
       })
@@ -325,7 +325,7 @@ onMounted(async () => {
 </script>
 
 
-<style>
+<style scoped>
 .map {
   width: 100%;
   height: 395px;
@@ -349,11 +349,11 @@ onMounted(async () => {
   <div v-if="!loadingnat">
     <label for='nativeland'>Native Land Digital Data Information</label>
     <Panel id='nativeland' :class="{ custom: !hasFeatures, norm: hasFeatures }" toggleable collapsed
-      aria-label="Tying this label to fix things">
+      aria-label="Native-Land.ca panel.">
       <template #header>
         <div class="flex align-items-center gap-2">
 
-          <img src="https://149613070.v2.pressablecdn.com/wp-content/themes/NLD-2021/assets/nld-logo.png" height=40 />
+          <img src="@/assets/nld-logo.png" height=40 />
           <span>
             <h3>Native Land Digital Data</h3>
           </span>

@@ -41,3 +41,6 @@ package-lock.json
 passwords.txt
 
 .yarnclean
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.github/instructions/snyk_rules.instructions.md

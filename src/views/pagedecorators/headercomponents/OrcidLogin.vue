@@ -7,7 +7,7 @@ import VueCookies from 'vue-cookies'
 
 const route = useRoute();
 
-const apiLocation = import.meta.env.VITE_APP_API_URL || 'https://api.neotomadb.org';
+const apiLocation = import.meta.env.VITE_APP_API_ENDPOINT || 'https://api.neotomadb.org';
 const baseUrl = import.meta.env.VITE_APP_ORCID_LOGIN || 'https://orcid.org/oauth/authorize?response_type=token&redirect_uri=https://data.neotomadb.org/login&client_id=APP-OKAEGWFY7MEOK4HE&scope=openid';
 const userValidation = apiLocation + '/v2.0/apps/orcids/validate';
 
@@ -58,7 +58,7 @@ function handleLogout() {
         <div v-if="buttonType === 'login'">
             <Button id="orcid-login-btn" @click="handleLogin" rounded
                 v-tooltip="'Use ORCiD to manage your authentication on the Neotoma Landing pages.'"
-                aria-label="Login to ORCID">
+                aria-label="Log into ORCID">
                 <i class="pi pi-sign-in"></i>
                 Log Into ORCID
             </Button>

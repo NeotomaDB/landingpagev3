@@ -46,7 +46,7 @@ async function getdatacitecitation(doi, style) {
   if (citation_format.ok) {
     citation.value = await citation_format.text()
   } else {
-    citation.value = 'Just junk';
+    citation.value = 'No publication information available.';
   }
 };
 
@@ -101,7 +101,7 @@ onMounted(async () => {
         <div class="grid">
           <div v-for="name in props.title.site.datasets[0].datasetpi" class="col-6">
             <div class="text-center p-3 border-round-sm surface-ground hover:surface-500 font-bold">
-              <ContactDetails :contactid="name.contactid" style="float:left" /> {{ name.contactname }}
+              <ContactDetails :contactid="name.contactid" style="float:left" />
             </div>
           </div>
         </div>

@@ -21,8 +21,7 @@ const imageref = computed(() => {
     </template>
     <img :src=imageref style="width:100%" alt="Close up regional map showing Neotoma Sample Site locations.">
     <p>This site is a resource for obtaining extended metadata about Neotoma resources. These landing pages also serve
-      as a
-      platform for DOI resolution.</p>
+      as a platform for DOI resolution.</p>
     <p>To access information about an individual Neotoma Dataset include the dataset ID in the URL:
       <strong>https://data.neotomadb.org/{DatasetID}</strong>, for example, the dataset for the <em>Lake Tulane Loss on
         Ignition dataset</em> can be found at <router-link

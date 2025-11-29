@@ -200,7 +200,8 @@ loading_temp.value = false
     <div v-if="!chartReady" class="flex flex-wrap justify-content-center align-items-center">
       <ProgressSpinner class="flex-grow-1 w-max" />
     </div>
-    <canvas ref="chartCanvas" width="400" height="300"></canvas>
+    <canvas ref="chartCanvas" width="400" height="300">A chart of temporal coverage per dataset for the
+      database.</canvas>
     <p style="margin-bottom:0px;margin-top:0px;"><span style="color:darkblue;font-weight:bold;">dark blue</span>
       points are in units of <strong style="color:darkblue">Calibrated radiocarbon Years BP</strong>;</p>
     <p style="margin-bottom:0px;margin-top:0px;"><span style="color:gold;font-weight:bold;">gold</span>
