@@ -1,8 +1,23 @@
 <script setup>
-import SiteMap from '@/views/resources/MapSite.vue'
 
-import NativeMap from '@/views/pages/datasetelements/NativeLandMap.vue'
+import { defineAsyncComponent } from 'vue'
+import ProgressSpinner from 'primevue/progressspinner';
 import Panel from 'primevue/panel'
+
+const SiteMap = defineAsyncComponent({
+  loader: () => import("@/views/resources/MapSite.vue"),
+  loadingComponent: ProgressSpinner,
+  delay: 200,
+  timeout: 3000
+})
+
+const NativeMap = defineAsyncComponent({
+  loader: () => import("@/views/pages/datasetelements/NativeLandMap.vue"),
+  loadingComponent: ProgressSpinner,
+  delay: 200,
+  timeout: 3000
+})
+
 const props = defineProps(['title'])
 </script>
 
@@ -34,7 +49,7 @@ const props = defineProps(['title'])
           <span v-else> None</span>
         </div>
         <div class="col" style="max-height:200px">
-          <SiteMap :location="props.title.site.geography" style="border:1px solid black"/>
+          <SiteMap :location="props.title.site.geography" style="border:1px solid black" />
         </div>
       </div>
       <br>

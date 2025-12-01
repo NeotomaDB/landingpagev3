@@ -5,15 +5,26 @@ import Panel from 'primevue/panel'
 import Card from 'primevue/card'
 import ProgressSpinner from 'primevue/progressspinner';
 
-const SiteDetails = defineAsyncComponent(() =>
-  import("@/views/pages/datasetelements/SiteDetails.vue")
-)
-const DatasetDetails = defineAsyncComponent(() =>
-  import("@/views/pages/datasetelements/DatasetDetails.vue")
-)
-const MissingDataset = defineAsyncComponent(() =>
-  import("@/views/pages/MissingDataset.vue")
-)
+const SiteDetails = defineAsyncComponent({
+  loader: () => import("@/views/pages/datasetelements/SiteDetails.vue"),
+  loadingComponent: ProgressSpinner,
+  delay: 200,
+  timeout: 3000
+})
+
+const DatasetDetails = defineAsyncComponent({
+  loader: () => import("@/views/pages/datasetelements/DatasetDetails.vue"),
+  loadingComponent: ProgressSpinner,
+  delay: 200,
+  timeout: 3000
+})
+
+const MissingDataset = defineAsyncComponent({
+  loader: () => import("@/views/pages/MissingDataset.vue"),
+  loadingComponent: ProgressSpinner,
+  delay: 200,
+  timeout: 3000
+})
 
 const route = useRoute()
 const router = useRouter();

@@ -1,7 +1,14 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, defineAsyncComponent } from 'vue'
 import Panel from 'primevue/panel'
-import DatasetStatistics from '@/views/NeotomaStats.vue'
+import ProgressSpinner from 'primevue/progressspinner';
+
+const DatasetStatistics = defineAsyncComponent({
+  loader: () => import("@/views/NeotomaStats.vue"),
+  loadingComponent: ProgressSpinner,
+  delay: 200,
+  timeout: 3000
+})
 
 const images = ref(['centralamerica-fs8.png', 'australia-fs8.png',
   'easternna-fs8.png', 'japan-fs8.png',
