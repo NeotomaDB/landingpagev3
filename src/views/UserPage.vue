@@ -1,11 +1,21 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, defineAsyncComponent } from 'vue'
 import Panel from 'primevue/panel'
 import Card from 'primevue/card'
 import { useRoute, useRouter } from 'vue-router'
-import ContactDetails from '@/views/resources/contactelements/ContactDetails.vue'
-import ContactPublications from '@/views/resources/contactelements/ContactLinkedPublications.vue'
-import ContactDatasets from '@/views/resources/contactelements/ContactLinkedDatasets.vue'
+
+
+const ContactDetails = defineAsyncComponent(() =>
+  import('@/views/resources/contactelements/ContactDetails.vue')
+)
+
+const ContactPublications = defineAsyncComponent(() =>
+  import('@/views/resources/contactelements/ContactLinkedPublications.vue')
+)
+
+const ContactDatasets = defineAsyncComponent(() =>
+  import('@/views/resources/contactelements/ContactLinkedDatasets.vue')
+)
 
 const route = useRoute();
 const router = useRouter();
@@ -50,8 +60,7 @@ onMounted(async () => {
         <h1>Neotoma Contacts</h1>
       </template>
       <p>This page is intended as a landing page for Neotoma contacts. This includes authors, stewards, data
-        contributors,
-        analysts and others.</p>
+        contributors, analysts and others.</p>
 
       <p>Neotoma is the product of thousands of contributors working as sample analysts, sample collectors, authors,
         data modellers and stewards, among other activities.</p>
@@ -67,12 +76,3 @@ onMounted(async () => {
     </Panel>
   </div>
 </template>
-
-<script>
-export default {
-  name: 'UserPage',
-  data() {
-    return {}
-  }
-}
-</script>
