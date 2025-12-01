@@ -22,7 +22,6 @@ const buttonType = computed(() => {
     return hasValidTokens.value ? 'logout' : 'login';
 });
 
-
 // Watch for route changes (like when redirected from OAuth)
 watch(() => route.fullPath, (newPath) => {
     // Refetch tokens when route changes
