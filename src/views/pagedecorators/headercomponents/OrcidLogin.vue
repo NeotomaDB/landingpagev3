@@ -7,9 +7,11 @@ import VueCookies from 'vue-cookies'
 
 const route = useRoute();
 
-const apiLocation = import.meta.env.VITE_APP_API_ENDPOINT || 'https://api.neotomadb.org';
-const baseUrl = import.meta.env.VITE_APP_ORCID_LOGIN || 'https://orcid.org/oauth/authorize?response_type=token&redirect_uri=https://data.neotomadb.org/login&client_id=APP-OKAEGWFY7MEOK4HE&scope=openid';
-const userValidation = apiLocation + '/v2.0/apps/orcids/validate';
+const {VITE_APP_API_ENDPOINT, VITE_APP_ORCID_BASE, VITE_APP_ORCID_REDIRECT_URI, VITE_APP_ORCID_CLIENT_ID } = import.meta.env
+
+// const apiLocation = VITE_APP_API_ENDPOINT || 'https://api.neotomadb.org';
+const baseUrl = `${VITE_APP_ORCID_BASE}/oauth/authorize?response_type=token&redirect_uri=${VITE_APP_ORCID_REDIRECT_URI}&client_id=${VITE_APP_ORCID_CLIENT_ID}&scope=openid`
+// const userValidation = apiLocation + '/v2.0/apps/orcids/validate';
 
 const user = ref(null);
 const isValidating = ref(false);

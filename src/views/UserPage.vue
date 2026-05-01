@@ -3,6 +3,7 @@ import { onMounted, ref, defineAsyncComponent } from 'vue'
 import Panel from 'primevue/panel'
 import Card from 'primevue/card'
 import { useRoute, useRouter } from 'vue-router'
+import VueCookies from 'vue-cookies'
 
 
 const ContactDetails = defineAsyncComponent(() =>
@@ -29,11 +30,12 @@ onMounted(async () => {
   await router.isReady()
   contactinfo.value = route.params.contactid;
   if (!contactinfo.value) {
-    const userValidation = localStorage.getItem("orcid_user");
+    // const userValidation = localStorage.getItem("orcid_user");
+    const userValidation = VueCookies.get("orcid_user");
     if (userValidation) {
-      const response = await fetch(neotomaapi + `/v2.0/apps/landing/orcids/orcid?{userOrcid}`, {
-        method: 'GET',
-      }
+      const response = await fetch(
+        `${neotomaapi}/v2.0/apps/landing/orcids/orcid?orcid=${userOrcid}`,
+        { method: 'GET' },
       )
       if (!response.ok) {
         loading.value = false
@@ -54,7 +56,7 @@ onMounted(async () => {
     <ContactDatasets :title="contactinfo" />
     <ContactPublications :title="contactinfo" />
   </div>
-  <div else>
+  <div v-else>
     <Panel>
       <template #header>
         <h1>Neotoma Contacts</h1>
