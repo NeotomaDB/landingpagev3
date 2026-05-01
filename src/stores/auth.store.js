@@ -19,51 +19,16 @@
 import { reactive, toRefs, computed } from "vue";
 import VueCookies from 'vue-cookies'
 
+const apiLocation = import.meta.env.VITE_APP_API_ENDPOINT || 'https://api.neotomadb.org';
+const userValidation = `${apiLocation}/v2.0/apps/orcids/validate`;
+
 const state = reactive({
     access_token: null,
     user: null,
     error: null,
-    consent: null
+    consent: null,
+    isValidating: false
 });
-
-// Validate user with backend
-async function validateUser() {
-
-    if (!hasValidTokens.value) {
-        return;
-    }
-    
-    isValidating.value = true;
-    
-    try {
-        const response = await fetch(userValidation, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ 
-                token: access_token.value.access_token 
-            })
-        });
-
-        if (response.status !== 200) {
-            console.log('Token validation failed, logging out');
-            logoutTokens();
-            return;
-        }
-
-        const userData = await response.json();
-        userData['data']['user']['expires_at'] = access_token.value.expires_at;
-        VueCookies.set('orcid_user', userData);
-        VueCookies.remove('orcid_token');
-        user.value = userData;
-        
-    } catch (error) {
-        logoutTokens();
-    } finally {
-        isValidating.value = false;
-    }
-}
 
 export default function useTokens() {
     
@@ -102,6 +67,47 @@ export default function useTokens() {
         VueCookies.remove('orcid_token');
         VueCookies.remove('orcid_user');
     };
+
+    // Validate user with backend
+    async function validateUser() {
+
+        if (!hasValidTokens.value) {
+            return;
+        }
+        
+        state.isValidating = true; // doesn't exist
+        
+        try {
+            const response = await fetch(userValidation, { //userValidation is not in the scope
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ 
+                    token: state.access_token.access_token 
+                })
+            });
+
+            if (response.status !== 200) {
+                console.log('Token validation failed, logging out');
+                logoutTokens();
+                return;
+            }
+
+            const userData = await response.json();
+            userData['data']['user']['expires_at'] = state.access_token.expires_at;
+            VueCookies.set('orcid_user', userData);
+            VueCookies.remove('orcid_token');
+            state.user = userData;
+            console.log('✅ User validated and stored:', state.user);
+            
+        } catch (error) {
+            console.error('❌ validateUser error:', error);
+            logoutTokens();
+        } finally {
+            state.isValidating = false;
+        }
+    }
 
     const hasValidTokens = computed(() => {
         console.log(state)

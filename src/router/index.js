@@ -124,7 +124,7 @@ function removeORCIDHash(to) {
         // Store the token object
         let hash_object = JSON.stringify(hash_return);
         VueCookies.set("orcid_token", hash_object)
-        VueCookies.set('orcid_bearer_token', hash_object);
+        // VueCookies.set('orcid_bearer_token', hash_object);
         
         console.log('✅ ORCID tokens stored successfully');
         console.log('📦 Stored data:', hash_object);
