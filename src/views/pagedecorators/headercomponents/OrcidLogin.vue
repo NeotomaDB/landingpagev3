@@ -47,7 +47,23 @@ function handleLogin() {
     window.location.href = baseUrl;
 }
 
-function handleLogout() {
+async function handleLogout() {
+    try {
+        // Read the session UUID from the cookie *before* we wipe it
+        const orcidUser = VueCookies.get('orcid_user');
+        const sessionuuid = orcidUser?.data?.neotoken?.sessionuuid;
+
+        if (sessionuuid) {
+            await fetch(`${VITE_APP_API_ENDPOINT}/v2.0/apps/logout`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${sessionuuid}` }
+            });
+        }
+    } catch (err) {
+        // If the API call fails, still clear local state.
+        // Otherwise the user is stuck "logged in" on the frontend.
+        console.error('API logout failed, clearing local state anyway:', err);
+    }
     logoutTokens();
     user.value = null;
 }
