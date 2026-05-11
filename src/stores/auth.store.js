@@ -74,8 +74,15 @@ export default function useTokens() {
         if (!hasValidTokens.value) {
             return;
         }
-        
-        state.isValidating = true; // doesn't exist
+
+        // Guard against re-entry: if a validation request is already in flight,
+        // don't start a second one (otherwise we create duplicate sessions
+        // in ap.orcidlogins).
+        if (state.isValidating) {
+            return;
+        }
+
+        state.isValidating = true;
         
         try {
             const response = await fetch(userValidation, { //userValidation is not in the scope

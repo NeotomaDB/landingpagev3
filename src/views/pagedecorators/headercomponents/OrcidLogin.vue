@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import Button from 'primevue/button';
 import useTokens from '@/stores/auth.store.js';
 import { useRoute } from 'vue-router';
@@ -36,12 +36,6 @@ watch(() => route.fullPath, (newPath) => {
         });
 }, { immediate: true });
 
-
-// Initialize on mount
-onMounted(async () => {
-    // Load tokens from localStorage
-    await fetchTokens();
-});
 
 function handleLogin() {
     window.location.href = baseUrl;
