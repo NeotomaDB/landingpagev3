@@ -30,6 +30,7 @@ coverage
 test-results/
 playwright-report/
 
+.env.development
 .env
 .vscode/
 *.vsidx
