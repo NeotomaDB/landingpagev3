@@ -1,4 +1,4 @@
-'use-strict';
+'use-strict'
 
 /* We want to be able to provide support to log in, and return to the same session. */
 /* We have state variables across all components that help us do that:
@@ -16,11 +16,11 @@
 
   */
 
-import { reactive, toRefs, computed } from "vue";
+import { reactive, toRefs, computed } from 'vue'
 import VueCookies from 'vue-cookies'
 
-const apiLocation = import.meta.env.VITE_APP_API_ENDPOINT || 'https://api.neotomadb.org';
-const userValidation = `${apiLocation}/v2.0/apps/orcids/validate`;
+const apiLocation = import.meta.env.VITE_APP_API_ENDPOINT || 'https://api.neotomadb.org'
+const userValidation = `${apiLocation}/v2.0/apps/orcids/validate`
 
 const state = reactive({
     access_token: null,
@@ -28,124 +28,122 @@ const state = reactive({
     error: null,
     consent: null,
     isValidating: false
-});
+})
 
 export default function useTokens() {
-    
     const fetchTokens = async () => {
         try {
             // Passed from ORCID
-            const storedTokens = VueCookies.get("orcid_token");
+            const storedTokens = VueCookies.get('orcid_token')
             // Passed from Neotoma
-            const userValidation = VueCookies.get("orcid_user");
-            
+            const userValidation = VueCookies.get('orcid_user')
+
             if (storedTokens) {
-                state.access_token = storedTokens;
+                state.access_token = storedTokens
                 let nothing = await validateUser()
             } else {
-                state.access_token = null;
+                state.access_token = null
             }
 
             if (userValidation) {
-                state.user = userValidation;
+                state.user = userValidation
                 state.user = state.user['data']
             } else {
-                state.user = null;
+                state.user = null
             }
         } catch (error) {
-            console.error('Error parsing stored tokens:', error);
-            state.access_token = null;
-            state.user = null;
-            VueCookies.remove('neotoma_orcid');
+            console.error('Error parsing stored tokens:', error)
+            state.access_token = null
+            state.user = null
+            VueCookies.remove('neotoma_orcid')
         }
-    };
+    }
 
     const logoutTokens = () => {
-        state.access_token = null;
-        state.user = null;
-        state.error = null;
-        VueCookies.remove('orcid_token');
-        VueCookies.remove('orcid_user');
-    };
+        state.access_token = null
+        state.user = null
+        state.error = null
+        VueCookies.remove('orcid_token')
+        VueCookies.remove('orcid_user')
+    }
 
     // Validate user with backend
     async function validateUser() {
-
         if (!hasValidTokens.value) {
-            return;
+            return
         }
 
         // Guard against re-entry: if a validation request is already in flight,
         // don't start a second one (otherwise we create duplicate sessions
         // in ap.orcidlogins).
         if (state.isValidating) {
-            return;
+            return
         }
 
-        state.isValidating = true;
-        
+        state.isValidating = true
+
         try {
-            const response = await fetch(userValidation, { //userValidation is not in the scope
-                method: "POST",
+            const response = await fetch(userValidation, {
+                //userValidation is not in the scope
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ 
-                    token: state.access_token.access_token 
+                body: JSON.stringify({
+                    token: state.access_token.access_token
                 })
-            });
+            })
 
             if (response.status !== 200) {
-                console.log('Token validation failed, logging out');
-                logoutTokens();
-                return;
+                console.log('Token validation failed, logging out')
+                logoutTokens()
+                return
             }
 
-            const userData = await response.json();
-            userData['data']['user']['expires_at'] = state.access_token.expires_at;
-            VueCookies.set('orcid_user', userData);
-            VueCookies.remove('orcid_token');
-            state.user = userData;
-            console.log('✅ User validated and stored:', state.user);
-            
+            const userData = await response.json()
+            userData['data']['user']['expires_at'] = state.access_token.expires_at
+            VueCookies.set('orcid_user', userData)
+            VueCookies.remove('orcid_token')
+            state.user = userData
+            console.log('✅ User validated and stored:', state.user)
         } catch (error) {
-            console.error('❌ validateUser error:', error);
-            logoutTokens();
+            console.error('❌ validateUser error:', error)
+            logoutTokens()
         } finally {
-            state.isValidating = false;
+            state.isValidating = false
         }
     }
 
     const hasValidTokens = computed(() => {
         console.log(state)
         if (state.access_token == null && state.user == null) {
-            return false;
+            return false
         }
-        
+
         // Check if token has required properties
         // if (!state.access_token.access_token) return false;
-        
+
         // Check if token is expired
         if (state.user) {
             // This should post back to the API to check.
-            if (state.user.expires_at){
+            if (state.user.expires_at) {
                 console.log('testing time.')
-                const isExpired = Date.now() >= state.access_token.expires_at;
+                const isExpired = Date.now() >= state.access_token.expires_at
                 if (isExpired) {
-                    console.log('Token has expired');
+                    console.log('Token has expired')
                     logoutTokens()
-                    return false;
+                    return false
                 }
             }
         }
-        
-        return true;
-    });
+
+        return true
+    })
 
     return {
         ...toRefs(state),
         fetchTokens,
         logoutTokens,
         hasValidTokens
-    };
+    }
 }

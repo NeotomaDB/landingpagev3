@@ -1,66 +1,65 @@
 <script setup>
-
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import Panel from 'primevue/panel'
-import Chart from 'chart.js/auto';
-import zoomPlugin from 'chartjs-plugin-zoom';
-import ProgressSpinner from 'primevue/progressspinner';
+import Chart from 'chart.js/auto'
+import zoomPlugin from 'chartjs-plugin-zoom'
+import ProgressSpinner from 'primevue/progressspinner'
 
+Chart.register(zoomPlugin)
 
-Chart.register(zoomPlugin);
-
-const chartCanvas2 = ref(null);
-const cumulativeData = ref([]);
-const loading_this = ref(true);
-const route = useRoute();
-const datasetsDB = ref(null);
+const chartCanvas2 = ref(null)
+const cumulativeData = ref([])
+const loading_this = ref(true)
+const route = useRoute()
+const datasetsDB = ref(null)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
-Chart.defaults.font.size = 20;
+Chart.defaults.font.size = 20
 
 function downloadDBSets() {
-    return fetch(neotomaapi + "/v2.0/apps/constdb/datasetuploads?dbid=" + route.params.databaseid,
-        { method: "GET", headers: { 'content-type': 'application/json' } })
-        .then(sets => {
-            return sets.json();
+    return fetch(neotomaapi + '/v2.0/apps/constdb/datasetuploads?dbid=' + route.params.databaseid, {
+        method: 'GET',
+        headers: { 'content-type': 'application/json' }
+    })
+        .then((sets) => {
+            return sets.json()
         })
-        .then(setjson => {
-            datasetsDB.value = setjson.data;
+        .then((setjson) => {
+            datasetsDB.value = setjson.data
         })
-        .catch(err => {
+        .catch((err) => {
             console.log(err)
         })
 }
 
-
 onMounted(async () => {
-    await downloadDBSets();
+    await downloadDBSets()
 
-    cumulativeData.value = [];
-    let cumulativeValue = 0;
+    cumulativeData.value = []
+    let cumulativeValue = 0
     Object.entries(datasetsDB.value).forEach(([index, obj]) => {
-        cumulativeValue += Number(obj.count);
+        cumulativeValue += Number(obj.count)
         var month = obj.month
-        cumulativeData.value.push({ month, count: cumulativeValue });
-
-    });
+        cumulativeData.value.push({ month, count: cumulativeValue })
+    })
     const chartData = cumulativeData.value.map(({ count, month }) => ({
-        x: new Date(month).getFullYear() + (new Date(month).getMonth()) / 12,
+        x: new Date(month).getFullYear() + new Date(month).getMonth() / 12,
         y: count
-    }));
-
+    }))
 
     const myChart2 = new Chart(chartCanvas2.value, {
         type: 'scatter',
         data: {
-            datasets: [{
-                data: chartData,
-                borderColor: 'darkblue',
-                showLine: true,
-                borderWidth: 1,
-                fill: false,
-                pointRadius: 1
-            }]
+            datasets: [
+                {
+                    data: chartData,
+                    borderColor: 'darkblue',
+                    showLine: true,
+                    borderWidth: 1,
+                    fill: false,
+                    pointRadius: 1
+                }
+            ]
         },
         options: {
             responsive: true,
@@ -68,15 +67,15 @@ onMounted(async () => {
                 x: {
                     ticks: {
                         font: {
-                            size: 20,
+                            size: 20
                         },
                         callback: function (value) {
-                            var year = Math.floor(value);
-                            var decimal = value - Math.floor(value);
+                            var year = Math.floor(value)
+                            var decimal = value - Math.floor(value)
                             var month = Math.floor(decimal * 12) + 1
                             var day = Math.round((decimal * 12 - Math.floor(decimal * 12)) * 30) + 1
-                            return "" + month + "/" + day + "/" + year
-                        },
+                            return '' + month + '/' + day + '/' + year
+                        }
                     },
                     title: {
                         display: true,
@@ -98,15 +97,13 @@ onMounted(async () => {
             plugins: {
                 legend: {
                     display: false
-                },
+                }
             }
         }
-
     })
-});
+})
 
 loading_this.value = false
-
 </script>
 
 <template>
