@@ -19,6 +19,8 @@ import Stroke from 'ol/style/Stroke'
 import Circle from 'ol/style/Circle'
 import Fill from 'ol/style/Fill'
 import Text from 'ol/style/Text'
+import { authedFetch } from '@/functions/apicalls'
+
 const route = useRoute()
 const datasets = ref([])
 const dataindexer = ref([])
@@ -40,10 +42,9 @@ const vectorSource = new VectorSource()
 
 const visible = ref(false)
 const constDBinfo = ref(null)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 function loadconstDB() {
-    return fetch(neotomaapi + '/v2.0/apps/constdb/datasets?dbid=' + route.params.databaseid, {
+    return authedFetch('/v2.0/apps/constdb/datasets?dbid=' + route.params.databaseid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
@@ -263,7 +264,7 @@ onMounted(async () => {
                 var stringIDs = uniqueids.value.join(',')
                 visible.value = true
                 console.log(stringIDs)
-                var sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' + stringIDs + '/datasets?limit=2000')
+                var sets = authedFetch('/v2.0/data/sites/' + stringIDs + '/datasets?limit=2000')
                     .then((res) => {
                         var inter = res.json()
                         console.log(inter)
