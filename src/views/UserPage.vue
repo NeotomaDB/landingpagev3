@@ -27,19 +27,28 @@ onMounted(async () => {
     await router.isReady()
     contactinfo.value = route.params.contactid
     if (!contactinfo.value) {
-        // const userValidation = localStorage.getItem("orcid_user");
         const userValidation = VueCookies.get('orcid_user')
         if (userValidation) {
-            const response = await fetch(`${neotomaapi}/v2.0/apps/landing/orcids/orcid?orcid=${userOrcid}`, {
-                method: 'GET'
-            })
+            const userOrcid = userValidation?.data?.user?.sub
+            if (!userOrcid) {
+            console.warn('orcid_user cookie present but has no ORCID identifier')
+            loading.value = false
+            return
+        }
+        try {
+            const response = await authedFetch(
+                `/v2.0/apps/landing/orcids/orcid?orcid=${userOrcid}`,
+                { method: 'GET' }
+            )
             if (!response.ok) {
-                loading.value = false
-                console.log('Issue with the API call.')
                 throw new Error(`Response status: ${response.status}`)
             }
             const json = await response.json()
-            contactinfo.value = json['data']
+            contactinfo.value = json.data
+        } catch (err) {
+            console.error('Failed to look up user by ORCID:', err)
+            loading.value = false
+            }
         }
     }
 })

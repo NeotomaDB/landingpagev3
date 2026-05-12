@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useRouter } from 'vue-router'
+import { authedFetch } from '@/functions/apicalls'
 
 const router = useRouter()
-
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
 const props = defineProps(['title'])
 const publications = ref({})
@@ -12,8 +12,7 @@ const loading = ref(true)
 const error = ref(null)
 
 async function get_contactpubs(contactid) {
-    console.log(neotomaapi + `/v2.0/data/contacts/` + contactid + `/publications`)
-    await fetch(neotomaapi + `/v2.0/data/contacts/` + contactid + `/publications`, {
+    await authedFetch(`/v2.0/data/contacts/${contactid}/publications`, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

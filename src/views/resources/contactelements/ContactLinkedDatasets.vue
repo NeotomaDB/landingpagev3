@@ -4,7 +4,7 @@ import Panel from 'primevue/panel'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useRouter } from 'vue-router'
-
+import { authedFetch } from '@/functions/apicalls'
 const router = useRouter()
 
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
@@ -30,7 +30,7 @@ async function groupRoles(datasets) {
 }
 
 async function get_contactdatasets(contactid) {
-    await fetch(neotomaapi + `/v2.0/apps/contacts/` + contactid + `/datasets`, {
+    await authedFetch(`/v2.0/apps/contacts/${contactid}/datasets`, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
