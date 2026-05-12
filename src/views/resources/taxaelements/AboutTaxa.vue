@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner'
 import Panel from 'primevue/panel'
+import { authedFetch } from '@/functions/apicalls'
 const route = useRoute()
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const taxon = ref(null)
@@ -21,7 +22,7 @@ const link = ref(null)
 const externals = ref(null)
 
 function loadAbout() {
-    return fetch(neotomaapi + '/v2.0/data/taxa/' + route.params.taxonid, {
+    return authedFetch('/v2.0/data/taxa/' + route.params.taxonid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
@@ -39,7 +40,7 @@ function loadAbout() {
             return high1.value
         })
         .then((high) => {
-            return fetch(neotomaapi + '/v2.0/data/taxa/' + high, {
+            return authedFetch('/v2.0/data/taxa/' + high, {
                 method: 'GET',
                 headers: { 'content-type': 'application/json' }
             })
@@ -57,7 +58,7 @@ function loadAbout() {
 }
 
 function loadEcol() {
-    return fetch(neotomaapi + '/v2.0/data/dbtables/ecolgrouptypes?count=false&limit=9999', {
+    return authedFetch('/v2.0/data/dbtables/ecolgrouptypes?count=false&limit=9999', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
@@ -72,7 +73,7 @@ function loadEcol() {
 }
 
 function loadExternal() {
-    return fetch(neotomaapi + '/v2.0/apps/exttax?taxonid=' + route.params.taxonid, {
+    return authedFetch('/v2.0/apps/exttax?taxonid=' + route.params.taxonid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
