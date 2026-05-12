@@ -5,6 +5,7 @@ import Panel from 'primevue/panel'
 import Chart from 'chart.js/auto'
 import zoomPlugin from 'chartjs-plugin-zoom'
 import ProgressSpinner from 'primevue/progressspinner'
+import { authedFetch } from '@/functions/apicalls'
 
 Chart.register(zoomPlugin)
 
@@ -17,7 +18,7 @@ const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotoma
 Chart.defaults.font.size = 20
 
 function downloadDBSets() {
-    return fetch(neotomaapi + '/v2.0/apps/constdb/datasetuploads?dbid=' + route.params.databaseid, {
+    return authedFetch('/v2.0/apps/constdb/datasetuploads?dbid=' + route.params.databaseid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

@@ -6,6 +6,7 @@ import textobj from '@/views/resources/databaseelements/dbdescrips.json'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner'
+import { authedFetch } from '@/functions/apicalls'
 
 const contact = ref(null)
 const email = ref(null)
@@ -26,7 +27,7 @@ const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotoma
 uniqueSites.value = new Set()
 
 function loadConstDB() {
-    return fetch(neotomaapi + '/v2.0/apps/constdb?dbid=' + route.params.databaseid, {
+    return authedFetch('/v2.0/apps/constdb?dbid=' + route.params.databaseid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

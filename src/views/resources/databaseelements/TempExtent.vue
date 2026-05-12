@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import Chart from 'chart.js/auto'
 import zoomPlugin from 'chartjs-plugin-zoom'
 import ProgressSpinner from 'primevue/progressspinner'
+import { authedFetch } from '@/functions/apicalls'
 
 Chart.register(zoomPlugin)
 
@@ -75,7 +76,7 @@ function addCommasToNumber(number) {
 }
 
 function loadDBages() {
-    return fetch(neotomaapi + '/v2.0/apps/constdb/datasetages?dbid=' + route.params.databaseid, {
+    return authedFetch('/v2.0/apps/constdb/datasetages?dbid=' + route.params.databaseid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
