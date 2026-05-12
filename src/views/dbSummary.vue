@@ -9,7 +9,7 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Slider from 'primevue/slider'
 import ProgressSpinner from 'primevue/progressspinner'
-
+import { authedFetch } from '@/functions/apicalls'
 import Badge from 'primevue/badge'
 
 const slide = ref([1950 - new Date().getFullYear(), 50000000])
@@ -869,7 +869,7 @@ const geo_code = [
 ]
 
 function loadDatabases() {
-    return fetch(neotomaapi + '/v2.0/apps/constdb/', { method: 'GET', headers: { 'content-type': 'application/json' } })
+    return authedFetch('/v2.0/apps/constdb/', { method: 'GET', headers: { 'content-type': 'application/json' } })
         .then((res1) => {
             return res1.json()
         })

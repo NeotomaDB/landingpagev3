@@ -3,13 +3,14 @@ import { ref } from 'vue'
 import Badge from 'primevue/badge'
 import Card from 'primevue/card'
 import ProgressSpinner from 'primevue/progressspinner'
+import { authedFetch } from '@/functions/apicalls'
 const rawstats = ref(null)
 const loaderror = ref(null)
 const today = new Date().toLocaleString()
 
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
-fetch(neotomaapi + '/v2.0/data/summary/rawbymonth?end=999999', {
+authedFetch('/v2.0/data/summary/rawbymonth?end=999999', {
     method: 'GET',
     headers: {
         'Content-Type': 'application/json',

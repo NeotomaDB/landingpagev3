@@ -4,6 +4,7 @@ import Button from 'primevue/button'
 import useTokens from '@/stores/auth.store.js'
 import { useRoute } from 'vue-router'
 import VueCookies from 'vue-cookies'
+import { authedFetch } from '@/functions/apicalls'
 
 const route = useRoute()
 

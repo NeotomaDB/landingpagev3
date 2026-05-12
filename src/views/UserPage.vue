@@ -4,6 +4,7 @@ import Panel from 'primevue/panel'
 import Card from 'primevue/card'
 import { useRoute, useRouter } from 'vue-router'
 import VueCookies from 'vue-cookies'
+import { authedFetch } from '@/functions/apicalls'
 
 const ContactDetails = defineAsyncComponent(() => import('@/views/resources/contactelements/ContactDetails.vue'))
 
