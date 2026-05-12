@@ -6,6 +6,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 import InputText from 'primevue/inputtext'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import { authedFetch } from '@/functions/apicalls'
 
 const loading_some = ref(true)
 const globalFilter = ref('')
@@ -16,10 +17,9 @@ const currentDB = ref(null)
 const route = useRoute()
 const pis = ref(null)
 const pis_array1 = ref(null)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 function loadDatabase() {
-    return fetch(neotomaapi + '/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0', {
+    return authedFetch('/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
@@ -36,7 +36,7 @@ function loadDatabase() {
             return databasename.value
         })
         .then((val) =>
-            fetch('https://api.neotomadb.org/v2.0/data/datasets/db?limit=10000&offset=0&database=' + val, {
+            authedFetch('/v2.0/data/datasets/db?limit=10000&offset=0&database=' + val, {
                 method: 'GET',
                 headers: { 'content-type': 'application/json' }
             })
