@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Panel from 'primevue/panel'
 import Card from 'primevue/card'
 import ProgressSpinner from 'primevue/progressspinner'
+import { authedFetch } from '@/functions/apicalls'
 
 const SiteDetails = defineAsyncComponent({
     loader: () => import('@/views/pages/datasetelements/SiteDetails.vue'),
@@ -36,7 +37,7 @@ const error = ref(null)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 async function loadDataset() {
-    return fetch(neotomaapi + '/v2.0/data/datasets/' + route.params.datasetid, {
+    return authedFetch('/v2.0/data/datasets/' + route.params.datasetid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

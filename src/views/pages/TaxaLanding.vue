@@ -3,6 +3,7 @@ import TaxaMap from '@/views/resources/taxaelements/TaxaMap.vue'
 import AboutTaxa from '@/views/resources/taxaelements/AboutTaxa.vue'
 import TaxaTree from '@/views/resources/taxaelements/TaxaTree.vue'
 import { useRoute } from 'vue-router'
+import { authedFetch } from '@/functions/apicalls'
 const route = useRoute()
 </script>
 
@@ -24,7 +25,7 @@ export default {
     },
     computed: {
         taxondata() {
-            fetch('https://api.neotomadb.org/v2.0/data/taxa/' + this.$route.params.taxonid, {
+            authedFetch('/v2.0/data/taxa/' + this.$route.params.taxonid, {
                 method: 'GET',
                 headers: {}
             })
@@ -41,7 +42,7 @@ export default {
                 })
         },
         sitenum() {
-            fetch('https://api.neotomadb.org/v2.0/data/sites?limit=999999&taxonid=' + this.$route.params.taxonid, {
+            authedFetch('/v2.0/data/sites?limit=999999&taxonid=' + this.$route.params.taxonid, {
                 method: 'GET',
                 headers: {}
             })

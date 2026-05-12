@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Panel from 'primevue/panel'
 import Chip from 'primevue/chip'
-
+import { authedFetch } from '@/functions/apicalls'
 const route = useRoute()
 
 const datasetinfo = ref(null)
@@ -14,7 +14,7 @@ const visible = ref(false)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 function callTaxa() {
-    return fetch(neotomaapi + '/v2.0/data/datasets/' + route.params.datasetid + '/taxa', {
+    return authedFetch('/v2.0/data/datasets/' + route.params.datasetid + '/taxa', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

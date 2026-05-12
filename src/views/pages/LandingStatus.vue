@@ -3,6 +3,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 import { ref, onMounted } from 'vue'
 import Card from 'primevue/card'
 import Badge from 'primevue/badge'
+import { authedFetch } from '@/functions/apicalls'
 
 const refs = ref({})
 
@@ -13,7 +14,7 @@ const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotoma
 const tiliaapi = import.meta.env.VITE_APP_TILIA_ENDPOINT ?? 'https://tilia.neotomadb.org'
 
 const loadStatus = new Promise(() => {
-    fetch(apidev + '/api-docs/', {
+    authedFetch('/api-docs/', {
         method: 'HEAD',
         mode: 'no-cors',
         signal: controller.signal
@@ -34,7 +35,7 @@ const loadStatus = new Promise(() => {
             console.log(err)
         })
 
-    fetch(neotomaapi + '/api-docs/', {
+    authedFetch('/api-docs/', {
         method: 'HEAD',
         signal: controller.signal
     })

@@ -20,6 +20,7 @@ import Fill from 'ol/style/Fill'
 import Text from 'ol/style/Text'
 import Overlay from 'ol/Overlay'
 import { transformExtent } from 'ol/proj'
+import { authedFetch } from '@/functions/apicalls'
 
 let props = defineProps(['location'])
 var location = JSON.parse(props.location)
@@ -305,7 +306,7 @@ const mapContent = async function () {
         params = new URLSearchParams({ lat: location.coordinates.flat()[1], long: location.coordinates.flat()[0] })
     }
     // console.log(neotomaapi + `/v2.0/apps/nativelands?${params}`)
-    const waiting = await fetch(neotomaapi + `/v2.0/apps/nativelands?${params}`)
+    const waiting = await authedFetch(`/v2.0/apps/nativelands?${params}`)
     const output = await waiting.json()
     loadingnat.value = false
     return output

@@ -9,7 +9,7 @@ const error = ref(null)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 function load_contact() {
-    return fetch(neotomaapi + '/v2.0/apps/orcids?contactid=' + props.contactid, {
+    return authedFetch('/v2.0/apps/orcids?contactid=' + props.contactid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

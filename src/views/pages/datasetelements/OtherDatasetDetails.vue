@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import Panel from 'primevue/panel'
 import Card from 'primevue/card'
 import ProgressSpinner from 'primevue/progressspinner'
+import { authedFetch } from '@/functions/apicalls'
 const props = defineProps(['siteid', 'datasetid'])
 let otherDatasets = ref(null)
 let loading = ref(true)
@@ -10,7 +11,7 @@ const error = ref(null)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 async function loadOtherDatasets() {
-    fetch(neotomaapi + '/v2.0/data/sites/' + props.siteid + '/datasets', {
+    authedFetch('/v2.0/data/sites/' + props.siteid + '/datasets', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

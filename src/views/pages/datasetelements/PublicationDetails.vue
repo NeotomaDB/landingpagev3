@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import Panel from 'primevue/panel'
 import ProgressSpinner from 'primevue/progressspinner'
+import { authedFetch } from '@/functions/apicalls'
 const props = defineProps(['datasetid'])
 let publication = ref(null)
 let loading = ref(true)
@@ -9,7 +10,7 @@ const error = ref(null)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 function loadPublication() {
-    return fetch(neotomaapi + '/v2.0/data/datasets/' + props.datasetid + '/publications', {
+    return authedFetch('/v2.0/data/datasets/' + props.datasetid + '/publications', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

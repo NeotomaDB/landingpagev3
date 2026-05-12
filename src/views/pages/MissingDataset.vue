@@ -10,6 +10,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
+import { authedFetch } from '@/functions/apicalls'
 
 const route = useRoute()
 const router = useRouter()
@@ -25,7 +26,7 @@ const dataciteapi = import.meta.env.VITE_APP_DOI_ENDPOINT ?? 'https://api.dataci
 async function getDatasetDOI() {
     datasetid.value = route.params.datasetid
     if (datasetid.value) {
-        const response = await fetch(neotomaapi + '/v2.0/data/datasets/' + datasetid.value + '/doi', {
+        const response = await authedFetch('/v2.0/data/datasets/' + datasetid.value + '/doi', {
             method: 'GET'
         })
         if (!response.ok) {

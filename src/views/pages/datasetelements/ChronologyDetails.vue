@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import Panel from 'primevue/panel'
+import { authedFetch } from '@/functions/apicalls'
 const props = defineProps(['datasetid'])
 let chronology = ref(null)
 let loading = ref(true)
@@ -9,7 +10,7 @@ const error = ref(null)
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 function loadChronology() {
-    return fetch(neotomaapi + '/v2.0/data/datasets/' + props.datasetid + '/chronologies', {
+    return authedFetch('/v2.0/data/datasets/' + props.datasetid + '/chronologies', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })

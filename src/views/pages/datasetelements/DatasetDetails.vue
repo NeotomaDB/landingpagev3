@@ -10,6 +10,7 @@ import TaxaDetails from '@/views/pages/datasetelements/TaxaLoad.vue'
 import PublicationsDetails from '@/views/pages/datasetelements/PublicationDetails.vue'
 import OtherDetails from '@/views/pages/datasetelements/OtherDatasetDetails.vue'
 import { ref, onMounted, watch } from 'vue'
+import { authedFetch } from '@/functions/apicalls'
 
 const citation = ref(null)
 const styles = ref(['apa', 'bibtex', 'ieee', 'vancouver'])
@@ -22,7 +23,7 @@ let dstype =
 const calljson = () => {
     let datasetid = props.title.site.datasets[0].datasetid
     let url = 'https://api.neotomadb.org/v2.0/data/downloads/' + datasetid
-    fetch(url, {
+    authedFetch(`v2.0/data/downloads/${datasetid}`, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
