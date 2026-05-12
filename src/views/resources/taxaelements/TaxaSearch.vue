@@ -5,6 +5,7 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import ProgressSpinner from 'primevue/progressspinner'
+import { authedFetch } from '@/functions/apicalls'
 
 const globalFilter = ref('')
 const filtered = ref(null)
@@ -21,7 +22,7 @@ async function findTaxa(taxonval) {
         console.log(pattern)
         ready.value = false
         processing.value = true
-        const res1 = await fetch(neotomaapi + '/v2.0/data/dbtables?table=taxa&count=false&limit=60000', {
+        const res1 = await authedFetch('/v2.0/data/dbtables?table=taxa&count=false&limit=60000', {
             method: 'GET',
             headers: { 'content-type': 'application/json' }
         })

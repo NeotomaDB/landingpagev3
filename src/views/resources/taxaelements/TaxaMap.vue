@@ -20,6 +20,7 @@ import Circle from 'ol/style/Circle'
 import Fill from 'ol/style/Fill'
 import Text from 'ol/style/Text'
 import Panel from 'primevue/panel'
+import { authedFetch } from '@/functions/apicalls'
 const route = useRoute()
 const datasets = ref([])
 const dataindexer = ref([])
@@ -49,7 +50,7 @@ const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotoma
 function loadtaxon() {
     //https://api.neotomadb.org/v2.0/data/sites?taxa=Betulaceae
     //v2.0/data/taxa/12... gives relationship between taxonid and taxonname
-    return fetch(neotomaapi + '/v2.0/data/taxa/' + route.params.taxonid, {
+    return authedFetch('/v2.0/data/taxa/' + route.params.taxonid, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
@@ -61,7 +62,7 @@ function loadtaxon() {
             return (name.value = firstreturn.value[0].taxonname)
         })
         .then((name) => {
-            return fetch(neotomaapi + '/v2.0/data/sites?taxa=' + name + '&limit=999999', {
+            return authedFetch('/v2.0/data/sites?taxa=' + name + '&limit=999999', {
                 method: 'GET',
                 headers: { 'content-type': 'application/json' }
             })
@@ -283,7 +284,7 @@ onMounted(async () => {
                 var stringIDs = uniqueids.value.join(',')
                 visible.value = true
                 console.log(stringIDs)
-                let sets = fetch('https://api.neotomadb.org/v2.0/data/sites/' + stringIDs + '/datasets?limit=2000')
+                let sets = authedFetch('/v2.0/data/sites/' + stringIDs + '/datasets?limit=2000')
                     .then((res) => {
                         var inter = res.json()
                         //console.log(inter)

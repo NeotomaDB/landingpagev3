@@ -5,6 +5,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 import Panel from 'primevue/panel'
 import VueTree from '@ssthouse/vue3-tree-chart'
 import '@ssthouse/vue3-tree-chart/dist/vue3-tree-chart.css'
+import { authedFetch } from '@/functions/apicalls'
 const route = useRoute()
 const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const alltaxa = ref(null)
@@ -49,7 +50,7 @@ function sortTreeByChildrenCount(nodes) {
 }
 
 function loadTree() {
-    return fetch(neotomaapi + '/v2.0/data/dbtables/taxa?count=false&limit=999999&offset=0', {
+    return authedFetch('/v2.0/data/dbtables/taxa?count=false&limit=999999&offset=0', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
