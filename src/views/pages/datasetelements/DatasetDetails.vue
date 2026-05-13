@@ -20,43 +20,53 @@ const props = defineProps(['title'])
 let dstype =
     props.title.site.datasets[0].datasettype[0].toUpperCase() + props.title.site.datasets[0].datasettype.slice(1)
 
-const calljson = () => {
-    let datasetid = props.title.site.datasets[0].datasetid
-    let url = 'https://api.neotomadb.org/v2.0/data/downloads/' + datasetid
-    authedFetch(`v2.0/data/downloads/${datasetid}`, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res) => {
-            return res.json()
+const calljson = async () => {
+    const datasetid = props.title.site.datasets[0].datasetid
+
+    try {
+        const res = await authedFetch(`/v2.0/data/downloads/${datasetid}`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((data) => {
-            download(JSON.stringify(data.data), 'neotoma_dataset_' + datasetid + '.json', 'text/plain')
-        })
+
+        if (!res.ok) {
+            throw new Error(res.statusText)
+        }
+
+        const data = await res.json()
+        download(JSON.stringify(data.data), `neotoma_dataset_${datasetid}.json`, 'text/plain')
+    } catch (err) {
+        console.error(err)
+    }
 }
 
 async function getdatacitecitation(doi, style) {
-    let sty = style.value
-    if (!sty) {
-        sty = 'apa'
-    }
-    const citation_format = await fetch(`https://citation.doi.org/format?doi=${doi}&style=${sty}&lang=en-US`, {
-        method: 'GET'
-    })
-    if (citation_format.ok) {
-        citation.value = await citation_format.text()
-    } else {
+    try {
+        let sty = style.value
+        if (!sty) {
+            sty = 'apa'
+        }
+        const citation_format = await fetch(`https://citation.doi.org/format?doi=${doi}&style=${sty}&lang=en-US`, {
+            method: 'GET'
+        })
+        if (citation_format.ok) {
+            citation.value = await citation_format.text()
+        } else {
+            citation.value = 'No publication information available.'
+        }
+    } catch (err) {
         citation.value = 'No publication information available.'
+        console.error(err)
     }
 }
 
 watch(style, async () => {
-    getdatacitecitation(props.title.site.datasets[0].doi[0], style)
+    await getdatacitecitation(props.title.site.datasets[0].doi[0], style)
 })
 
 onMounted(async () => {
     style.value = 'apa'
-    getdatacitecitation(props.title.site.datasets[0].doi[0], style)
+    await getdatacitecitation(props.title.site.datasets[0].doi[0], style)
 })
 </script>
 
@@ -84,7 +94,7 @@ onMounted(async () => {
                     as="a"
                     label="View Data in Neotoma Explorer"
                     aria-label="View Data in Neotoma Explorer"
-                    :href="'https://apps.neotomadb.org/explorer/?datasetids=' + props.title.site.datasets[0].datasetid"
+                    :href="`https://apps.neotomadb.org/explorer/?datasetids=${props.title.site.datasets[0].datasetid}`"
                     target="_blank"
                     rel="noopener"
                     style="margin: 10px; text-decoration: none; width: 100%"

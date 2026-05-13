@@ -3,42 +3,40 @@ import { ref, onMounted } from 'vue'
 import Panel from 'primevue/panel'
 import ProgressSpinner from 'primevue/progressspinner'
 import { authedFetch } from '@/functions/apicalls'
+
 const props = defineProps(['datasetid'])
 let publication = ref(null)
 let loading = ref(true)
 const error = ref(null)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
-function loadPublication() {
-    return authedFetch('/v2.0/data/datasets/' + props.datasetid + '/publications', {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res) => {
-            if (!res.ok) {
-                const error = new Error(res.statusText)
-                error.json = res.json()
-                throw error
-            }
-            return res.json()
+async function loadPublication() {
+    try {
+        const res = await authedFetch(`/v2.0/data/datasets/${props.datasetid}/publications`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json) => {
-            publication.value = json.data
-            loading.value = false
-        })
-        .catch((err) => {
-            error.value = err
-            if (err.json) {
-                return err.json.then((json) => {
-                    // set the JSON response message
-                    error.value.message = json.message
-                })
-            }
-        })
+
+        if (!res.ok) {
+            const requestError = new Error(res.statusText)
+            requestError.json = res.json()
+            throw requestError
+        }
+
+        const json = await res.json()
+        publication.value = json.data
+    } catch (err) {
+        error.value = err
+        if (err.json) {
+            const json = await err.json
+            error.value.message = json.message
+        }
+    } finally {
+        loading.value = false
+    }
 }
 
-onMounted(() => {
-    loadPublication()
+onMounted(async () => {
+    await loadPublication()
 })
 </script>
 
@@ -54,7 +52,7 @@ onMounted(() => {
                         {{ pub.publication.citation }}<br />
                         <div v-if="pub.publication.doi">
                             <strong>DOI:</strong>
-                            <a :href="'https://doi.org/' + pub.publication.doi" target="_blank"
+                            <a :href="`https://doi.org/${pub.publication.doi}`" target="_blank"
                                 >https://doi.org/{{ pub.publication.doi }}</a
                             >
                         </div>

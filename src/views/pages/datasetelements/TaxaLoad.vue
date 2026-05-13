@@ -11,39 +11,35 @@ const loading = ref(true)
 const error = ref(null)
 const visible = ref(false)
 
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+async function callTaxa() {
+    try {
+        const res = await authedFetch(`/v2.0/data/datasets/${route.params.datasetid}/taxa`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
+        })
 
-function callTaxa() {
-    return authedFetch('/v2.0/data/datasets/' + route.params.datasetid + '/taxa', {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res) => {
-            if (!res.ok) {
-                const error = new Error(res.statusText)
-                error.json = { error: res.json(), datasetid: route.params.datasetid }
-                throw error
-            }
-            return res.json()
-        })
-        .then((json) => {
-            let taxon_list = json.data
-            taxon_list.sort((a, b) => (a.ecolgroup > b.ecolgroup ? 1 : b.ecolgroup > a.ecolgroup ? -1 : 0))
-            datasetinfo.value = taxon_list
-            loading.value = false
-        })
-        .catch((err) => {
-            error.value = err
-            if (err.json) {
-                return err.json.then((json) => {
-                    // set the JSON response message
-                    error.value.message = json.message
-                })
-            }
-        })
+        if (!res.ok) {
+            const requestError = new Error(res.statusText)
+            requestError.json = { error: res.json(), datasetid: route.params.datasetid }
+            throw requestError
+        }
+
+        const json = await res.json()
+        const taxon_list = json.data
+        taxon_list.sort((a, b) => (a.ecolgroup > b.ecolgroup ? 1 : b.ecolgroup > a.ecolgroup ? -1 : 0))
+        datasetinfo.value = taxon_list
+    } catch (err) {
+        error.value = err
+        if (err.json) {
+            const json = await err.json.error
+            error.value.message = json.message
+        }
+    } finally {
+        loading.value = false
+    }
 }
-onMounted(() => {
-    callTaxa()
+onMounted(async () => {
+    await callTaxa()
 })
 </script>
 

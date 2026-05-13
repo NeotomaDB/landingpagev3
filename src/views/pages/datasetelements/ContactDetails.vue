@@ -1,50 +1,43 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import Badge from 'primevue/badge'
+import { authedFetch } from '@/functions/apicalls'
+
 const props = defineProps(['contactid'])
 let orcid = ref(null)
 let loading = ref(true)
 const error = ref(null)
 
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+async function load_contact() {
+    try {
+        const res = await authedFetch(`/v2.0/apps/orcids?contactid=${props.contactid}`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
+        })
 
-function load_contact() {
-    return authedFetch('/v2.0/apps/orcids?contactid=' + props.contactid, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res) => {
-            if (!res.ok) {
-                const error = new Error(res.statusText)
-                error.json = res.json()
-                orcid.value = false
-                loading.value = false
-                throw error
-            }
-            return res.json()
-        })
-        .then((json) => {
-            if (json['data'][0]) {
-                orcid.value = json['data'][0]['identifier']
-                loading.value = false
-            } else {
-                loading.value = false
-                orcid.value = false
-            }
-        })
-        .catch((err) => {
-            error.value = err
-            if (err.json) {
-                return err.json.then((json) => {
-                    // set the JSON response message
-                    error.value.message = json.message
-                })
-            }
-        })
+        if (!res.ok) {
+            const requestError = new Error(res.statusText)
+            requestError.json = res.json()
+            orcid.value = false
+            throw requestError
+        }
+
+        const json = await res.json()
+        orcid.value = json.data[0] ? json.data[0].identifier : false
+    } catch (err) {
+        error.value = err
+        orcid.value = false
+        if (err.json) {
+            const json = await err.json
+            error.value.message = json.message
+        }
+    } finally {
+        loading.value = false
+    }
 }
 
-onMounted(() => {
-    load_contact()
+onMounted(async () => {
+    await load_contact()
 })
 </script>
 

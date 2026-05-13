@@ -8,35 +8,31 @@ const props = defineProps(['siteid', 'datasetid'])
 let otherDatasets = ref(null)
 let loading = ref(true)
 const error = ref(null)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 async function loadOtherDatasets() {
-    authedFetch('/v2.0/data/sites/' + props.siteid + '/datasets', {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res) => {
-            if (!res.ok) {
-                const error = new Error(res.statusText)
-                error.json = res.json()
-                throw error
-            }
-            return res.json()
+    try {
+        const res = await authedFetch(`/v2.0/data/sites/${props.siteid}/datasets`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json) => {
-            otherDatasets.value = json.data
-            loading.value = false
-        })
-        .catch((err) => {
-            error.value = err
-            loading.value = false
-            if (err.json) {
-                return err.json.then((json) => {
-                    // set the JSON response message
-                    error.value.message = json.message
-                })
-            }
-        })
+
+        if (!res.ok) {
+            const requestError = new Error(res.statusText)
+            requestError.json = res.json()
+            throw requestError
+        }
+
+        const json = await res.json()
+        otherDatasets.value = json.data
+    } catch (err) {
+        error.value = err
+        if (err.json) {
+            const json = await err.json
+            error.value.message = json.message
+        }
+    } finally {
+        loading.value = false
+    }
 }
 
 onMounted(async () => {
@@ -65,7 +61,7 @@ onMounted(async () => {
                                         <span v-if="dsets.datasetid == props.datasetid">(this dataset)</span><br />
                                         <div v-if="dsets.doi[0]">
                                             <strong>DOI:</strong>
-                                            <a :href="'https://doi.org/' + dsets.doi[0]">{{ dsets.doi[0] }}</a
+                                            <a :href="`https://doi.org/${dsets.doi[0]}`">{{ dsets.doi[0] }}</a
                                             ><br />
                                         </div>
                                         <div v-else><strong>DOI:</strong> None Minted.</div>

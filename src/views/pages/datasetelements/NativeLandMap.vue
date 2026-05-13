@@ -1,6 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watchEffect } from 'vue'
-import OSM from 'ol/source/OSM.js'
+import { ref, onMounted } from 'vue'
 import Panel from 'primevue/panel'
 import Dialog from 'primevue/dialog'
 import ProgressSpinner from 'primevue/progressspinner'
@@ -19,54 +18,50 @@ import Circle from 'ol/style/Circle'
 import Fill from 'ol/style/Fill'
 import Text from 'ol/style/Text'
 import Overlay from 'ol/Overlay'
-import { transformExtent } from 'ol/proj'
 import { authedFetch } from '@/functions/apicalls'
 
-let props = defineProps(['location'])
-var location = JSON.parse(props.location)
-delete location.crs
-const projection = ref('EPSG:4326')
-const zoom = ref(9)
-const rotation = ref(0)
+const props = defineProps(['location'])
+const parsedLocation = JSON.parse(props.location)
+const { crs: _crs, ...location } = parsedLocation
 const newlong = ref(0)
 const newlat = ref(0)
-const natland = ref(null)
-const map = ref(null)
 const hasFeatures = ref(null)
-var ids = ref([])
-var features = ref([])
-var info = ref([])
-var link = ref([])
-var visible = ref(false)
+const features = ref([])
+const info = ref([])
+const link = ref([])
+const visible = ref(false)
 const vectorSource2 = ref(null)
 const loadingnat = ref(true)
+let myMap2 = null
 
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
-
-const centerMap = async function (location) {
+function centerMap(location) {
     // Intention is to center the map around the data point for the site.
     if (Array.isArray(location.coordinates.flat()[0])) {
         return location.coordinates.flat()[0]
-    } else {
-        return location.coordinates
     }
+
+    return location.coordinates
 }
 
-const displayFeatureInfo = function (pixel, coordinate) {
+function displayFeatureInfo(pixel, vectorLayer2) {
+    if (!myMap2) {
+        return
+    }
+
     features.value = []
     info.value = []
-    ids.value = []
     link.value = []
-    myMap2.forEachFeatureAtPixel(pixel, function (feature, layer) {
+
+    myMap2.forEachFeatureAtPixel(pixel, (feature, layer) => {
         if (layer === vectorLayer2) {
             features.value.push(feature)
         }
     })
+
     if (features.value.length > 0) {
-        for (var i = 0, ii = features.value.length; i < ii; ++i) {
+        for (let i = 0; i < features.value.length; i += 1) {
             info.value.push(features.value[i].get('name'))
-            ids.value.push(features.value[i].get('slug'))
-            //link.value.push(("https://native-land.ca/maps/territories/" + features.value[i].get('slug')));
+            link.value.push(features.value[i].get('url'))
         }
     }
 }
@@ -76,17 +71,7 @@ if (Array.isArray(location.coordinates.flat()[0])) {
     newlong.value = (location.coordinates.flat()[1][0] + location.coordinates.flat()[0][0]) / 2
 }
 
-function getColor(source) {
-    var length = source.length
-    var color = null
-    var colorList = ['#D94120', '#92bb20', '#20BB82', '#484D5C']
-    for (var i = 0; i < length; i++) {
-        color = colorList[i]
-    }
-    return color
-}
-
-async function nativeland(mapOverlay) {
+function nativeland(mapOverlay) {
     // This is the main function to render the map.
     const vectorSource = new VectorSource()
     const vectorStyle = new Style({
@@ -110,13 +95,13 @@ async function nativeland(mapOverlay) {
     if (Array.isArray(location.coordinates.flat()[0])) {
         // console.log("true poly")
         const lonLat = fromLonLat([newlong.value, newlat.value])
-        var feature = new Feature({
+        const feature = new Feature({
             geometry: new Point(lonLat)
         })
         vectorSource.addFeature(feature)
     } else {
         const lonLat = fromLonLat(location.coordinates.flat())
-        var feature = new Feature({
+        const feature = new Feature({
             geometry: new Point(lonLat)
         })
         vectorSource.addFeature(feature)
@@ -168,47 +153,40 @@ async function nativeland(mapOverlay) {
     })
 
     mapOverlay.forEach((elem, index) => {
-        if (elem.geometry.coordinates.flat().length != 1) {
-            var polygonGeometry = new Polygon([elem.geometry.coordinates.flat().map((coord) => fromLonLat(coord))])
-            var choices = [
+        if (elem.geometry.coordinates.flat().length !== 1) {
+            const polygonGeometry = new Polygon([elem.geometry.coordinates.flat().map((coord) => fromLonLat(coord))])
+            const choices = [
                 'rgba(227, 181, 0, 0.7)',
                 'rgba(90, 253, 101, 0.7)',
                 'rgba(134, 192, 253, 0.7)',
                 'rgba(255, 0, 185, 0.5)',
                 'rgba(0, 0, 10, 0.5)'
             ]
-            var fillColor = choices[index % 5]
+            const fillColor = choices[index % 5]
             const polygonFeature = new Feature({
-                fillColor: fillColor,
+                fillColor,
                 geometry: polygonGeometry,
                 name: elem.properties.Name,
                 slug: elem.properties.Slug,
-                url: 'https://native-land.ca/api/index.php?maps=territories&' + elem.properties.Slug
+                url: `https://native-land.ca/api/index.php?maps=territories&${elem.properties.Slug}`
             })
             vectorSource2.value.addFeature(polygonFeature)
         } else {
             elem.geometry.coordinates.flat().forEach((pol) => {
-                var polygonGeometry = new Polygon([pol.map((coord) => fromLonLat(coord))])
+                const polygonGeometry = new Polygon([pol.map((coord) => fromLonLat(coord))])
                 const polygonFeature = new Feature({
                     geometry: polygonGeometry,
                     name: elem.properties.Name,
                     slug: elem.properties.Slug,
-                    url: 'https://native-land.ca/api/index.php?maps=territories&' + elem.properties.Slug
+                    url: `https://native-land.ca/api/index.php?maps=territories&${elem.properties.Slug}`
                 })
                 vectorSource2.value.addFeature(polygonFeature)
             })
         }
     })
 
-    // console.log("features: " + vectorSource2.value.getFeatures().length)
-
-    if (vectorSource2.value.getFeatures().length > 0) {
-        hasFeatures.value = true
-    } else {
-        hasFeatures.value = false
-    }
-    // console.log("has features: " + hasFeatures.value)
-    var myMap2 = new Map({
+    hasFeatures.value = vectorSource2.value.getFeatures().length > 0
+    myMap2 = new Map({
         layers: [
             new Tile({
                 source: new XYZ({
@@ -221,7 +199,7 @@ async function nativeland(mapOverlay) {
         target: 'map2',
         style: undefined,
         view: new View({
-            center: await centerMap(location),
+            center: centerMap(location),
             zoom: 10
         })
     })
@@ -249,8 +227,7 @@ async function nativeland(mapOverlay) {
 
     myMap2.on('click', function (evt) {
         visible.value = true
-        var coordinate = evt.coordinate
-        displayFeatureInfo(evt.pixel, coordinate)
+        displayFeatureInfo(evt.pixel, vectorLayer2)
     })
 
     const popupContainer = document.createElement('div')
@@ -280,7 +257,7 @@ async function nativeland(mapOverlay) {
                 // Do something when hovering over the feature
                 const featureProperties = feature.getProperties()
                 const text = featureProperties.name || 'Feature'
-                if (layer == vectorLayer2) {
+                if (layer === vectorLayer2) {
                     featureInfo.push(text)
                 }
             }
@@ -298,24 +275,34 @@ async function nativeland(mapOverlay) {
     })
 }
 
-const mapContent = async function () {
-    let params = {}
-    if (Array.isArray(location.coordinates.flat()[0])) {
-        params = new URLSearchParams({ lat: newlat.value, long: newlong.value })
-    } else {
-        params = new URLSearchParams({ lat: location.coordinates.flat()[1], long: location.coordinates.flat()[0] })
+async function mapContent() {
+    try {
+        const params = Array.isArray(location.coordinates.flat()[0])
+            ? new URLSearchParams({ lat: newlat.value, long: newlong.value })
+            : new URLSearchParams({ lat: location.coordinates.flat()[1], long: location.coordinates.flat()[0] })
+
+        const waiting = await authedFetch(`/v2.0/apps/nativelands?${params}`)
+        if (!waiting.ok) {
+            throw new Error(waiting.statusText)
+        }
+
+        return await waiting.json()
+    } catch (err) {
+        console.error(err)
+        return null
+    } finally {
+        loadingnat.value = false
     }
-    // console.log(neotomaapi + `/v2.0/apps/nativelands?${params}`)
-    const waiting = await authedFetch(`/v2.0/apps/nativelands?${params}`)
-    const output = await waiting.json()
-    loadingnat.value = false
-    return output
 }
 
 onMounted(async () => {
     const mapOverlayPass = await mapContent()
-    const mapData = mapOverlayPass['data']
-    nativeland(await mapData)
+    if (!mapOverlayPass) {
+        return
+    }
+
+    const mapData = mapOverlayPass.data
+    nativeland(mapData)
 })
 </script>
 
@@ -335,8 +322,6 @@ onMounted(async () => {
     background-color: gray;
 }
 
-.norm .p-panel-header {
-}
 </style>
 
 <template>
@@ -367,7 +352,7 @@ onMounted(async () => {
                         border: 3px solid rgb(92, 84, 80);
                     "
                 >
-                    <div id="map2" class="map" ref="map"></div>
+                    <div id="map2" class="map"></div>
                 </div>
                 <div v-if="!hasFeatures">
                     <p>
