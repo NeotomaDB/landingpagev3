@@ -15,6 +15,10 @@ const ContactDatasets = defineAsyncComponent(
     () => import('@/views/resources/contactelements/ContactLinkedDatasets.vue')
 )
 
+const ContactSearch = defineAsyncComponent(
+    () => import('@/views/resources/contactelements/ContactSearch.vue')
+)
+
 const route = useRoute()
 const router = useRouter()
 
@@ -79,7 +83,10 @@ onMounted(async () => {
                 summaries can help showcase the work individuals have put into the database.
             </p>
             <Card>
-                <template #content> User Search coming soon. </template>
+                <template #title>Contact Search</template>
+                <template #content>
+                    <ContactSearch />
+                </template>
             </Card>
         </Panel>
     </div>
