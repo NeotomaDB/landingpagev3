@@ -1,4 +1,5 @@
 import VueCookies from 'vue-cookies';
+import useTokens from '@/stores/auth.store';
 
 const apiBase = import.meta.env.VITE_APP_API_ENDPOINT || 'https://api.neotomadb.org';
 
@@ -27,6 +28,11 @@ export async function authedFetch(path, options = {}) {
  */
 export async function authedFetchJson(path, options = {}) {
   const res = await authedFetch(path, options);
+  if (res.status === 401) {
+    const { logoutTokens } = useTokens();
+    await logoutTokens();
+    throw new Error('Session expired — please log in again');
+  }
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`API ${res.status}: ${body}`);
