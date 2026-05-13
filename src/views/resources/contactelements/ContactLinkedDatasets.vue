@@ -5,57 +5,59 @@ import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useRouter } from 'vue-router'
 import { authedFetch } from '@/functions/apicalls'
-const router = useRouter()
 
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
+const router = useRouter()
 const props = defineProps(['title'])
-const datasets = ref({})
+const datasets = ref([])
 const countsums = ref([])
 const loading = ref(true)
 const error = ref(null)
 
-async function groupRoles(datasets) {
-    var counts = datasets.reduce((p, c) => {
-        var roles = c.roles
-        roles.forEach((role, index) => {
-            if (!p.hasOwnProperty(role)) {
+function groupRoles(datasets) {
+    const counts = datasets.reduce((p, c) => {
+        const roles = c.roles
+        roles.forEach((role) => {
+            if (!Object.prototype.hasOwnProperty.call(p, role)) {
                 p[role] = 0
             }
             p[role]++
         })
         return p
     }, {})
-    loading.value = false
+
     return counts
 }
 
 async function get_contactdatasets(contactid) {
-    await authedFetch(`/v2.0/apps/contacts/${contactid}/datasets`, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res) => {
-            if (!res.ok) {
-                const error = new Error(res.statusText)
-                error.json = { error: res.json(), contactid: contactid }
-                throw error
-            }
-            return res.json()
+    try {
+        const res = await authedFetch(`/v2.0/apps/contacts/${contactid}/datasets`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json) => {
-            datasets.value = json.data
-        })
-        .catch((err) => {
-            error.value = err
-            if (err.json) {
-                return err.json
-            }
-        })
+
+        if (!res.ok) {
+            const requestError = new Error(res.statusText)
+            requestError.json = res.json()
+            throw requestError
+        }
+
+        const json = await res.json()
+        datasets.value = json.data
+        countsums.value = groupRoles(datasets.value)
+    } catch (err) {
+        error.value = err
+        if (err.json) {
+            const json = await err.json
+            error.value.message = json.message
+        }
+    } finally {
+        loading.value = false
+    }
 }
+
 onMounted(async () => {
     await router.isReady()
-    await get_contactdatasets(await props.title)
-    countsums.value = await groupRoles(datasets.value)
+    await get_contactdatasets(props.title)
 })
 </script>
 

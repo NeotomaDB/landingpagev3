@@ -5,40 +5,40 @@ import { useRouter } from 'vue-router'
 import { authedFetch } from '@/functions/apicalls'
 
 const router = useRouter()
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
 const props = defineProps(['title'])
-const publications = ref({})
+const publications = ref([])
 const loading = ref(true)
 const error = ref(null)
 
 async function get_contactpubs(contactid) {
-    await authedFetch(`/v2.0/data/contacts/${contactid}/publications`, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res) => {
-            if (!res.ok) {
-                const error = new Error(res.statusText)
-                error.json = { error: res.json(), contactid: contactid }
-                throw error
-            }
-            return res.json()
+    try {
+        const res = await authedFetch(`/v2.0/data/contacts/${contactid}/publications`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json) => {
-            publications.value = json.data[0]
-            loading.value = false
-        })
-        .catch((err) => {
-            error.value = err
-            if (err.json) {
-                return err.json
-            }
-        })
+
+        if (!res.ok) {
+            const requestError = new Error(res.statusText)
+            requestError.json = res.json()
+            throw requestError
+        }
+
+        const json = await res.json()
+        publications.value = json.data
+    } catch (err) {
+        error.value = err
+        if (err.json) {
+            const json = await err.json
+            error.value.message = json.message
+        }
+    } finally {
+        loading.value = false
+    }
 }
 
 onMounted(async () => {
     await router.isReady()
-    publications.value = await get_contactpubs(await props.title)
+    await get_contactpubs(props.title)
 })
 </script>
 
@@ -46,12 +46,12 @@ onMounted(async () => {
     <div v-if="loading">
         <ProgressSpinner class="flex-grow-1 w-max" />
     </div>
-    <div v-else>
-        {{ publications }}
+    <div v-else-if="publications.length">
         <div v-for="item in publications">
             {{ item.citation }}
         </div>
     </div>
+    <div v-else></div>
 </template>
 
 <script>
