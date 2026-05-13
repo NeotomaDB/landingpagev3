@@ -20,13 +20,12 @@ let datasetmeta = ref(null)
 let datasetdoi = ref(null)
 let loading = ref(true)
 
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const dataciteapi = import.meta.env.VITE_APP_DOI_ENDPOINT ?? 'https://api.datacite.org/dois/'
 
 async function getDatasetDOI() {
     datasetid.value = route.params.datasetid
     if (datasetid.value) {
-        const response = await authedFetch('/v2.0/data/datasets/' + datasetid.value + '/doi', {
+        const response = await authedFetch(`/v2.0/data/datasets/${datasetid.value}/doi`, {
             method: 'GET'
         })
         if (!response.ok) {

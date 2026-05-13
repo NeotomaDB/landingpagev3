@@ -7,7 +7,6 @@ import VueCookies from 'vue-cookies'
 import { authedFetch } from '@/functions/apicalls'
 
 const ContactDetails = defineAsyncComponent(() => import('@/views/resources/contactelements/ContactDetails.vue'))
-
 const ContactPublications = defineAsyncComponent(
     () => import('@/views/resources/contactelements/ContactLinkedPublications.vue')
 )
@@ -19,7 +18,6 @@ const ContactDatasets = defineAsyncComponent(
 const route = useRoute()
 const router = useRouter()
 
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT
 let loading = ref(true)
 let contactinfo = ref(null)
 

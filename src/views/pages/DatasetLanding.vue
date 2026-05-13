@@ -34,33 +34,30 @@ const datasetinfo = ref(1)
 const datasetid = ref(null)
 const loading = ref(true)
 const error = ref(null)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 async function loadDataset() {
-    return authedFetch('/v2.0/data/datasets/' + route.params.datasetid, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res) => {
-            if (!res.ok) {
-                const error = new Error(res.statusText)
-                error.json = { error: res.json(), datasetid: route.params.datasetid }
-                throw error
-            }
-            return res.json()
+    try {
+        const res = await authedFetch('/v2.0/data/datasets/' + route.params.datasetid, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json) => {
-            return json.data[0]
-        })
-        .catch((err) => {
-            error.value = err
-            if (err.json) {
-                return err.json.then((json) => {
-                    // set the JSON response message
-                    error.value.message = json.message
-                })
-            }
-        })
+
+        if (!res.ok) {
+            const requestError = new Error(res.statusText)
+            requestError.json = { error: res.json(), datasetid: route.params.datasetid }
+            throw requestError
+        }
+
+        const json = await res.json()
+        return json.data[0]
+    } catch (err) {
+        error.value = err
+
+        if (err.json) {
+            const json = await err.json.error
+            error.value.message = json.message
+        }
+    }
 }
 
 onMounted(async () => {

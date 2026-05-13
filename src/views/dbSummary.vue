@@ -32,7 +32,6 @@ const regionfilter = ref([])
 const timefilter = ref([])
 const filteredDBs = ref(null)
 const loaded = ref(false)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const datasettypes_master = ref([
     { value: 'biochemistry', clicked: false },
     { value: 'biomarker', clicked: false },
@@ -868,54 +867,55 @@ const geo_code = [
     }
 ]
 
-function loadDatabases() {
-    return authedFetch('/v2.0/apps/constdb/', { method: 'GET', headers: { 'content-type': 'application/json' } })
-        .then((res1) => {
-            return res1.json()
+async function loadDatabases() {
+    try {
+        const res1 = await authedFetch('/v2.0/apps/constdb/', {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json1) => {
-            dbsums.value = json1.data
-            return dbsums.value
+        const json1 = await res1.json()
+
+        dbsums.value = json1.data
+        databasekeys.value = dbsums.value.map((obj) => {
+            const geoEntry = geo_code.find((geo) => geo.DB === obj.database.databasename)
+            const timeEntry = temp_code.find((time) => time.DB === obj.database.databasename)
+
+            return {
+                ...obj,
+                string: obj.datasettypes
+                    .map((type) => type.datasettype)
+                    .filter(Boolean)
+                    .join('\n'),
+                location: geoEntry ? geoEntry.places : null,
+                location_marg: geoEntry ? geoEntry.marg_pl : null,
+                time: timeEntry ? timeEntry.times : null,
+                time_marg: timeEntry ? timeEntry.marginals : null,
+                locstring: geoEntry ? geoEntry.places.join('\n') : null,
+                timestring: timeEntry ? timeEntry.times.join('\n') : null,
+                time_margstring:
+                    timeEntry && timeEntry.marginals.length
+                        ? [...timeEntry.marginals.slice(0, -1), timeEntry.marginals.at(-1) + ' (marginal)'].join(
+                              ' (marginal) \n'
+                          )
+                        : '',
+                loc_margstring:
+                    geoEntry && geoEntry.marg_pl.length
+                        ? [...geoEntry.marg_pl.slice(0, -1), geoEntry.marg_pl.at(-1) + ' (marginal)'].join(
+                              ' (marginal) \n'
+                          )
+                        : '',
+                marginal_value: false,
+                marginal_valuet: false
+            }
         })
-        .then((db) => {
-            databasekeys.value = db.map((obj) => {
-                const geoEntry = geo_code.find((geo) => geo.DB === obj.database.databasename)
-                const timeEntry = temp_code.find((time) => time.DB === obj.database.databasename)
-                return {
-                    ...obj,
-                    string: obj.datasettypes
-                        .map((type) => type.datasettype)
-                        .filter(Boolean)
-                        .join('\n'),
-                    location: geoEntry ? geoEntry.places : null,
-                    location_marg: geoEntry ? geoEntry.marg_pl : null,
-                    time: timeEntry ? timeEntry.times : null,
-                    time_marg: timeEntry ? timeEntry.marginals : null,
-                    locstring: geoEntry ? geoEntry.places.join('\n') : null,
-                    timestring: timeEntry ? timeEntry.times.join('\n') : null,
-                    time_margstring:
-                        timeEntry && timeEntry.marginals.length
-                            ? [...timeEntry.marginals.slice(0, -1), timeEntry.marginals.at(-1) + ' (marginal)'].join(
-                                  ' (marginal) \n'
-                              )
-                            : '',
-                    loc_margstring:
-                        geoEntry && geoEntry.marg_pl.length
-                            ? [...geoEntry.marg_pl.slice(0, -1), geoEntry.marg_pl.at(-1) + ' (marginal)'].join(
-                                  ' (marginal) \n'
-                              )
-                            : '',
-                    marginal_value: false,
-                    marginal_valuet: false
-                }
-            })
-            show.value = true
-            loaded.value = true
-            console.log(databasekeys.value)
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+
+        show.value = true
+        loaded.value = true
+        return databasekeys.value
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
 }
 
 loadDatabases()

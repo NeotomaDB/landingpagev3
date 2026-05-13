@@ -3,104 +3,45 @@ import ProgressSpinner from 'primevue/progressspinner'
 import { ref, onMounted } from 'vue'
 import Card from 'primevue/card'
 import Badge from 'primevue/badge'
-import { authedFetch } from '@/functions/apicalls'
 
 const refs = ref({})
 
 const controller = new AbortController()
 
-const apidev = import.meta.env.VITE_APP_APIDEV_ENDPOINT ?? 'https://api-dev.neotomadb.org'
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
-const tiliaapi = import.meta.env.VITE_APP_TILIA_ENDPOINT ?? 'https://tilia.neotomadb.org'
-
-const loadStatus = new Promise(() => {
-    authedFetch('/api-docs/', {
-        method: 'HEAD',
-        mode: 'no-cors',
-        signal: controller.signal
-    })
-        .then((response) => {
-            refs.value['apidev'] = {
-                name: 'Development API',
-                status: response.status === 200,
-                url: apidev + '/api-docs/'
-            }
-        })
-        .catch((err) => {
-            refs.value['apidev'] = {
-                name: 'Development API',
-                status: false,
-                url: apidev + '/api-docs/'
-            }
-            console.log(err)
+async function checkEndpointStatus(key, name, url, mode = 'cors') {
+    try {
+        const response = await fetch(url, {
+            method: 'HEAD',
+            mode,
+            signal: controller.signal
         })
 
-    authedFetch('/api-docs/', {
-        method: 'HEAD',
-        signal: controller.signal
-    })
-        .then((response) => {
-            refs.value['api'] = {
-                name: 'Neotoma API',
-                status: response.status === 200,
-                url: neotomaapi + '/api-docs/'
-            }
-        })
-        .catch((err) => {
-            refs.value['api'] = {
-                name: 'Neotoma API',
-                status: false,
-                url: neotomaapi + '/api-docs/'
-            }
-            console.log(err)
-        })
+        refs.value[key] = {
+            name,
+            status: response.ok || response.type === 'opaque',
+            url
+        }
+    } catch (err) {
+        refs.value[key] = {
+            name,
+            status: false,
+            url
+        }
+        console.log(err)
+    }
+}
 
-    fetch('https://apps.neotomadb.org/explorer', {
-        mode: 'no-cors',
-        method: 'HEAD',
-        signal: controller.signal
-    })
-        .then((response) => {
-            refs.value['explorer'] = {
-                name: 'Neotoma Explorer',
-                status: response.status === 200,
-                url: 'https://apps.neotomadb.org/explorer'
-            }
-        })
-        .catch((err) => {
-            refs.value['explorer'] = {
-                name: 'Neotoma Explorer',
-                status: false,
-                url: 'https://apps.neotomadb.org/explorer'
-            }
-            console.log(err)
-        })
-
-    fetch(tiliaapi + '/api', {
-        method: 'HEAD',
-        signal: controller.signal
-    })
-        .then((response) => {
-            refs.value['tilia'] = {
-                name: 'Tilia API',
-                status: response.status === 200,
-                url: tiliaapi + '/api'
-            }
-        })
-        .catch((err) => {
-            refs.value['tilia'] = {
-                name: 'Tilia API',
-                status: false,
-                url: tiliaapi + '/api'
-            }
-
-            console.log('tilia' + err)
-        })
-    return null
-})
+async function loadStatus() {
+    await Promise.all([
+        checkEndpointStatus('apidev', 'Development API', 'https://api-dev.neotomadb.org/api-docs/', 'no-cors'),
+        checkEndpointStatus('api', 'Neotoma API', 'https://api.neotomadb.org/api-docs/', 'no-cors'),
+        checkEndpointStatus('explorer', 'Neotoma Explorer', 'https://apps.neotomadb.org/explorer', 'no-cors'),
+        checkEndpointStatus('tilia', 'Tilia API', 'https://tilia.neotomadb.org/api', 'no-cors')
+    ])
+}
 
 onMounted(() => {
-    loadStatus
+    loadStatus()
 })
 </script>
 

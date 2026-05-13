@@ -4,29 +4,39 @@ import Badge from 'primevue/badge'
 import Card from 'primevue/card'
 import ProgressSpinner from 'primevue/progressspinner'
 import { authedFetch } from '@/functions/apicalls'
+
 const rawstats = ref(null)
 const loaderror = ref(null)
 const today = new Date().toLocaleString()
 
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
+async function loadRawStats() {
+    const uri = '/v2.0/data/summary/rawbymonth?end=999999'
 
-authedFetch('/v2.0/data/summary/rawbymonth?end=999999', {
-    method: 'GET',
-    headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'ndb landing pages'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-    }
-})
-    .then((response) => response.json())
-    .then((data) => (rawstats.value = data['data']['data'][0]))
-    .catch((err) => {
+    try {
+        const response = await authedFetch(uri, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'ndb landing pages'
+            }
+        })
+
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+
+        const data = await response.json()
+        rawstats.value = data.data.data[0]
+    } catch (err) {
         rawstats.value = 'error'
         loaderror.value = {
-            uri: neotomaapi + '/v2.0/data/summary/rawbymonth?end=999999',
+            uri,
             error: err
         }
-    })
+    }
+}
+
+loadRawStats()
 </script>
 
 <template>
