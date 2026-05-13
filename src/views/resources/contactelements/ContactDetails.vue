@@ -11,6 +11,21 @@ const contactinfo = ref(null)
 const loading = ref(true)
 const error = ref(null)
 
+function getInstitution(address) {
+    if (!address) {
+        return ''
+    }
+
+    const normalizedAddress = address.replace(/\s+/g, ' ').trim()
+    const streetAddressStart = normalizedAddress.search(/\b(?:\d+[A-Za-z-]*|P\.?\s*O\.?\s*Box)\b/i)
+
+    if (streetAddressStart === -1) {
+        return normalizedAddress
+    }
+
+    return normalizedAddress.slice(0, streetAddressStart).trim().replace(/[,\s]+$/, '')
+}
+
 async function get_contact(contactid) {
     const res = await authedFetch(`/v2.0/data/contacts/${contactid}`, {
         method: 'GET',
@@ -48,9 +63,8 @@ onMounted(async () => {
                 <h4>{{ contactinfo.contactname }}</h4>
             </template>
             <p>
-                email:
-                <a :href="`mailto:${contactinfo.email}`">{{ contactinfo.email }}</a>
-                <p><b>Neotoma ID:</b> {{ props.title }}</p>
+                <b>Institution:</b> {{ getInstitution(contactinfo.address) }} <br><br>
+                <b>Neotoma ID:</b> {{ props.title }}
             </p>
         </Panel>
     </div>
