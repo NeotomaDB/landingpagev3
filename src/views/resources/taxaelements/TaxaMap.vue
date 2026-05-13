@@ -45,166 +45,157 @@ const vectorSource = new VectorSource()
 
 const visible = ref(false)
 const taxonreturn = ref(null)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
-function loadtaxon() {
+async function loadtaxon() {
     //https://api.neotomadb.org/v2.0/data/sites?taxa=Betulaceae
     //v2.0/data/taxa/12... gives relationship between taxonid and taxonname
-    return authedFetch('/v2.0/data/taxa/' + route.params.taxonid, {
+    const res0 = await authedFetch(`/v2.0/data/taxa/${route.params.taxonid}`, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
-        .then((res0) => {
-            return res0.json()
-        })
-        .then((json0) => {
-            firstreturn.value = json0.data
-            return (name.value = firstreturn.value[0].taxonname)
-        })
-        .then((name) => {
-            return authedFetch('/v2.0/data/sites?taxa=' + name + '&limit=999999', {
-                method: 'GET',
-                headers: { 'content-type': 'application/json' }
-            })
-        })
-        .then((res1) => {
-            return res1.json()
-        })
-        .then((json1) => {
-            taxonreturn.value = json1.data
-            console.log(taxonreturn.value)
-            numresults.value = taxonreturn.value.length
-            return taxonreturn.value
-        })
-        .then((values) => {
-            let ids = []
-            values.forEach((pointfull) => {
-                let site = JSON.parse(pointfull.geography)
-                let siteid = pointfull.siteid
-                let sitename = pointfull.sitename
-                if (site && site.coordinates !== null) {
-                    if (!ids.includes(siteid)) {
-                        var geom = site.coordinates
-                        let geometry
-                        if (Array.isArray(geom[0][0])) {
-                            let transformedCoordinates = geom.map((ring) => ring.map((coord) => fromLonLat(coord)))
 
-                            geometry = new Polygon([transformedCoordinates])
-                            const flatco = geometry.getFlatCoordinates()
-                            const centroid = [
-                                (flatco[0][0] + flatco[1][0]) / 2, // X centroid
-                                (flatco[0][1] + flatco[2][1]) / 2 // Y centroid
-                            ]
-                            geometry = new Point(centroid)
-                        } else {
-                            geometry = new Point(fromLonLat(geom))
-                        }
-                        var feature = new Feature({
-                            geometry: geometry,
-                            name: sitename,
-                            id: siteid
-                        })
-                        ids.push(siteid)
-                        vectorSource.addFeature(feature)
-                    }
+    if (!res0.ok) {
+        throw new Error(res0.statusText)
+    }
+
+    const json0 = await res0.json()
+    firstreturn.value = json0.data
+    name.value = firstreturn.value[0].taxonname
+
+    const res1 = await authedFetch(`/v2.0/data/sites?taxa=${name.value}&limit=999999`, {
+        method: 'GET',
+        headers: { 'content-type': 'application/json' }
+    })
+
+    if (!res1.ok) {
+        throw new Error(res1.statusText)
+    }
+
+    const json1 = await res1.json()
+    taxonreturn.value = json1.data
+    console.log(taxonreturn.value)
+    numresults.value = taxonreturn.value.length
+
+    let ids = []
+    taxonreturn.value.forEach((pointfull) => {
+        let site = JSON.parse(pointfull.geography)
+        let siteid = pointfull.siteid
+        let sitename = pointfull.sitename
+        if (site && site.coordinates !== null) {
+            if (!ids.includes(siteid)) {
+                var geom = site.coordinates
+                let geometry
+                if (Array.isArray(geom[0][0])) {
+                    let transformedCoordinates = geom.map((ring) => ring.map((coord) => fromLonLat(coord)))
+
+                    geometry = new Polygon([transformedCoordinates])
+                    const flatco = geometry.getFlatCoordinates()
+                    const centroid = [
+                        (flatco[0][0] + flatco[1][0]) / 2,
+                        (flatco[0][1] + flatco[2][1]) / 2
+                    ]
+                    geometry = new Point(centroid)
+                } else {
+                    geometry = new Point(fromLonLat(geom))
                 }
-            })
-            console.log(vectorSource.getFeatures())
-            console.log(ids)
-            return vectorSource
-        })
-        .then((source) => {
-            const clusterSource = new Cluster({
-                distance: 15,
-                minDistance: 15,
-                source: source
-            })
-
-            const styleCache = {}
-
-            const clusters = new VectorLayer({
-                source: clusterSource,
-                style: function (feature) {
-                    const size = feature.get('features').length
-                    let style = styleCache[size]
-                    if (!style) {
-                        if (size == 1) {
-                            style = new Style({
-                                image: new Circle({
-                                    radius: 5,
-                                    fill: new Fill({
-                                        color: 'rgba(251,205,188,1)'
-                                    }),
-                                    stroke: new Stroke({
-                                        color: 'rgba(92,84,80,1)',
-                                        width: (2 / 3) * 4
-                                    })
-                                })
-                            })
-                        } else {
-                            style = new Style({
-                                image: new Circle({
-                                    radius: 8,
-                                    stroke: new Stroke({
-                                        color: 'rgb(60,50,40)'
-                                    }),
-                                    fill: new Fill({
-                                        color: 'rgb(221,205,188)'
-                                    })
-                                }),
-                                text: new Text({
-                                    text: size.toString(),
-                                    fill: new Fill({
-                                        color: 'rgb(60,50,40)'
-                                    }),
-                                    font: 'bold ' + (size ** (1 / 6.35) / 3.5 + 8) + 'px Helvetica'
-                                })
-                            })
-                        }
-                        styleCache[size] = style
-                    }
-                    return style
-                }
-            })
-            return clusters
-        })
-        .then((vl) => {
-            myMap.value = new Map({
-                layers: [
-                    new Tile({
-                        source: new XYZ({
-                            url: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png'
-                        })
-                    }),
-                    vl
-                ],
-                target: 'map2',
-                view: new View({
-                    center: [0, 0],
-                    zoom: 2
+                var feature = new Feature({
+                    geometry: geometry,
+                    name: sitename,
+                    id: siteid
                 })
-            })
+                ids.push(siteid)
+                vectorSource.addFeature(feature)
+            }
+        }
+    })
+    console.log(vectorSource.getFeatures())
+    console.log(ids)
 
-            myMap.value.on('click', (e) => {
-                vl.getFeatures(e.pixel)
-                    .then((clickedFeatures) => {
-                        if (clickedFeatures.length) {
-                            // Get clustered Coordinates
-                            const features = clickedFeatures[0].get('features')
-                            if (features.length > 1) {
-                                const extent = boundingExtent(features.map((r) => r.getGeometry().getCoordinates()))
-                                myMap.value.getView().fit(extent, { duration: 1000, padding: [50, 50, 50, 50] })
-                            }
-                        }
+    const clusterSource = new Cluster({
+        distance: 15,
+        minDistance: 15,
+        source: vectorSource
+    })
+
+    const styleCache = {}
+
+    const clusters = new VectorLayer({
+        source: clusterSource,
+        style: function (feature) {
+            const size = feature.get('features').length
+            let style = styleCache[size]
+            if (!style) {
+                if (size == 1) {
+                    style = new Style({
+                        image: new Circle({
+                            radius: 5,
+                            fill: new Fill({
+                                color: 'rgba(251,205,188,1)'
+                            }),
+                            stroke: new Stroke({
+                                color: 'rgba(92,84,80,1)',
+                                width: (2 / 3) * 4
+                            })
+                        })
                     })
-                    .catch((err) => {
-                        console.log(err)
+                } else {
+                    style = new Style({
+                        image: new Circle({
+                            radius: 8,
+                            stroke: new Stroke({
+                                color: 'rgb(60,50,40)'
+                            }),
+                            fill: new Fill({
+                                color: 'rgb(221,205,188)'
+                            })
+                        }),
+                        text: new Text({
+                            text: size.toString(),
+                            fill: new Fill({
+                                color: 'rgb(60,50,40)'
+                            }),
+                            font: 'bold ' + (size ** (1 / 6.35) / 3.5 + 8) + 'px Helvetica'
+                        })
                     })
+                }
+                styleCache[size] = style
+            }
+            return style
+        }
+    })
+
+    myMap.value = new Map({
+        layers: [
+            new Tile({
+                source: new XYZ({
+                    url: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png'
+                })
+            }),
+            clusters
+        ],
+        target: 'map2',
+        view: new View({
+            center: [0, 0],
+            zoom: 2
+        })
+    })
+
+    myMap.value.on('click', (e) => {
+        clusters
+            .getFeatures(e.pixel)
+            .then((clickedFeatures) => {
+                if (clickedFeatures.length) {
+                    const features = clickedFeatures[0].get('features')
+                    if (features.length > 1) {
+                        const extent = boundingExtent(features.map((r) => r.getGeometry().getCoordinates()))
+                        myMap.value.getView().fit(extent, { duration: 1000, padding: [50, 50, 50, 50] })
+                    }
+                }
             })
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+            .catch((err) => {
+                console.log(err)
+            })
+    })
 }
 
 function areObjectsIdentical(obj1, obj2) {
@@ -244,13 +235,19 @@ function areAllIdentical(array) {
 }
 
 onMounted(async () => {
-    await loadtaxon()
+    try {
+        await loadtaxon()
+    } catch (err) {
+        console.log(err)
+        loading2.value = false
+        return
+    }
     var extent2 = vectorSource.getExtent()
     var padding = (extent2[2] - extent2[0] + (extent2[3] - extent2[1])) / 20
     var paddedExtent = [extent2[0] - padding, extent2[1] - padding, extent2[2] + padding, extent2[3] + padding]
     myMap.value.getView().fit(paddedExtent)
 
-    var displayFeatureInfo = function (pixel) {
+    var displayFeatureInfo = async function (pixel) {
         var features2 = []
         names.value = []
         ids.value = []
@@ -284,50 +281,45 @@ onMounted(async () => {
                 var stringIDs = uniqueids.value.join(',')
                 visible.value = true
                 console.log(stringIDs)
-                let sets = authedFetch('/v2.0/data/sites/' + stringIDs + '/datasets?limit=2000')
-                    .then((res) => {
-                        var inter = res.json()
-                        //console.log(inter)
-                        return inter
-                    })
-                    .then((int) => {
-                        var all = int.data
-                        var fullsets = all.flatMap((site) => site.site.datasets).map((on) => on)
-                        siteids.value = []
-                        idxlist.value = []
-                        var idx = 0
-                        all.forEach(function (site) {
-                            site.site.datasets.forEach(function () {
-                                idx = idx + 1
-                                siteids.value.push({ name: site.site.sitename, index: idx })
-                                idxlist.value.push(idx)
-                            })
+                try {
+                    const res = await authedFetch(`/v2.0/data/sites/${stringIDs}/datasets?limit=2000`)
+                    if (!res.ok) {
+                        throw new Error(res.statusText)
+                    }
+
+                    const int = await res.json()
+                    var all = int.data
+                    var fullsets = all.flatMap((site) => site.site.datasets).map((on) => on)
+                    siteids.value = []
+                    idxlist.value = []
+                    var idx = 0
+                    all.forEach(function (site) {
+                        site.site.datasets.forEach(function () {
+                            idx = idx + 1
+                            siteids.value.push({ name: site.site.sitename, index: idx })
+                            idxlist.value.push(idx)
                         })
-
-                        dataindexer.value = {}
-
-                        siteids.value.forEach((item) => {
-                            // Extract name and index from each item
-                            const { name, index } = item
-
-                            // If the name doesn't exist in the result object, initialize it with an empty array
-                            if (!dataindexer.value[name]) {
-                                dataindexer.value[name] = []
-                            }
-
-                            // Push the index into the array corresponding to the name
-                            dataindexer.value[name].push(index)
-                        })
-                        fullsets.forEach((entry) => {
-                            datatypes.value.push(entry.datasettype)
-                            datasets.value.push(entry.datasetid)
-                            link.value.push('https://data.neotomadb.org/datasets/' + entry.datasetid)
-                        })
-                        return datasets.value
                     })
-                    .catch((err) => {
-                        console.log(err)
+
+                    dataindexer.value = {}
+
+                    siteids.value.forEach((item) => {
+                        const { name, index } = item
+
+                        if (!dataindexer.value[name]) {
+                            dataindexer.value[name] = []
+                        }
+
+                        dataindexer.value[name].push(index)
                     })
+                    fullsets.forEach((entry) => {
+                        datatypes.value.push(entry.datasettype)
+                        datasets.value.push(entry.datasetid)
+                        link.value.push(`https://data.neotomadb.org/datasets/${entry.datasetid}`)
+                    })
+                } catch (err) {
+                    console.log(err)
+                }
             }
 
             if (areAllIdentical(coords.value) && uniquenames.value.length >= threshold) {
@@ -340,7 +332,7 @@ onMounted(async () => {
         console.log(uniquenames.value)
 
         var coordinate = evt.coordinate
-        displayFeatureInfo(evt.pixel, coordinate)
+        await displayFeatureInfo(evt.pixel, coordinate)
     })
 
     loading2.value = false

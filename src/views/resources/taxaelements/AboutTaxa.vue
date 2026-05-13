@@ -4,8 +4,8 @@ import { useRoute } from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner'
 import Panel from 'primevue/panel'
 import { authedFetch } from '@/functions/apicalls'
+
 const route = useRoute()
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const taxon = ref(null)
 const name = ref(null)
 const hightaxon = ref(null)
@@ -21,74 +21,81 @@ const ecolgroupname = ref(null)
 const link = ref(null)
 const externals = ref(null)
 
-function loadAbout() {
-    return authedFetch('/v2.0/data/taxa/' + route.params.taxonid, {
+async function loadAbout() {
+    const res1 = await authedFetch(`/v2.0/data/taxa/${route.params.taxonid}`, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
-        .then((res1) => {
-            return res1.json()
-        })
-        .then((json1) => {
-            taxon.value = json1.data
-            high1.value = taxon.value[0].highertaxonid
-            link.value = 'https://data.neotomadb.org/taxa/' + high1.value
-            name.value = taxon.value[0].taxonname
-            author.value = taxon.value[0].author
-            pub.value = taxon.value[0].publication
-            status.value = taxon.value[0].status
-            return high1.value
-        })
-        .then((high) => {
-            return authedFetch('/v2.0/data/taxa/' + high, {
-                method: 'GET',
-                headers: { 'content-type': 'application/json' }
-            })
-        })
-        .then((res2) => {
-            return res2.json()
-        })
-        .then((json2) => {
-            hightaxon.value = json2.data
-            ecolgroup.value = hightaxon.value[0].ecolgroup
-            highname.value = hightaxon.value[0].taxonname
-            loading_ab.value = true
-            return hightaxon.value[0].ecolgroup
-        })
+
+    if (!res1.ok) {
+        throw new Error(res1.statusText)
+    }
+
+    const json1 = await res1.json()
+    taxon.value = json1.data
+    high1.value = taxon.value[0].highertaxonid
+    link.value = `https://data.neotomadb.org/taxa/${high1.value}`
+    name.value = taxon.value[0].taxonname
+    author.value = taxon.value[0].author
+    pub.value = taxon.value[0].publication
+    status.value = taxon.value[0].status
+
+    const res2 = await authedFetch(`/v2.0/data/taxa/${high1.value}`, {
+        method: 'GET',
+        headers: { 'content-type': 'application/json' }
+    })
+
+    if (!res2.ok) {
+        throw new Error(res2.statusText)
+    }
+
+    const json2 = await res2.json()
+    hightaxon.value = json2.data
+    ecolgroup.value = hightaxon.value[0].ecolgroup
+    highname.value = hightaxon.value[0].taxonname
+
+    return hightaxon.value[0].ecolgroup
 }
 
-function loadEcol() {
-    return authedFetch('/v2.0/data/dbtables/ecolgrouptypes?count=false&limit=9999', {
+async function loadEcol() {
+    const res3 = await authedFetch('/v2.0/data/dbtables/ecolgrouptypes?count=false&limit=9999', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
-        .then((res3) => {
-            return res3.json()
-        })
-        .then((json3) => {
-            console.log(ecolgroup.value)
-            ecolgroups.value = json3.data.find((item) => item.ecolgroupid == ecolgroup.value)
-            ecolgroupname.value = ecolgroups.value.ecolgroup
-        })
+
+    if (!res3.ok) {
+        throw new Error(res3.statusText)
+    }
+
+    const json3 = await res3.json()
+    console.log(ecolgroup.value)
+    ecolgroups.value = json3.data.find((item) => item.ecolgroupid == ecolgroup.value)
+    ecolgroupname.value = ecolgroups.value.ecolgroup
 }
 
-function loadExternal() {
-    return authedFetch('/v2.0/apps/exttax?taxonid=' + route.params.taxonid, {
+async function loadExternal() {
+    const res4 = await authedFetch(`/v2.0/apps/exttax?taxonid=${route.params.taxonid}`, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
-        .then((res4) => {
-            return res4.json()
-        })
-        .then((json4) => {
-            externals.value = json4.data
-        })
+
+    if (!res4.ok) {
+        throw new Error(res4.statusText)
+    }
+
+    const json4 = await res4.json()
+    externals.value = json4.data
 }
 
 onMounted(async () => {
-    await loadAbout()
-    await loadEcol()
-    await loadExternal()
+    try {
+        await loadAbout()
+        await loadEcol()
+        await loadExternal()
+        loading_ab.value = true
+    } catch (err) {
+        console.log(err)
+    }
 })
 </script>
 
@@ -117,14 +124,14 @@ h3 {
                     <div v-if="item.extdatabasename == 'GBIF Backbone Taxonomy'">
                         <li>
                             {{ item.extdatabasename }}:
-                            <a :href="'https://www.gbif.org/species/' + item.exttaxonid">{{ item.exttaxonid }}</a>
+                            <a :href="`https://www.gbif.org/species/${item.exttaxonid}`">{{ item.exttaxonid }}</a>
                         </li>
                     </div>
                     <div v-else-if="item.extdatabasename == 'NCBI Taxonomy Database'">
                         <li>
                             {{ item.extdatabasename }}:
                             <a
-                                :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=' + item.exttaxonid"
+                                :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${item.exttaxonid}`"
                                 >{{ item.exttaxonid }}</a
                             >
                         </li>

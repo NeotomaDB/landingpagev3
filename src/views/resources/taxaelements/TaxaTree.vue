@@ -6,8 +6,8 @@ import Panel from 'primevue/panel'
 import VueTree from '@ssthouse/vue3-tree-chart'
 import '@ssthouse/vue3-tree-chart/dist/vue3-tree-chart.css'
 import { authedFetch } from '@/functions/apicalls'
+
 const route = useRoute()
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const alltaxa = ref(null)
 const high1 = ref(null)
 const high2 = ref(null)
@@ -49,28 +49,29 @@ function sortTreeByChildrenCount(nodes) {
     return reordered
 }
 
-function loadTree() {
-    return authedFetch('/v2.0/data/dbtables/taxa?count=false&limit=999999&offset=0', {
+async function loadTree() {
+    const res1 = await authedFetch('/v2.0/data/dbtables/taxa?count=false&limit=999999&offset=0', {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
     })
-        .then((res1) => {
-            return res1.json()
-        })
-        .then((json1) => {
-            alltaxa.value = json1.data
-            taxon.value = alltaxa.value.find((obj) => obj.taxonid == route.params.taxonid)
-            taxname.value = taxon.value.taxonname
-            high1.value = alltaxa.value.find((obj) => obj.taxonid == taxon.value.highertaxonid)
-            high2.value = alltaxa.value.find((obj) => obj.taxonid == high1.value.highertaxonid)
-            high3.value = alltaxa.value.find((obj) => obj.taxonid == high2.value.highertaxonid)
-            low1s.value = alltaxa.value.filter((obj) => obj.highertaxonid == taxon.value.taxonid)
-            adelphi.value = alltaxa.value.filter((obj) => obj.highertaxonid == taxon.value.highertaxonid)
-            adelphi1.value = alltaxa.value.filter((obj) => obj.highertaxonid == high1.value.highertaxonid)
-            adelphi2.value = alltaxa.value.filter((obj) => obj.highertaxonid == high2.value.highertaxonid)
-            allbros.value = adelphi.value.concat(adelphi1.value, adelphi2.value, high3.value, low1s.value)
-            console.log(high3.value)
-        })
+
+    if (!res1.ok) {
+        throw new Error(res1.statusText)
+    }
+
+    const json1 = await res1.json()
+    alltaxa.value = json1.data
+    taxon.value = alltaxa.value.find((obj) => obj.taxonid == route.params.taxonid)
+    taxname.value = taxon.value.taxonname
+    high1.value = alltaxa.value.find((obj) => obj.taxonid == taxon.value.highertaxonid)
+    high2.value = alltaxa.value.find((obj) => obj.taxonid == high1.value.highertaxonid)
+    high3.value = alltaxa.value.find((obj) => obj.taxonid == high2.value.highertaxonid)
+    low1s.value = alltaxa.value.filter((obj) => obj.highertaxonid == taxon.value.taxonid)
+    adelphi.value = alltaxa.value.filter((obj) => obj.highertaxonid == taxon.value.highertaxonid)
+    adelphi1.value = alltaxa.value.filter((obj) => obj.highertaxonid == high1.value.highertaxonid)
+    adelphi2.value = alltaxa.value.filter((obj) => obj.highertaxonid == high2.value.highertaxonid)
+    allbros.value = adelphi.value.concat(adelphi1.value, adelphi2.value, high3.value, low1s.value)
+    console.log(high3.value)
 }
 
 function buildTree() {
@@ -78,7 +79,7 @@ function buildTree() {
     allbros.value.forEach((item) => {
         map.set(item.taxonid, {
             value: item.taxonname,
-            data: 'https://data.neotomadb.org/taxa/' + item.taxonid,
+            data: `https://data.neotomadb.org/taxa/${item.taxonid}`,
             children: []
         })
     })
@@ -102,8 +103,12 @@ function buildTree() {
 }
 
 onMounted(async () => {
-    await loadTree()
-    await buildTree()
+    try {
+        await loadTree()
+        await buildTree()
+    } catch (err) {
+        console.log(err)
+    }
 })
 </script>
 

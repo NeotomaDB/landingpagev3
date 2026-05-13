@@ -12,7 +12,6 @@ const filtered = ref(null)
 const tabledat = ref(null)
 const ready = ref(false)
 const processing = ref(false)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const value = ref('')
 
 async function findTaxa(taxonval) {
@@ -27,6 +26,10 @@ async function findTaxa(taxonval) {
             headers: { 'content-type': 'application/json' }
         })
 
+        if (!res1.ok) {
+            throw new Error(res1.statusText)
+        }
+
         const json1 = await res1.json()
         const taxa = json1.data ?? {}
         filtered.value = taxa.filter((obj) => pattern.test(obj.taxonname))
@@ -38,10 +41,12 @@ async function findTaxa(taxonval) {
             link: `https://data.neotomadb.org/taxa/${obj.taxonid}`
         }))
         ready.value = true
-        processing.value = false
     } catch (err) {
         console.log(err)
-        return {}
+        tabledat.value = []
+        ready.value = true
+    } finally {
+        processing.value = false
     }
 }
 
