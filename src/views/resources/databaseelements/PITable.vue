@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Panel from 'primevue/panel'
 import ProgressSpinner from 'primevue/progressspinner'
@@ -18,58 +18,54 @@ const route = useRoute()
 const pis = ref(null)
 const pis_array1 = ref(null)
 
-function loadDatabase() {
-    return authedFetch('/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0', {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res1) => {
-            return res1.json()
+async function loadDatabase() {
+    try {
+        const res1 = await authedFetch('/v2.0/data/dbtables/constituentdatabases?count=false&limit=5000&offset=0', {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json1) => {
-            databasekeys.value = json1.data
-            currentDB.value = databasekeys.value.find(
-                (element) => element.databaseid === Number(route.params.databaseid)
-            )
 
-            databasename.value = currentDB.value.databasename
-            return databasename.value
+        if (!res1.ok) {
+            throw new Error(res1.statusText)
+        }
+
+        const json1 = await res1.json()
+        databasekeys.value = json1.data
+        currentDB.value = databasekeys.value.find((element) => element.databaseid === Number(route.params.databaseid))
+        databasename.value = currentDB.value.databasename
+
+        const res = await authedFetch(`/v2.0/data/datasets/db?limit=10000&offset=0&database=${databasename.value}`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((val) =>
-            authedFetch('/v2.0/data/datasets/db?limit=10000&offset=0&database=' + val, {
-                method: 'GET',
-                headers: { 'content-type': 'application/json' }
-            })
-        )
-        .then((res) => {
-            if (!res.ok) {
-                const error = new Error(res.statusText)
-                error.json = { error: res.json(), databaseid: route.params.databaseid }
-                throw error
-            } else {
-                return res.json()
-            }
-        })
-        .then((json) => {
-            databaseinfo.value = json.data
-            pis.value = databaseinfo.value.reduce((acc, obj) => {
-                obj.site.datasets.forEach((dataset) => {
-                    dataset.datasetpi.forEach((pi) => {
-                        const type = pi.contactname
-                        acc[type] = (acc[type] || 0) + 1
-                    })
+
+        if (!res.ok) {
+            throw new Error(res.statusText)
+        }
+
+        const json = await res.json()
+        databaseinfo.value = json.data
+        pis.value = databaseinfo.value.reduce((acc, obj) => {
+            obj.site.datasets.forEach((dataset) => {
+                dataset.datasetpi.forEach((pi) => {
+                    const type = pi.contactname
+                    acc[type] = (acc[type] || 0) + 1
                 })
-                return acc
-            }, {})
-            pis_array1.value = Object.entries(pis.value).map(([name, value]) => ({ name, value }))
-            pis_array1.value = pis_array1.value.filter((obj) => obj.name !== 'null')
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+            })
+            return acc
+        }, {})
+        pis_array1.value = Object.entries(pis.value).map(([name, value]) => ({ name, value }))
+        pis_array1.value = pis_array1.value.filter((obj) => obj.name !== 'null')
+    } catch (err) {
+        console.log(err)
+    } finally {
+        loading_some.value = false
+    }
 }
 
-loadDatabase()
+onMounted(async () => {
+    await loadDatabase()
+})
 
 const filteredPIs = computed(() => {
     if (pis_array1.value) {
@@ -82,8 +78,6 @@ const filteredPIs = computed(() => {
         return []
     }
 })
-
-loading_some.value = false
 </script>
 
 <template>

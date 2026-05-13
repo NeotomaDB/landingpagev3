@@ -8,7 +8,6 @@ import { authedFetch } from '@/functions/apicalls'
 
 Chart.register(zoomPlugin)
 
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 const route = useRoute()
 const theAges = ref(null)
 const theAges2 = ref(null)
@@ -17,6 +16,7 @@ const loading_temp = ref(true)
 const chartReady = ref(false)
 const units_count = ref(null)
 const units_list = ref(null)
+let myChart = null
 
 Chart.defaults.plugins.tooltip.enabled = false
 
@@ -75,122 +75,121 @@ function addCommasToNumber(number) {
     return result
 }
 
-function loadDBages() {
-    return authedFetch('/v2.0/apps/constdb/datasetages?dbid=' + route.params.databaseid, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res1) => {
-            return res1.json()
+async function loadDBages() {
+    try {
+        const res1 = await authedFetch(`/v2.0/apps/constdb/datasetages?dbid=${route.params.databaseid}`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json1) => {
-            theAges.value = json1.data
-            theAges.value = theAges.value.filter((agerange) => agerange.older !== null)
-            theAges.value = theAges.value.sort((a, b) => a.older - b.older)
-            theAges.value = theAges.value.map((agerange, index) => ({ ...agerange, index }))
-            units_list.value = theAges.value.map((agerange) => agerange.agetype)
-            units_count.value = theAges.value.reduce((acc, obj) => {
-                const unit = obj.agetype
-                acc[unit] = (acc[unit] || 0) + 1
-                return acc
-            }, {})
 
-            theAges2.value = {
-                datasets: theAges.value.map((agerange) => ({
-                    data: [
-                        { y: agerange.index, x: Math.log10(agerange.younger + 20000) },
-                        { y: agerange.index, x: Math.log10(agerange.older + 20000) }
-                    ],
-                    borderWidth: 1,
-                    borderColor: colorpick(agerange.agetype),
-                    showLine: true,
-                    pointRadius: sizepick(agerange.older, agerange.younger)
-                }))
-            }
+        if (!res1.ok) {
+            throw new Error(res1.statusText)
+        }
 
-            return theAges2.value
-        })
-        .then((ages) => {
-            myChart = new Chart(chartCanvas.value, {
-                type: 'scatter',
-                data: ages,
-                options: {
-                    scales: {
-                        x: {
-                            min: Math.log10(1950 - new Date().getFullYear() + 20000),
-                            ticks: {
-                                callback: function (value, index, values) {
-                                    var newLab = Math.pow(10, value) - 20000
-                                    if (newLab < 0) {
-                                        var sizer = String(Math.round(newLab)).length - 1
-                                    }
-                                    if (newLab >= 0) {
-                                        var sizer = String(Math.round(newLab)).length
-                                    }
-                                    sizer = Math.pow(10, sizer) / 1000
-                                    if (sizer < 1) {
-                                        sizer = 1
-                                    }
-                                    newLab = addCommasToNumber(Math.round(newLab / sizer) * sizer)
-                                    return newLab + ' '
+        const json1 = await res1.json()
+        theAges.value = json1.data
+        theAges.value = theAges.value.filter((agerange) => agerange.older !== null)
+        theAges.value = theAges.value.sort((a, b) => a.older - b.older)
+        theAges.value = theAges.value.map((agerange, index) => ({ ...agerange, index }))
+        units_list.value = theAges.value.map((agerange) => agerange.agetype)
+        units_count.value = theAges.value.reduce((acc, obj) => {
+            const unit = obj.agetype
+            acc[unit] = (acc[unit] || 0) + 1
+            return acc
+        }, {})
+
+        theAges2.value = {
+            datasets: theAges.value.map((agerange) => ({
+                data: [
+                    { y: agerange.index, x: Math.log10(agerange.younger + 20000) },
+                    { y: agerange.index, x: Math.log10(agerange.older + 20000) }
+                ],
+                borderWidth: 1,
+                borderColor: colorpick(agerange.agetype),
+                showLine: true,
+                pointRadius: sizepick(agerange.older, agerange.younger)
+            }))
+        }
+
+        myChart = new Chart(chartCanvas.value, {
+            type: 'scatter',
+            data: theAges2.value,
+            options: {
+                scales: {
+                    x: {
+                        min: Math.log10(1950 - new Date().getFullYear() + 20000),
+                        ticks: {
+                            callback: function (value, index, values) {
+                                var newLab = Math.pow(10, value) - 20000
+                                if (newLab < 0) {
+                                    var sizer = String(Math.round(newLab)).length - 1
                                 }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Age (Years)',
-                                fontSize: 15
+                                if (newLab >= 0) {
+                                    var sizer = String(Math.round(newLab)).length
+                                }
+                                sizer = Math.pow(10, sizer) / 1000
+                                if (sizer < 1) {
+                                    sizer = 1
+                                }
+                                newLab = addCommasToNumber(Math.round(newLab / sizer) * sizer)
+                                return newLab + ' '
                             }
                         },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Dataset Index'
-                            }
+                        title: {
+                            display: true,
+                            text: 'Age (Years)',
+                            fontSize: 15
                         }
                     },
-                    elements: {
-                        point: {
-                            radius: 0
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Dataset Index'
                         }
-                    },
-                    plugins: {
-                        tooltips: {
-                            enabled: false // Disable tooltips
-                        },
-                        legend: {
-                            display: false
-                        }
-                        // zoom: {
-                        //       pan: {
-                        //         enabled: true,
-                        //         mode: 'xy'
-                        //       },
-                        //       zoom: {
-                        //           wheel: {
-                        //               enabled: true,
-                        //           },
-                        //           pinch: {
-                        //               enabled: true
-                        //           },
-                        //          mode: 'xy'
-                        //      }
-                        //  }
                     }
+                },
+                elements: {
+                    point: {
+                        radius: 0
+                    }
+                },
+                plugins: {
+                    tooltips: {
+                        enabled: false // Disable tooltips
+                    },
+                    legend: {
+                        display: false
+                    }
+                    // zoom: {
+                    //       pan: {
+                    //         enabled: true,
+                    //         mode: 'xy'
+                    //       },
+                    //       zoom: {
+                    //           wheel: {
+                    //               enabled: true,
+                    //           },
+                    //           pinch: {
+                    //               enabled: true
+                    //           },
+                    //          mode: 'xy'
+                    //      }
+                    //  }
                 }
-            })
-            chartReady.value = true
-            console.log(Chart.version)
+            }
         })
-        .catch((err) => {
-            console.log(err)
-        })
+        chartReady.value = true
+        console.log(Chart.version)
+    } catch (err) {
+        console.log(err)
+    } finally {
+        loading_temp.value = false
+    }
 }
 
 onMounted(async () => {
     await loadDBages()
 })
-
-loading_temp.value = false
 </script>
 
 <template>

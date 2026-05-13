@@ -14,97 +14,101 @@ const cumulativeData = ref([])
 const loading_this = ref(true)
 const route = useRoute()
 const datasetsDB = ref(null)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 Chart.defaults.font.size = 20
 
-function downloadDBSets() {
-    return authedFetch('/v2.0/apps/constdb/datasetuploads?dbid=' + route.params.databaseid, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((sets) => {
-            return sets.json()
+async function downloadDBSets() {
+    try {
+        const sets = await authedFetch(`/v2.0/apps/constdb/datasetuploads?dbid=${route.params.databaseid}`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((setjson) => {
-            datasetsDB.value = setjson.data
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+
+        if (!sets.ok) {
+            throw new Error(sets.statusText)
+        }
+
+        const setjson = await sets.json()
+        datasetsDB.value = setjson.data
+    } catch (err) {
+        console.log(err)
+        datasetsDB.value = []
+    }
 }
 
 onMounted(async () => {
-    await downloadDBSets()
+    try {
+        await downloadDBSets()
 
-    cumulativeData.value = []
-    let cumulativeValue = 0
-    Object.entries(datasetsDB.value).forEach(([index, obj]) => {
-        cumulativeValue += Number(obj.count)
-        var month = obj.month
-        cumulativeData.value.push({ month, count: cumulativeValue })
-    })
-    const chartData = cumulativeData.value.map(({ count, month }) => ({
-        x: new Date(month).getFullYear() + new Date(month).getMonth() / 12,
-        y: count
-    }))
+        cumulativeData.value = []
+        let cumulativeValue = 0
+        Object.entries(datasetsDB.value).forEach(([index, obj]) => {
+            cumulativeValue += Number(obj.count)
+            var month = obj.month
+            cumulativeData.value.push({ month, count: cumulativeValue })
+        })
+        const chartData = cumulativeData.value.map(({ count, month }) => ({
+            x: new Date(month).getFullYear() + new Date(month).getMonth() / 12,
+            y: count
+        }))
 
-    const myChart2 = new Chart(chartCanvas2.value, {
-        type: 'scatter',
-        data: {
-            datasets: [
-                {
-                    data: chartData,
-                    borderColor: 'darkblue',
-                    showLine: true,
-                    borderWidth: 1,
-                    fill: false,
-                    pointRadius: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    ticks: {
-                        font: {
-                            size: 20
+        const myChart2 = new Chart(chartCanvas2.value, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        data: chartData,
+                        borderColor: 'darkblue',
+                        showLine: true,
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 20
+                            },
+                            callback: function (value) {
+                                var year = Math.floor(value)
+                                var decimal = value - Math.floor(value)
+                                var month = Math.floor(decimal * 12) + 1
+                                var day = Math.round((decimal * 12 - Math.floor(decimal * 12)) * 30) + 1
+                                return '' + month + '/' + day + '/' + year
+                            }
                         },
-                        callback: function (value) {
-                            var year = Math.floor(value)
-                            var decimal = value - Math.floor(value)
-                            var month = Math.floor(decimal * 12) + 1
-                            var day = Math.round((decimal * 12 - Math.floor(decimal * 12)) * 30) + 1
-                            return '' + month + '/' + day + '/' + year
+                        title: {
+                            display: true,
+                            text: 'Date Contributed'
                         }
                     },
-                    title: {
-                        display: true,
-                        text: 'Date Contributed'
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Cumulative Uploads'
+                        }
                     }
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Cumulative Uploads'
+                elements: {
+                    point: {
+                        radius: 0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
                     }
                 }
-            },
-            elements: {
-                point: {
-                    radius: 0
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
             }
-        }
-    })
+        })
+    } finally {
+        loading_this.value = false
+    }
 })
-
-loading_this.value = false
 </script>
 
 <template>

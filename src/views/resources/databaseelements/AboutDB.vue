@@ -22,38 +22,39 @@ const uniqueDBdatasets = ref(null)
 const datasettypes = ref(null)
 const textDB = ref(null)
 const htmlString = ref(null)
-const neotomaapi = import.meta.env.VITE_APP_API_ENDPOINT ?? 'https://api.neotomadb.org'
 
 uniqueSites.value = new Set()
 
-function loadConstDB() {
-    return authedFetch('/v2.0/apps/constdb?dbid=' + route.params.databaseid, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    })
-        .then((res1) => {
-            console.log(res1)
-            return res1.json()
+async function loadConstDB() {
+    try {
+        const res1 = await authedFetch(`/v2.0/apps/constdb?dbid=${route.params.databaseid}`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
         })
-        .then((json1) => {
-            databasekeys.value = json1.data[0]
 
-            currentDB.value = route.params.databaseid
-            contact.value = databasekeys.value.database['contact']
-            email.value = databasekeys.value.database['email'] || 'no email provided'
-            databaseurl.value = databasekeys.value.database['url'] || 'no URL provided'
-            databasename.value = databasekeys.value.database['databasename']
-            uniqueDBsites.value = databasekeys.value.sitecount
-            datasettypes.value = databasekeys.value.datasettypes
-            loading_ab.value = false
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+        if (!res1.ok) {
+            throw new Error(res1.statusText)
+        }
+
+        const json1 = await res1.json()
+        databasekeys.value = json1.data[0]
+
+        currentDB.value = route.params.databaseid
+        contact.value = databasekeys.value.database.contact
+        email.value = databasekeys.value.database.email || 'no email provided'
+        databaseurl.value = databasekeys.value.database.url || 'no URL provided'
+        databasename.value = databasekeys.value.database.databasename
+        uniqueDBsites.value = databasekeys.value.sitecount
+        datasettypes.value = databasekeys.value.datasettypes
+    } catch (err) {
+        console.log(err)
+    } finally {
+        loading_ab.value = false
+    }
 }
 
-onMounted(() => {
-    loadConstDB()
+onMounted(async () => {
+    await loadConstDB()
     if (textobj.filter((a) => a.dbID == route.params.databaseid).length != 0) {
         let texttry = textobj.filter((a) => a.dbID == route.params.databaseid)[0].dbDescrip
         textDB.value = texttry
