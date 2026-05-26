@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, ref, defineAsyncComponent } from 'vue'
+import { onMounted, ref, computed, defineAsyncComponent } from 'vue'
 import Panel from 'primevue/panel'
 import Card from 'primevue/card'
 import { useRoute, useRouter } from 'vue-router'
 import VueCookies from 'vue-cookies'
 import { authedFetch } from '@/functions/apicalls'
+import useTokens from '@/stores/auth.store'
 
 const ContactDetails = defineAsyncComponent(() => import('@/views/resources/contactelements/ContactDetails.vue'))
 const ContactPublications = defineAsyncComponent(
@@ -18,6 +19,9 @@ const ContactDatasets = defineAsyncComponent(
 const ContactSearch = defineAsyncComponent(
     () => import('@/views/resources/contactelements/ContactSearch.vue')
 )
+
+const { user } = useTokens()
+const userName = computed(() => user.value?.data?.orcid?.name ?? null)
 
 const route = useRoute()
 const router = useRouter()
