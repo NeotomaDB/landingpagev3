@@ -2,6 +2,14 @@
 import { RouterView } from 'vue-router'
 import LandingPageHeader from '@/views/pagedecorators/PageHeader.vue'
 import LandingPageFooter from '@/views/pagedecorators/PageFooter.vue'
+import { onMounted } from 'vue';
+import useTokens from '@/stores/auth.store';
+
+const { refreshSession } = useTokens();
+
+onMounted(async () => {
+  await refreshSession();
+});
 </script>
 
 <template>

@@ -18,6 +18,9 @@
 
 import { reactive, toRefs, computed } from 'vue'
 import VueCookies from 'vue-cookies'
+// Note: apicalls.js also imports useTokens — circular dep is safe here because
+// authedFetchJson is only referenced inside function bodies, never at module init time.
+import { authedFetchJson } from '@/functions/apicalls'
 
 const apiLocation = import.meta.env.VITE_APP_API_ENDPOINT || 'https://api.neotomadb.org'
 const userValidation = `${apiLocation}/v2.0/apps/orcids/validate`
@@ -140,10 +143,34 @@ export default function useTokens() {
         return true
     })
 
+    const refreshSession = async () => {
+        // Skip if there's no active session — nothing to verify
+        if (!state.user?.data?.neotoken?.sessionuuid) return null
+
+        try {
+            const json = await authedFetchJson('/v2.0/apps/orcids/me')
+            // Update in-memory user state with fresh data from the server
+            state.user = {
+                ...state.user,
+                data: {
+                    ...state.user.data,
+                    orcid: { name: json.data.name, orcid: json.data.orcid },
+                    contactid: json.data.contactid,
+                },
+            }
+            return json.data
+        } catch (err) {
+            // Most likely a 401 — authedFetchJson already cleared the cookie
+            console.warn('Session check failed; user logged out.', err.message)
+            return null
+        }
+    }
+
     return {
         ...toRefs(state),
         fetchTokens,
         logoutTokens,
-        hasValidTokens
+        hasValidTokens,
+        refreshSession,
     }
 }
