@@ -103,6 +103,10 @@ onMounted(async () => {
 h3 {
     padding-left: 10px;
 }
+
+.taxon-summary li {
+    line-height: 1.5;
+}
 </style>
 
 <template>
@@ -112,24 +116,24 @@ h3 {
         </template>
         <div v-if="loading_ab">
             <h3>Taxon Summary</h3>
-            <ul>
-                <li>Authority: {{ author }}</li>
-                <li>Publication: {{ pub }}</li>
+            <ul class="taxon-summary">
+                <li><strong>Authority:</strong> {{ author }}</li>
+                <li><strong>Publication:</strong> {{ pub }}</li>
                 <li>
-                    Higher Taxon: <a :href="link">{{ highname }} </a>
+                    <strong>Higher Taxon:</strong> <a :href="link">{{ highname }} </a>
                 </li>
-                <li>Status: {{ status }}</li>
-                <li>Ecological Group: {{ ecolgroupname }}</li>
+                <li><strong>Status:</strong> {{ status }}</li>
+                <li><strong>Ecological Group:</strong> {{ ecolgroupname }}</li>
                 <div v-for="item in externals">
                     <div v-if="item.extdatabasename == 'GBIF Backbone Taxonomy'">
                         <li>
-                            {{ item.extdatabasename }}:
+                            <strong>{{ item.extdatabasename }}:</strong>
                             <a :href="`https://www.gbif.org/species/${item.exttaxonid}`">{{ item.exttaxonid }}</a>
                         </li>
                     </div>
                     <div v-else-if="item.extdatabasename == 'NCBI Taxonomy Database'">
                         <li>
-                            {{ item.extdatabasename }}:
+                            <strong>{{ item.extdatabasename }}:</strong>
                             <a
                                 :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${item.exttaxonid}`"
                                 >{{ item.exttaxonid }}</a
@@ -137,7 +141,7 @@ h3 {
                         </li>
                     </div>
                     <div v-else-if="item.extdatabasename != null">
-                        <li>{{ item.extdatabasename }}: {{ item.exttaxonid }}</li>
+                        <li><strong>{{ item.extdatabasename }}:</strong> {{ item.exttaxonid }}</li>
                     </div>
                 </div>
             </ul>
