@@ -47,3 +47,10 @@ passwords.txt
 .github/instructions/snyk_rules.instructions.md
 
 yarn.lock
+
+# Yarn 4 (Berry) local artifacts
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+.pnp.*

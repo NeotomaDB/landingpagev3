@@ -29,21 +29,30 @@ jobs:
         with:
           node-version: '22'
 
-      # setup-node's built-in `cache: npm` is not used: it requires a committed
-      # lockfile, and package-lock.json is gitignored in this repo.
-      - name: Cache npm downloads
+      # Must run after setup-node: corepack installs its shims into the active
+      # Node's bin dir. The runner's global yarn is 1.x and refuses to run a
+      # project whose package.json pins "packageManager": "yarn@4.x".
+      - name: Enable Corepack
+        run: corepack enable
+
+      # setup-node's built-in `cache: yarn` is not used: it requires a committed
+      # lockfile, and yarn.lock is gitignored in this repo.
+      - name: Cache Yarn downloads
         uses: actions/cache@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('package.json') }}
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('package.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-
+            ${{ runner.os }}-yarn-
 
+      # --no-immutable is required because no lockfile is committed: Yarn 4
+      # enables immutable installs automatically whenever CI=true, which would
+      # fail on the lockfile it has to generate.
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: yarn install --no-immutable
 
       - name: Build
-        run: npm run build
+        run: yarn build
 
       - name: Deploying application to Amazon S3
         uses: dvelasquez/deploy-s3-action@main
