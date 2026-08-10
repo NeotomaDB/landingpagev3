@@ -19,7 +19,7 @@ const user = ref(null)
 const isValidating = ref(false)
 
 // Get the store functions and state:
-const { access_token, fetchTokens, logoutTokens, hasValidTokens } = useTokens()
+const { access_token, error, fetchTokens, logoutTokens, hasValidTokens } = useTokens()
 
 // Computed property for button state:
 const buttonType = computed(() => {
@@ -42,6 +42,9 @@ watch(
 )
 
 function handleLogin() {
+    // Drop any message from a previous rejected attempt, so it can't linger
+    // next to a login that's still in progress.
+    error.value = null
     window.location.href = baseUrl
 }
 
@@ -81,6 +84,8 @@ async function handleLogout() {
                 <i class="pi pi-sign-in"></i>
                 Log Into ORCID
             </Button>
+            <!-- Why a login was refused: not a steward, expired ORCID token. -->
+            <small v-if="error" class="login-error" role="alert">{{ error }}</small>
         </div>
 
         <!-- Logout State -->
@@ -103,3 +108,15 @@ async function handleLogout() {
         </div>
     </div>
 </template>
+
+<style scoped>
+/* The only styled class in this component: an unstyled error is easy to miss
+   next to the login button. */
+.login-error {
+    display: block;
+    max-width: 22rem;
+    margin-top: 0.35rem;
+    color: var(--p-red-600, #b91c1c);
+    line-height: 1.3;
+}
+</style>
