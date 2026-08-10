@@ -24,24 +24,26 @@ jobs:
             echo "VITE_APP_API_ENDPOINT=https://api-dev.neotomadb.org" >> "$GITHUB_ENV"
           fi
           
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-        
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          node-version: '22'
+
+      # setup-node's built-in `cache: npm` is not used: it requires a committed
+      # lockfile, and package-lock.json is gitignored in this repo.
+      - name: Cache npm downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package.json') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-npm-
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
-        
-      - name: Build dependencies
-        run: yarn build
+        run: npm install --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
 
       - name: Deploying application to Amazon S3
         uses: dvelasquez/deploy-s3-action@main
