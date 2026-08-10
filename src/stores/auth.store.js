@@ -49,8 +49,11 @@ export default function useTokens() {
             }
 
             if (userValidation) {
+                // Keep the full API response shape ({status, data, message}) — every
+                // consumer reads through `.data` (UserPage, refreshSession), so
+                // unwrapping it here left `state.user` shaped differently after a
+                // reload than after a fresh login.
                 state.user = userValidation
-                state.user = state.user['data']
             } else {
                 state.user = null
             }
@@ -72,7 +75,10 @@ export default function useTokens() {
 
     // Validate user with backend
     async function validateUser() {
-        if (!hasValidTokens.value) {
+        // All we need to exchange is an ORCID token. Gating this on hasValidTokens
+        // used to mean a stale expired session blocked a fresh login, and could
+        // clear access_token out from under the fetch below.
+        if (!state.access_token?.access_token) {
             return
         }
 
@@ -98,13 +104,22 @@ export default function useTokens() {
             })
 
             if (response.status !== 200) {
+                // Read the reason before discarding the response. The API sends a
+                // human-readable `message` for the cases a person can act on — a
+                // 403 for "not a steward", a 401 for a dead ORCID token — and
+                // without this the login button just appeared to do nothing.
+                const body = await response.json().catch(() => null)
                 console.log('Token validation failed, logging out')
+                // logoutTokens() resets state.error, so set the message after it.
                 logoutTokens()
+                state.error = body?.message || 'Login failed. Please try again.'
                 return
             }
 
+            // The API returns the session's own expiry in data.neotoken.expiresat,
+            // so there's nothing to graft on here. (We used to copy the ORCID
+            // token's expiry, which was both undefined and the wrong clock.)
             const userData = await response.json()
-            userData['data']['user']['expires_at'] = state.access_token.expires_at
             VueCookies.set('orcid_user', userData)
             VueCookies.remove('orcid_token')
             state.user = userData
@@ -117,27 +132,35 @@ export default function useTokens() {
         }
     }
 
+    /**
+     * When the Neotoma session expires, in epoch ms, or null if we don't know.
+     *
+     * Postgres hands `expiresat` back as an ISO string, so it has to be parsed
+     * before comparing against Date.now(). Read it from the session it belongs
+     * to — never from state.access_token, which is null on every page load after
+     * login (the orcid_token cookie is dropped once validated).
+     */
+    const sessionExpiry = () => {
+        const raw = state.user?.data?.neotoken?.expiresat
+        if (!raw) return null
+        const parsed = Date.parse(raw)
+        return Number.isNaN(parsed) ? null : parsed
+    }
+
     const hasValidTokens = computed(() => {
-        console.log(state)
         if (state.access_token == null && state.user == null) {
             return false
         }
 
-        // Check if token has required properties
-        // if (!state.access_token.access_token) return false;
-
-        // Check if token is expired
-        if (state.user) {
-            // This should post back to the API to check.
-            if (state.user.expires_at) {
-                console.log('testing time.')
-                const isExpired = Date.now() >= state.access_token.expires_at
-                if (isExpired) {
-                    console.log('Token has expired')
-                    logoutTokens()
-                    return false
-                }
-            }
+        // The API enforces expiry on every request; this is the local check so the
+        // header doesn't advertise a session that's already dead. Sessions minted
+        // before the API returned expiresat have no expiry here — those fall back
+        // to being caught by the first 401.
+        const expiresAt = sessionExpiry()
+        if (expiresAt !== null && Date.now() >= expiresAt) {
+            console.log('Neotoma session has expired')
+            logoutTokens()
+            return false
         }
 
         return true
@@ -148,7 +171,7 @@ export default function useTokens() {
         if (!state.user?.data?.neotoken?.sessionuuid) return null
 
         try {
-            const json = await authedFetchJson('/v2.0/apps/orcids/me')
+            const json = await authedFetchJson('/v2.0/apps/orcids/steward')
             // Update in-memory user state with fresh data from the server
             state.user = {
                 ...state.user,
@@ -156,6 +179,9 @@ export default function useTokens() {
                     ...state.user.data,
                     orcid: { name: json.data.name, orcid: json.data.orcid },
                     contactid: json.data.contactid,
+                    // /orcids/steward reports the session's current expiry; keep it in
+                    // sync so hasValidTokens is checking the server's number.
+                    neotoken: { ...state.user.data.neotoken, expiresat: json.data.expiresat },
                 },
             }
             return json.data
